@@ -6,6 +6,7 @@
 package bridgempp;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -23,14 +24,20 @@ public class SocketService implements BridgeService {
 
     private ServerSocket serverSocket;
     private int listenPort;
+    private String listenAddress;
     private HashMap<Integer, SocketClient> connectedSockets;
     private ServerListener serverListener;
 
     @Override
-    public void connect(String args) {
+    public void connect(String argString) {
+        String[] args = argString.split("; ");
+        if (args.length != 2) {
+            throw new UnsupportedOperationException("Incorrect options for Socket Service: " + argString);
+        }
         ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
 
-        listenPort = Integer.parseInt(args);
+        listenPort = Integer.parseInt(args[1]);
+        listenAddress = args[2];
         connectedSockets = new HashMap<>();
         serverListener = new ServerListener();
         new Thread(serverListener, "Socket Server Listener").start();
@@ -81,7 +88,7 @@ public class SocketService implements BridgeService {
             ShadowManager.log(Level.INFO, "Starting TCP Server Socket Listener");
 
             try {
-                serverSocket = new ServerSocket(listenPort);
+                serverSocket = new ServerSocket(listenPort, 10, InetAddress.getByName(listenAddress));
                 serverSocket.setSoTimeout(5000);
                 while (!serverSocket.isClosed()) {
                     try {
