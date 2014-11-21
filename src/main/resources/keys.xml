@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<bridgempp>
+    <keys>
+        <!-- Example Key -->
+        <key>
+            <key>
+                bridgempp-key
+            </key>
+            <permissions>
+                8191
+            </permissions>
+            <useOnce>
+                false
+            </useOnce>
+        </key>
+    </keys>
+</bridgempp>
