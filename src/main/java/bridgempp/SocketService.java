@@ -37,7 +37,7 @@ public class SocketService implements BridgeService {
         ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
 
         listenPort = Integer.parseInt(args[1]);
-        listenAddress = args[2];
+        listenAddress = args[0];
         connectedSockets = new HashMap<>();
         serverListener = new ServerListener();
         new Thread(serverListener, "Socket Server Listener").start();
