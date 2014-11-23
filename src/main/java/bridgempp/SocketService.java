@@ -138,6 +138,7 @@ public class SocketService implements BridgeService {
                     CommandInterpreter.processMessage(line, endpoint);
                 }
                 socket.close();
+                GroupManager.removeEndpointFromAllGroups(endpoint);
                 connectedSockets.remove(randomIdentifier);
             } catch (IOException ex) {
                 Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);

@@ -34,7 +34,7 @@ public class GroupManager {
     //Find Group, finds the First Group with name IGNORES CASE!
     public static Group findGroup(String name) {
         for (int i = 0; i < groups.size(); i++) {
-        	String groupname = groups.get(i).getName();
+            String groupname = groups.get(i).getName();
             if (groupname != null && groupname.equalsIgnoreCase(name)) {
                 return groups.get(i);
             }
@@ -103,5 +103,11 @@ public class GroupManager {
             listGroups += "Group: " + groups.get(i).getName() + "\n" + groups.get(i).toString();
         }
         return listGroups;
+    }
+
+    static void removeEndpointFromAllGroups(Endpoint endpoint) {
+        for (int i = 0; i < groups.size(); i++) {
+            groups.get(i).removeEndpoint(endpoint);
+        }
     }
 }
