@@ -45,7 +45,8 @@ public class SQLManager {
             statement = connection.prepareStatement(
                     "CREATE TABLE Groups (" +
                             "id int NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-                            "name varchar(255) NOT NULL,"
+                            "name varchar(255) NOT NULL," +
+                            "members FOREIGN_KEY "
             );
         } catch (SQLException ex) {
             Logger.getLogger(SQLManager.class.getName()).log(Level.SEVERE, null, ex);
