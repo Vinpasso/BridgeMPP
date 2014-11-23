@@ -1042,8 +1042,8 @@ class ReaderThread(threading.Thread):
 								
 								#self.signalInterface.send("notification_groupParticipantAdded", (fromAttribute, addSubject, author, timestamp, msgId, receiptRequested))
 								
-							if removeSubject is not None:
-								self.signalInterface.send("notification_groupParticipantRemoved", (fromAttribute, removeSubject, author, timestamp, msgId, receiptRequested))
+							#if removeSubject is not None:
+								#self.signalInterface.send("notification_groupParticipantRemoved", (fromAttribute, removeSubject, author, timestamp, msgId, receiptRequested))
 
 							#self.sendNotificationReceived(notificationTo, notificationId, fromJid, participant, notificationType, None)
 
