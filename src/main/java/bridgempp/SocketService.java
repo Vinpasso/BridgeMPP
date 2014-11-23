@@ -6,6 +6,7 @@
 package bridgempp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -65,7 +66,11 @@ public class SocketService implements BridgeService {
     @Override
     public void sendMessage(String target, String response) {
         try {
-            connectedSockets.get(Integer.parseInt(target)).socket.getOutputStream().write((response + "\n").getBytes());
+            SocketClient conSockets = connectedSockets.get(Integer.parseInt(target));
+            if(conSockets == null){
+            	return;
+            }
+            conSockets.socket.getOutputStream().write((response + "\n").getBytes());
         } catch (IOException ex) {
             Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
         }
