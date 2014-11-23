@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Vincent Bode
  */
+
 public class BridgeMPPBotExample {
     static Socket socket;
     static Scanner bufferedReader;
@@ -72,5 +73,4 @@ public class BridgeMPPBotExample {
             this.message = message;
         }
     }
-
 }
