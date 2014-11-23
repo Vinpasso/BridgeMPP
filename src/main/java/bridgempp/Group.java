@@ -84,7 +84,7 @@ public class Group {
         String members = "";
         for(int i = 0; i < getEndpoints().size(); i++)
         {
-            members += "Member: " + getEndpoints().get(i).toString() + "\n";
+            members += "Member: " + getEndpoints().get(i).toString(false) + "Alias: " + getEndpoints().get(i).toString(true) + "\n";
         }
         return members;
     }
