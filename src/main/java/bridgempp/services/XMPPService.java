@@ -60,8 +60,7 @@ public class XMPPService implements BridgeService {
                 throw new UnsupportedOperationException("XMPP Configuration Error: " + parameters);
             }
             ConnectionConfiguration configuration = new ConnectionConfiguration(args[0], Integer.parseInt(args[1]), args[2]);
-            if(Boolean.parseBoolean(args[6]))
-            {
+            if (Boolean.parseBoolean(args[6])) {
                 configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
                 configuration.setSocketFactory(new DummySSLSocketFactory());
             }
@@ -75,16 +74,14 @@ public class XMPPService implements BridgeService {
 
                 @Override
                 public boolean accept(Packet packet) {
-                    if(packet instanceof Presence)
-                    {
-                        if(((Presence)packet).getType().equals(Presence.Type.subscribe))
-                        {
+                    if (packet instanceof Presence) {
+                        if (((Presence) packet).getType().equals(Presence.Type.subscribe)) {
                             return true;
                         }
                     }
                     return false;
                 }
-                
+
             });
             connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
             chatmanager = ChatManager.getInstanceFor(connection);
@@ -96,8 +93,6 @@ public class XMPPService implements BridgeService {
         }
 
     }
-    
-    
 
     @Override
     public void disconnect() {
@@ -123,6 +118,11 @@ public class XMPPService implements BridgeService {
     @Override
     public String getName() {
         return "XMPP";
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return true;
     }
 
     @Override

@@ -115,6 +115,11 @@ public class MailService implements BridgeService {
     }
 
     @Override
+    public boolean isPersistent() {
+        return true;
+    }
+
+    @Override
     public void addEndpoint(Endpoint endpoint) {
         endpoints.add(endpoint);
     }

@@ -24,8 +24,10 @@ public interface BridgeService {
     //Send message bridged from other Messages
     public void sendMessage(String target, String response);
     
-    //Get user-friendly name of this endpoint
+    //Get user-friendly name of this Service
     public String getName();
+    //Check whether this Service is persistent across restarts
+    public boolean isPersistent();
     
     //Add Endpoint from Save to list of Endpoints
     public void addEndpoint(Endpoint endpoint);

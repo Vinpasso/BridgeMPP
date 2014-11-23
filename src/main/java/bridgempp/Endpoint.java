@@ -113,7 +113,7 @@ public class Endpoint {
 
     //Always creates a new Endpoint in List. Parameter node is the list in which the endpoint is created with appended "."
     public static void writeEndpoint(Endpoint endpoint, XMLConfiguration configuration, String node) {
-    	if(endpoint.bridgeService instanceof SocketService){
+    	if(!endpoint.bridgeService.isPersistent()){
     		return;
     	}
         configuration.addProperty(node + "endpoint(-1).service", endpoint.getService().getName());

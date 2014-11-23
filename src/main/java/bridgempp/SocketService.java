@@ -76,6 +76,11 @@ public class SocketService implements BridgeService {
         return "TCPSocket";
     }
 
+    @Override
+    public boolean isPersistent() {
+        return false;
+    }
+
     //Non Persistent Service. Adding an endpoint from save does nothing
     @Override
     public void addEndpoint(Endpoint endpoint) {

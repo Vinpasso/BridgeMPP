@@ -37,20 +37,18 @@ public class WhatsappService implements BridgeService {
     //private PrintStream printStream;
     private LinkedBlockingQueue<String> senderQueue;
     private Thread senderThread;
-    
+
     @Override
     public void connect(String argString) {
         ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
         String[] args = argString.split("; ");
-        if(args.length != 3)
-        {
+        if (args.length != 3) {
             throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
         }
         String yowsupConfig = "cc=" + args[0] + "\nphone=" + args[1] + "\npassword=" + args[2];
         try {
             File configFile = new File(BridgeMPP.getPathLocation() + "/yowsup/src/credentials.config");
-            if(!configFile.exists())
-            {
+            if (!configFile.exists()) {
                 configFile.createNewFile();
             }
             PrintWriter configFileWriter = new PrintWriter(configFile);
@@ -91,6 +89,11 @@ public class WhatsappService implements BridgeService {
     @Override
     public String getName() {
         return "Whatsapp";
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return true;
     }
 
     @Override

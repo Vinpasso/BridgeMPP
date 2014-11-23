@@ -52,6 +52,11 @@ public class ConsoleService implements BridgeService {
         return "Console";
     }
 
+    @Override
+    public boolean isPersistent() {
+        return true;
+    }
+
     //Only one Endpoint. Adding a second does nothing
     @Override
     public void addEndpoint(Endpoint endpoint) {
