@@ -132,7 +132,7 @@ public class SocketService implements BridgeService {
         public void run() {
             ShadowManager.log(Level.INFO, "TCP client has connected");
             try {
-                Scanner scanner = new Scanner(socket.getInputStream());
+                Scanner scanner = new Scanner(socket.getInputStream(), "UTF-8");
                 while (scanner.hasNext()) {
                     String line = scanner.nextLine();
                     CommandInterpreter.processMessage(line, endpoint);
