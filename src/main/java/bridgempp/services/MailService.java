@@ -91,19 +91,19 @@ public class MailService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(bridgempp.Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
+    public void sendMessage(bridgempp.Message message) {
         try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(username);
-            message.setRecipients(Message.RecipientType.TO, target);
-            message.setSubject(response);
-            message.setText(response);
-            Transport.send(message, username, password);
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.setFrom(username);
+            mimeMessage.setRecipients(Message.RecipientType.TO, message.getTarget().getTarget());
+            mimeMessage.setSubject(message.getMessage());
+            mimeMessage.setText(message.getMessage());
+            Transport.send(mimeMessage, username, password);
         } catch (MessagingException ex) {
             Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -196,7 +196,8 @@ public class MailService implements BridgeService {
                 String sender = message.getFrom()[0].toString();
                 for (int i = 0; i < endpoints.size(); i++) {
                     if (endpoints.get(i).getTarget().equals(sender)) {
-                        CommandInterpreter.processMessage(message.getContent().toString(), endpoints.get(i));
+                        bridgempp.Message bMessage = new bridgempp.Message(endpoints.get(i), message.getContent().toString());
+                        CommandInterpreter.processMessage(bMessage);
                         folder.setFlags(new Message[]{message}, new Flags(Flags.Flag.DELETED), true);
                         folder.expunge();
                         return;
@@ -204,7 +205,8 @@ public class MailService implements BridgeService {
                 }
                 Endpoint endpoint = new Endpoint(MailService.this, message.getFrom()[0].toString());
                 endpoints.add(endpoint);
-                CommandInterpreter.processMessage(message.getContent().toString(), endpoint);
+                bridgempp.Message bMessage = new bridgempp.Message(endpoint, message.getContent().toString());
+                CommandInterpreter.processMessage(bMessage);
             } catch (MessagingException | IOException ex) {
                 Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
             }

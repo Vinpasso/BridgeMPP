@@ -12,25 +12,32 @@ import java.util.ArrayList;
  * @author Vinpasso
  */
 public class Group {
-    private ArrayList<Endpoint> endpoints;
+    private final ArrayList<Endpoint> endpoints;
     private String name;
     
     //Send message to all recipients in this group
-    public void sendMessage(String message)
+    public void sendMessage(Message message)
     {
+        message.setGroup(this);
         for(int i = 0; i < getEndpoints().size(); i++)
         {
             getEndpoints().get(i).sendMessage(message);
         }
     }
     
-    //Send message without Loopback to sender
-    public void sendMessageWithoutLoopback(String message, Endpoint sender)
+    public void sendMessage(String message)
     {
+        throw new UnsupportedOperationException();
+    }
+    
+    //Send message without Loopback to sender
+    public void sendMessageWithoutLoopback(Message message)
+    {
+        message.setGroup(this);
         for(int i = 0; i < getEndpoints().size(); i++)
         {
             //Check that Sender does not get the Message sent back to him
-            if(!endpoints.get(i).equals(sender))
+            if(!endpoints.get(i).equals(message.getSender()))
             {
                 getEndpoints().get(i).sendMessage(message);
             }

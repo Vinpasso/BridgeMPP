@@ -9,6 +9,7 @@ import bridgempp.BridgeMPP;
 import bridgempp.BridgeService;
 import bridgempp.CommandInterpreter;
 import bridgempp.Endpoint;
+import bridgempp.Message;
 import bridgempp.ShadowManager;
 import java.util.Base64;
 import java.io.File;
@@ -72,15 +73,15 @@ public class WhatsappService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
+    public void sendMessage(Message message) {
         try {
-            senderQueue.add(target);
-            senderQueue.add(Base64.getEncoder().encodeToString(response.getBytes("UTF-8")));
+            senderQueue.add(message.getTarget().getTarget());
+            senderQueue.add(Base64.getEncoder().encodeToString(message.getMessage().getBytes("UTF-8")));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -197,7 +198,8 @@ public class WhatsappService implements BridgeService {
                         for (int i = 0; i < endpoints.size(); i++) {
                             if (endpoints.get(i).getTarget().equals(sender)) {
                                 endpoints.get(i).setExtra(extra);
-                                CommandInterpreter.processMessage(message, endpoints.get(i));
+                                Message bMessage = new Message(endpoints.get(i), message);
+                                CommandInterpreter.processMessage(bMessage);
                                 found = true;
                                 break;
                             }
@@ -206,7 +208,8 @@ public class WhatsappService implements BridgeService {
                             Endpoint endpoint = new Endpoint(WhatsappService.this, sender);
                             endpoint.setExtra(extra);
                             endpoints.add(endpoint);
-                            CommandInterpreter.processMessage(message, endpoint);
+                            Message bMessage = new Message(endpoint, message);
+                            CommandInterpreter.processMessage(bMessage);
                         }
                     } catch (UnsupportedEncodingException ex) {
                         Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);

@@ -14,68 +14,68 @@ import bridgempp.PermissionsManager.Permissions;
  */
 public class CommandInterpreter {
 
-    //Interpret a String command with leading !
-    public static void interpretCommand(String command, Endpoint sender) {
-        if (command.charAt(0) != '!') {
-            sender.sendMessage("Internal Server Error! Command " + command + " not a command but recieved interpret request");
-            throw new UnsupportedOperationException("Interpret Command: " + command + " Not a command");
+    //Interpret a Message message with leading !
+    public static void interpretCommand(Message message) {
+        if (message.getMessage().charAt(0) != '!') {
+            message.getSender().sendMessage("Internal Server Error! Command " + message.getMessage() + " not a message.getMessage() but recieved interpret request");
+            throw new UnsupportedOperationException("Interpret Command: " + message.getMessage() + " Not a message.getMessage()");
         }
-        String operator = command.toLowerCase();
+        String operator = message.getMessage().toLowerCase();
         if (operator.startsWith("!creategroup")) {
-            CommandGroupOperations.cmdCreateGroup(command, sender);
+            CommandGroupOperations.cmdCreateGroup(message);
         } else if (operator.startsWith("!removegroup")) {
-            CommandGroupOperations.cmdRemoveGroup(command, sender);
+            CommandGroupOperations.cmdRemoveGroup(message);
         } else if (operator.startsWith("!subscribegroup")) {
-            CommandGroupOperations.cmdSubscribeGroup(command, sender);
+            CommandGroupOperations.cmdSubscribeGroup(message);
         } else if (operator.startsWith("!unsubscribegroup")) {
-            CommandGroupOperations.cmdUnsubscribeGroup(command, sender);
+            CommandGroupOperations.cmdUnsubscribeGroup(message);
         } else if (operator.startsWith("!listgroups")) {
-            CommandGroupOperations.cmdListGroups(sender);
+            CommandGroupOperations.cmdListGroups(message);
         } else if (operator.startsWith("!listmembers")) {
-            CommandGroupOperations.cmdListMembers(command, sender);
+            CommandGroupOperations.cmdListMembers(message);
         } else if (operator.startsWith("!addshadow")) {
-            CommandShadowOperations.cmdAddShadow(sender);
+            CommandShadowOperations.cmdAddShadow(message);
         } else if (operator.startsWith("!removeshadow")) {
-            CommandShadowOperations.cmdRemoveShadow(sender);
+            CommandShadowOperations.cmdRemoveShadow(message);
         } else if (operator.startsWith("!listshadows")) {
-            CommandShadowOperations.cmdListShadows(sender);
+            CommandShadowOperations.cmdListShadows(message);
         } else if (operator.startsWith("!exit")) {
-            CommandServerOperations.cmdExit(sender);
+            CommandServerOperations.cmdExit(message);
         } else if (operator.startsWith("!generatepermanentkey")) {
-            CommandPermissionOperations.cmdGeneratePermanentKey(sender, command);
+            CommandPermissionOperations.cmdGeneratePermanentKey(message);
         } else if (operator.startsWith("!generateonetimekey")) {
-            CommandPermissionOperations.cmdGenerateOneTimeKey(sender, command);
+            CommandPermissionOperations.cmdGenerateOneTimeKey(message);
         } else if (operator.startsWith("!removekey")) {
-            CommandPermissionOperations.cmdRemoveKey(sender, command);
+            CommandPermissionOperations.cmdRemoveKey(message);
         } else if (operator.startsWith("!usekey")) {
-            CommandPermissionOperations.cmdUseKey(sender, command);
+            CommandPermissionOperations.cmdUseKey(message);
         } else if (operator.startsWith("!listkey")) {
-            CommandPermissionOperations.cmdListKeys(sender, command);
+            CommandPermissionOperations.cmdListKeys(message);
         } else if (operator.startsWith("!printpermissions")) {
-            CommandPermissionOperations.cmdPrintPermissions(sender, command);
+            CommandPermissionOperations.cmdPrintPermissions(message);
         } else if (operator.startsWith("!removepermissions")) {
-            CommandPermissionOperations.cmdRemovePermissions(sender, command);
+            CommandPermissionOperations.cmdRemovePermissions(message);
         } else if (operator.startsWith("!createalias")) {
-            CommandAliasOperations.cmdCreateAlias(sender, command);
+            CommandAliasOperations.cmdCreateAlias(message);
         } else if (operator.startsWith("!importalias")) {
-            CommandAliasOperations.cmdImportAliasList(sender, command);
+            CommandAliasOperations.cmdImportAliasList(message);
         } else {
-            sender.sendMessage("BridgeMPP: Error: Command not found");
+            message.getSender().sendMessage("BridgeMPP: Error: Command not found");
         }
     }
 
     //Process incomming messages and forward them to targets
-    public static void processMessage(String line, Endpoint sender) {
-        if (line == null || line.length() == 0) {
+    public static void processMessage(Message message) {
+        if (message.getMessage() == null || message.getMessage().length() == 0) {
             return;
         }
-        if (isCommand(line)) {
-            interpretCommand(line, sender);
+        if (isCommand(message.getMessage())) {
+            interpretCommand(message);
         } else {
             for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
-                ShadowManager.shadowEndpoints.get(i).sendMessage("Shadow: " + sender.toString() + ": " + line);
+                ShadowManager.shadowEndpoints.get(i).sendMessage(message);
             }
-            GroupManager.sendMessageToAllSubscribedGroupsWithoutLoopback(sender.toString() + ": " + line, sender);
+            GroupManager.sendMessageToAllSubscribedGroupsWithoutLoopback(message);
         }
     }
 
@@ -99,7 +99,7 @@ public class CommandInterpreter {
         }
     }
 
-    //Test if input String is actually a command
+    //Test if input String is actually a message.getMessage()
     public static boolean isCommand(String command) {
         if (command.length() == 0) {
             return false;

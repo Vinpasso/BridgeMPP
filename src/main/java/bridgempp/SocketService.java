@@ -58,14 +58,14 @@ public class SocketService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
+    public void sendMessage(Message message) {
         try {
-            connectedSockets.get(Integer.parseInt(target)).socket.getOutputStream().write((response + "\n").getBytes("UTF-8"));
+            connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket.getOutputStream().write((message.getMessage() + "\n").getBytes("UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -135,7 +135,8 @@ public class SocketService implements BridgeService {
                 Scanner scanner = new Scanner(socket.getInputStream(), "UTF-8");
                 while (scanner.hasNext()) {
                     String line = scanner.nextLine();
-                    CommandInterpreter.processMessage(line, endpoint);
+                    Message message = new Message(endpoint, line);
+                    CommandInterpreter.processMessage(message);
                 }
                 socket.close();
                 GroupManager.removeEndpointFromAllGroups(endpoint);

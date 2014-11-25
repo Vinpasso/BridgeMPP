@@ -13,13 +13,13 @@ import java.util.logging.Level;
  */
 public class CommandServerOperations {
 
-    static void cmdExit(Endpoint sender) {
-        if (CommandInterpreter.checkPermission(sender, PermissionsManager.Permission.EXIT)) {
-            ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + sender.toString());
-            sender.sendMessage("BridgeMPP: Shutting down");
+    static void cmdExit(Message message) {
+        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.EXIT)) {
+            ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + message.getSender().toString());
+            message.getSender().sendMessage("BridgeMPP: Shutting down");
             BridgeMPP.exit();
         } else {
-            sender.sendMessage("BridgeMPP: Access denied");
+            message.getSender().sendMessage("BridgeMPP: Access denied");
         }
     }
     

@@ -8,6 +8,7 @@ package bridgempp.services;
 import bridgempp.BridgeService;
 import bridgempp.CommandInterpreter;
 import bridgempp.Endpoint;
+import bridgempp.Message;
 import bridgempp.ShadowManager;
 import com.skype.Chat;
 import com.skype.ChatMessage;
@@ -43,17 +44,17 @@ public class SkypeService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
+    public void sendMessage(Message message) {
         try {
             Chat[] chats = Skype.getAllChats();
             for (int i = 0; i < chats.length; i++) {
-                if (chats[i].getId().equals(target)) {
-                    chats[i].send(response);
+                if (chats[i].getId().equals(message.getTarget().getTarget())) {
+                    chats[i].send(message.getMessage());
                     return;
                 }
             }
@@ -91,14 +92,16 @@ public class SkypeService implements BridgeService {
             for (int i = 0; i < endpoints.size(); i++) {
                 if (endpoints.get(i).getTarget().equals(chatID)) {
                     endpoints.get(i).setExtra(sender);
-                    CommandInterpreter.processMessage(message, endpoints.get(i));
+                    Message bMessage = new Message(endpoints.get(i), message);
+                    CommandInterpreter.processMessage(bMessage);
                     return;
                 }
             }
             Endpoint endpoint = new Endpoint(SkypeService.this, chatID);
             endpoint.setExtra(sender);
             endpoints.add(endpoint);
-            CommandInterpreter.processMessage(message, endpoint);
+            Message bMessage = new Message(endpoint, message);
+            CommandInterpreter.processMessage(bMessage);
         }
 
         @Override

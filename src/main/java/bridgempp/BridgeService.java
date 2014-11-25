@@ -5,7 +5,6 @@
  */
 package bridgempp;
 
-import java.util.ArrayList;
 
 /**
  *
@@ -19,10 +18,10 @@ public interface BridgeService {
     public void disconnect();
     
     //When delivery Fails notify User
-    public void returnToSender(String target, String response);
+    public void returnToSender(Message message);
     
     //Send message bridged from other Messages
-    public void sendMessage(String target, String response);
+    public void sendMessage(Message message);
     
     //Get user-friendly name of this Service
     public String getName();

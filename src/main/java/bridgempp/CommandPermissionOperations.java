@@ -13,73 +13,73 @@ import java.util.logging.Level;
  */
 public class CommandPermissionOperations {
 
-    static void cmdUseKey(Endpoint sender, String command) {
-        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(command), sender);
+    static void cmdUseKey(Message message) {
+        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getMessage()), message.getSender());
         if (success) {
-            ShadowManager.log(Level.INFO, sender.toString() + " has used key and now has " + sender.getPermissions());
-            sender.sendMessage("BridgeMPP: Rights granted successfully. Your new rights are: " + sender.getPermissions());
+            ShadowManager.log(Level.INFO, message.getSender().toString() + " has used key and now has " + message.getSender().getPermissions());
+            message.getSender().sendMessage("BridgeMPP: Rights granted successfully. Your new rights are: " + message.getSender().getPermissions());
         } else {
-            sender.sendMessage("BridgeMPP: Key Failure. Incorrect Key");
+            message.getSender().sendMessage("BridgeMPP: Key Failure. Incorrect Key");
         }
     }
 
-    static void cmdPrintPermissions(Endpoint sender, String command) {
-        sender.sendMessage("BridgeMPP: Your rights are " + sender.getPermissions());
+    static void cmdPrintPermissions(Message message) {
+        message.getSender().sendMessage("BridgeMPP: Your rights are " + message.getSender().getPermissions());
     }
 
-    static void cmdGeneratePermanentKey(Endpoint sender, String command) {
-        if (CommandInterpreter.checkPermission(sender, PermissionsManager.Permission.GENERATE_PERMANENT_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(command) & sender.getPermissions();
-            ShadowManager.log(Level.INFO, sender.toString() + " has created permanent key with permissions " + permissions);
-            sender.sendMessage("BridgeMPP: Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
+    static void cmdGeneratePermanentKey(Message message) {
+        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_PERMANENT_KEYS)) {
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage()) & message.getSender().getPermissions();
+            ShadowManager.log(Level.INFO, message.getSender().toString() + " has created permanent key with permissions " + permissions);
+            message.getSender().sendMessage("BridgeMPP: Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
         } else {
-            sender.sendMessage("BridgeMPP: Access denied");
+            message.getSender().sendMessage("BridgeMPP: Access denied");
         }
     }
 
-    static void cmdRemovePermissions(Endpoint sender, String command) {
-        int permissions = CommandInterpreter.getIntegerFromArgument(command);
+    static void cmdRemovePermissions(Message message) {
+        int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage());
         if (permissions < 0) {
-            sender.sendMessage("Invalid Argument: Required Integer: New Permissions");
+            message.getSender().sendMessage("Invalid Argument: Required Integer: New Permissions");
             return;
         }
-        sender.removePermissions(permissions);
-        sender.sendMessage("BridgeMPP: Rights removed successfully. Your new rights are: " + sender.getPermissions());
+        message.getSender().removePermissions(permissions);
+        message.getSender().sendMessage("BridgeMPP: Rights removed successfully. Your new rights are: " + message.getSender().getPermissions());
     }
 
-    static void cmdGenerateOneTimeKey(Endpoint sender, String command) {
-        if (CommandInterpreter.checkPermission(sender, PermissionsManager.Permission.GENERATE_ONETIME_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(command) & sender.getPermissions();
-            ShadowManager.log(Level.INFO, sender.toString() + " has created temporary key with permissions " + permissions);
-            sender.sendMessage("BridgeMPP: Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
+    static void cmdGenerateOneTimeKey(Message message) {
+        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_ONETIME_KEYS)) {
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage()) & message.getSender().getPermissions();
+            ShadowManager.log(Level.INFO, message.getSender().toString() + " has created temporary key with permissions " + permissions);
+            message.getSender().sendMessage("BridgeMPP: Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
         } else {
-            sender.sendMessage("BridgeMPP: Access denied");
+            message.getSender().sendMessage("BridgeMPP: Access denied");
         }
     }
 
-    static void cmdRemoveKey(Endpoint sender, String command) {
-        if (CommandInterpreter.checkPermission(sender, PermissionsManager.Permission.REMOVE_KEYS)) {
-            boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(command));
+    static void cmdRemoveKey(Message message) {
+        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.REMOVE_KEYS)) {
+            boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getMessage()));
             if (success) {
-                ShadowManager.log(Level.INFO, sender.toString() + " has removed key");
-                sender.sendMessage("BridgeMPP: Successfully removed key");
+                ShadowManager.log(Level.INFO, message.getSender().toString() + " has removed key");
+                message.getSender().sendMessage("BridgeMPP: Successfully removed key");
             } else {
-                sender.sendMessage("BridgeMPP: Error: Key not found");
+                message.getSender().sendMessage("BridgeMPP: Error: Key not found");
             }
         } else {
-            sender.sendMessage("BridgeMPP: Access denied");
+            message.getSender().sendMessage("BridgeMPP: Access denied");
         }
     }
 
-    static void cmdListKeys(Endpoint sender ,String command)
+    static void cmdListKeys(Message message)
     {
-        if(CommandInterpreter.checkPermission(sender, PermissionsManager.Permission.LIST_KEYS))
+        if(CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_KEYS))
         {
-            sender.sendMessage("BridgeMPP: Key List: " + PermissionsManager.listKeys());
+            message.getSender().sendMessage("BridgeMPP: Key List: " + PermissionsManager.listKeys());
         }
         else
         {
-            sender.sendMessage("BridgeMPP: Access denied");
+            message.getSender().sendMessage("BridgeMPP: Access denied");
         }
     }
 }

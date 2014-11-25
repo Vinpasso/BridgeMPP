@@ -38,13 +38,13 @@ public class ConsoleService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
-        System.out.println(response);
+    public void sendMessage(Message message) {
+        System.out.println(message.toSimpleString());
     }
 
     @Override
@@ -75,7 +75,8 @@ public class ConsoleService implements BridgeService {
         public void run() {
             ShadowManager.log(Level.FINE, "Console reader is running...");
             while (scanner.hasNext()) {
-                CommandInterpreter.processMessage(scanner.nextLine(), endpoints.get(0));
+                Message message = new Message(endpoints.get(0), scanner.nextLine());
+                CommandInterpreter.processMessage(message);
             }
             ShadowManager.log(Level.FINE, "Console reader has closed");
         }

@@ -23,9 +23,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
@@ -106,13 +104,13 @@ public class XMPPService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(String target, String response) {
-        sendMessage(target, response);
+    public void returnToSender(bridgempp.Message message) {
+        sendMessage(message);
     }
 
     @Override
-    public void sendMessage(String target, String response) {
-        activeChats.get(target).sendMessage(response);
+    public void sendMessage(bridgempp.Message message) {
+        activeChats.get(message.getTarget().getTarget()).sendMessage(message.getMessage());
     }
 
     @Override
@@ -180,7 +178,7 @@ public class XMPPService implements BridgeService {
 
         @Override
         public void processMessage(Chat chat, Message message) {
-            CommandInterpreter.processMessage(message.getBody(), endpoint);
+            CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody()));
         }
 
         @Override
@@ -265,7 +263,7 @@ public class XMPPService implements BridgeService {
                 return;
             }
             endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/") + 1));
-            CommandInterpreter.processMessage(message.getBody(), endpoint);
+            CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody()));
         }
 
     }

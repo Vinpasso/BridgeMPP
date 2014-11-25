@@ -42,18 +42,18 @@ public class GroupManager {
         return null;
     }
 
-    public static void sendMessageToAllSubscribedGroups(String message, Endpoint endpoint) {
+    public static void sendMessageToAllSubscribedGroups(Message message) {
         for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).hasEndpoint(endpoint)) {
+            if (groups.get(i).hasEndpoint(message.getSender())) {
                 groups.get(i).sendMessage(message);
             }
         }
     }
 
-    public static void sendMessageToAllSubscribedGroupsWithoutLoopback(String message, Endpoint endpoint) {
+    public static void sendMessageToAllSubscribedGroupsWithoutLoopback(Message message) {
         for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).hasEndpoint(endpoint)) {
-                groups.get(i).sendMessageWithoutLoopback(message, endpoint);
+            if (groups.get(i).hasEndpoint(message.getSender())) {
+                groups.get(i).sendMessageWithoutLoopback(message);
             }
         }
     }
