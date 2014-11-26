@@ -92,11 +92,11 @@ public class Message {
     }
 
     public String toSimpleString() {
-        return getSender().toString() + ": " + getMessage();
+        return ((getSender() != null)?getSender().toString():"Unknown") + ": " + getMessage();
     }
 
     public String toComplexString() {
-        return getGroup() + ": " + getSender() + " --> " + getTarget() + ": " + getMessage();
+        return (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: " + ((getSender() != null)?getSender().toString():"Unknown") + " --> " + ((getTarget() != null)?(getTarget().toString() + ": "):("Unknown")) + getMessage();
     }
 
     @Override
