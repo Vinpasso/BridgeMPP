@@ -28,11 +28,12 @@ public class Endpoint {
 
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message) {
+        message.setTarget(this);
         bridgeService.sendMessage(message);
     }
 
-    public void sendMessage(String message) {
-        throw new UnsupportedOperationException();
+    public void sendOperatorMessage(String message) {
+        sendMessage(new Message(this, this, null, message));
     }
 
     //Get this endpoints Carrier Service

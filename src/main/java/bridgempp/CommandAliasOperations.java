@@ -17,12 +17,12 @@ public class CommandAliasOperations {
 
     static void cmdCreateAlias(Message message) {
         if (!message.getSender().hasAlias()) {
-            message.getSender().sendMessage("You already have an Alias, overwriting your old Alias");
+            message.getSender().sendOperatorMessage("You already have an Alias, overwriting your old Alias");
         }
         String newAlias = CommandInterpreter.getStringFromArgument(message.getMessage());
         ShadowManager.log(Level.FINER, "Endpoint: " + message.getSender().toString() + " now has assigned Alias: " + newAlias);
         EndpointTranslator.saveHumanReadableEndpoint(message.getSender(), newAlias);
-        message.getSender().sendMessage("Alias successfully assigned");
+        message.getSender().sendOperatorMessage("Alias successfully assigned");
     }
 
     static void cmdImportAliasList(Message message) {
@@ -32,11 +32,11 @@ public class CommandAliasOperations {
             while (scanner.hasNext()) {
                 EndpointTranslator.saveHumanReadableEndpoint(new Endpoint(null, scanner.next()), rearrangeNameFormat(scanner.next()));
             }
-            message.getSender().sendMessage("Alias List successfully imported");
+            message.getSender().sendOperatorMessage("Alias List successfully imported");
         }
         else
         {
-            message.getSender().sendMessage("Access Denied");
+            message.getSender().sendOperatorMessage("Access Denied");
         }
     }
 

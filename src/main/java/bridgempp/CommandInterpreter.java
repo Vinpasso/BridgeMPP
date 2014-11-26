@@ -17,7 +17,7 @@ public class CommandInterpreter {
     //Interpret a Message message with leading !
     public static void interpretCommand(Message message) {
         if (message.getMessage().charAt(0) != '!') {
-            message.getSender().sendMessage("Internal Server Error! Command " + message.getMessage() + " not a message.getMessage() but recieved interpret request");
+            message.getSender().sendOperatorMessage("Internal Server Error! Command " + message.getMessage() + " not a message.getMessage() but recieved interpret request");
             throw new UnsupportedOperationException("Interpret Command: " + message.getMessage() + " Not a message.getMessage()");
         }
         String operator = message.getMessage().toLowerCase();
@@ -60,7 +60,7 @@ public class CommandInterpreter {
         } else if (operator.startsWith("!importalias")) {
             CommandAliasOperations.cmdImportAliasList(message);
         } else {
-            message.getSender().sendMessage("BridgeMPP: Error: Command not found");
+            message.getSender().sendOperatorMessage("BridgeMPP: Error: Command not found");
         }
     }
 

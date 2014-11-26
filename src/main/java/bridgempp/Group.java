@@ -25,9 +25,9 @@ public class Group {
         }
     }
     
-    public void sendMessage(String message)
+    public void sendOperatorMessage(String message)
     {
-        throw new UnsupportedOperationException();
+        sendMessage(new Message(null, null, this, message));
     }
     
     //Send message without Loopback to sender

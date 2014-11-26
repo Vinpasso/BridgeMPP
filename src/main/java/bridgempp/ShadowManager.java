@@ -44,7 +44,7 @@ public class ShadowManager {
             System.out.println(logRecord);
             for(int i = 0; i < shadowEndpoints.size(); i++)
             {
-                shadowEndpoints.get(i).sendMessage(logRecord);
+                shadowEndpoints.get(i).sendOperatorMessage(logRecord);
             }
         }
 
