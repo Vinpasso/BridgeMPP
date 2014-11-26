@@ -96,7 +96,7 @@ public class Message {
     }
 
     public String toComplexString() {
-        return (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: " + ((getSender() != null)?getSender().toString():"Unknown") + " --> " + ((getTarget() != null)?(getTarget().toString() + ": "):("Unknown")) + getMessage();
+        return (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: " + ((getSender() != null)?getSender().toString():"Unknown") + " --> " + ((getTarget() != null)?(getTarget().toString() + ": "):("Unknown: ")) + getMessage();
     }
 
     @Override
