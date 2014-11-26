@@ -65,7 +65,7 @@ public class SocketService implements BridgeService {
     @Override
     public void sendMessage(Message message) {
         try {
-            connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket.getOutputStream().write((message.getMessage() + "\n").getBytes("UTF-8"));
+            connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket.getOutputStream().write((message.toComplexString() + "\n").getBytes("UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
         }

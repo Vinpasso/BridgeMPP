@@ -44,7 +44,7 @@ public class ConsoleService implements BridgeService {
 
     @Override
     public void sendMessage(Message message) {
-        System.out.println(message.toSimpleString());
+        System.out.println(message.toComplexString());
     }
 
     @Override

@@ -54,7 +54,7 @@ public class SkypeService implements BridgeService {
             Chat[] chats = Skype.getAllChats();
             for (int i = 0; i < chats.length; i++) {
                 if (chats[i].getId().equals(message.getTarget().getTarget())) {
-                    chats[i].send(message.getMessage());
+                    chats[i].send(message.toSimpleString());
                     return;
                 }
             }

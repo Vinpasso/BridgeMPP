@@ -110,7 +110,7 @@ public class XMPPService implements BridgeService {
 
     @Override
     public void sendMessage(bridgempp.Message message) {
-        activeChats.get(message.getTarget().getTarget()).sendMessage(message.getMessage());
+        activeChats.get(message.getTarget().getTarget()).sendMessage(message.toSimpleString());
     }
 
     @Override

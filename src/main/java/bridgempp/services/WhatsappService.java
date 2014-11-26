@@ -81,7 +81,7 @@ public class WhatsappService implements BridgeService {
     public void sendMessage(Message message) {
         try {
             senderQueue.add(message.getTarget().getTarget());
-            senderQueue.add(Base64.getEncoder().encodeToString(message.getMessage().getBytes("UTF-8")));
+            senderQueue.add(Base64.getEncoder().encodeToString(message.toSimpleString().getBytes("UTF-8")));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
         }

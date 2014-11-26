@@ -101,8 +101,8 @@ public class MailService implements BridgeService {
             MimeMessage mimeMessage = new MimeMessage(session);
             mimeMessage.setFrom(username);
             mimeMessage.setRecipients(Message.RecipientType.TO, message.getTarget().getTarget());
-            mimeMessage.setSubject(message.getMessage());
-            mimeMessage.setText(message.getMessage());
+            mimeMessage.setSubject(message.toSimpleString());
+            mimeMessage.setText(message.toSimpleString());
             Transport.send(mimeMessage, username, password);
         } catch (MessagingException ex) {
             Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
