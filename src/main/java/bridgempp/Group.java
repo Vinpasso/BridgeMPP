@@ -25,10 +25,10 @@ public class Group {
         }
     }
     
-    public void sendOperatorMessage(String message)
-    {
-        sendMessage(new Message(null, null, this, message));
-    }
+//    public void sendOperatorMessage(String message)
+//    {
+//        sendMessage(new Message(null, null, this, message));
+//    }
     
     //Send message without Loopback to sender
     public void sendMessageWithoutLoopback(Message message)

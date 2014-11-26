@@ -52,7 +52,7 @@ public class CommandGroupOperations {
             Group group = subscribeGroup(CommandInterpreter.getStringFromArgument(message.getMessage()), message.getSender());
             if (group != null) {
                 ShadowManager.log(Level.FINE, message.getSender().toString() + " has been subscribed: " + group.getName());
-                group.sendOperatorMessage("BridgeMPP: Endpoint: " + message.getSender().toString() + " has been added to Group: " + group.getName());
+                group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been added to Group: " + group.getName()));
                 message.getSender().sendOperatorMessage("BridgeMPP: Group has been subscribed");
             } else {
                 message.getSender().sendOperatorMessage("BridgeMPP: Error: Group not found");
@@ -75,7 +75,7 @@ public class CommandGroupOperations {
             Group group = unsubscribeGroup(CommandInterpreter.getStringFromArgument(message.getMessage()), message.getSender());
             if (group != null) {
                 ShadowManager.log(Level.FINE, message.getSender().toString() + " has been unsubscribed: " + group.getName());
-                group.sendOperatorMessage("BridgeMPP: Endpoint: " + message.getSender().toString() + " has been removed from Group: " + group.getName());
+                group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been removed from Group: " + group.getName()));
                 message.getSender().sendOperatorMessage("BridgeMPP: Group has been unsubscribed");
             } else {
                 message.getSender().sendOperatorMessage("BridgeMPP: Error: Group not found");
