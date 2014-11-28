@@ -6,9 +6,11 @@
 package bridgempp.services;
 
 import bridgempp.BridgeService;
-import bridgempp.CommandInterpreter;
 import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
+
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -34,6 +36,11 @@ public class XMPPService implements BridgeService {
     private XMPPTCPConnection connection;
     private ChatManager chatmanager;
     private HashMap<String, XMPPMessageListener> activeChats;
+    
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT,
+		MessageFormat.HTML
+	};
 
     public XMPPService() {
         activeChats = new HashMap<>();
@@ -254,5 +261,10 @@ public class XMPPService implements BridgeService {
         }
 
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 
 }

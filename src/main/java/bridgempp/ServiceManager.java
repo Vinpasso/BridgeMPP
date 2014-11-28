@@ -5,8 +5,10 @@
  */
 package bridgempp;
 
+import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
+import bridgempp.services.SocketService;
 import bridgempp.services.WhatsappService;
 import bridgempp.services.XMPPService;
 

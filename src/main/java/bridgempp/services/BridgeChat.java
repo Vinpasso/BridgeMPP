@@ -6,14 +6,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import bridgempp.BridgeService;
-import bridgempp.CommandInterpreter;
 import bridgempp.Endpoint;
 import bridgempp.Message;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
 
 public class BridgeChat implements BridgeService {
 
 	private Socket socket;
 	private Endpoint endpoint;
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+				MessageFormat.PLAIN_TEXT,
+				MessageFormat.HTML
+			};
 
 	@Override
 	public void connect(String argList) {
@@ -84,6 +89,11 @@ public class BridgeChat implements BridgeService {
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
 		this.endpoint = endpoint;
+	}
+	
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
 	}
 
 	public static final class BridgeChatProtoBuf {

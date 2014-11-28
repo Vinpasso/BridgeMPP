@@ -6,6 +6,8 @@
 package bridgempp.services;
 
 import bridgempp.*;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -28,6 +30,10 @@ public class WhatsappService implements BridgeService {
     //private PrintStream printStream;
     private LinkedBlockingQueue<String> senderQueue;
     private Thread senderThread;
+    
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT
+	};
 
     @Override
     public void connect(String argString) {
@@ -211,4 +217,9 @@ public class WhatsappService implements BridgeService {
         }
 
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 }

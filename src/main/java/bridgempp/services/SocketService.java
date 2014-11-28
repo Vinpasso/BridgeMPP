@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bridgempp;
+package bridgempp.services;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +17,14 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import bridgempp.BridgeService;
+import bridgempp.Endpoint;
+import bridgempp.GroupManager;
+import bridgempp.Message;
+import bridgempp.ShadowManager;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
+
 /**
  *
  * @author Vinpasso
@@ -28,6 +36,11 @@ public class SocketService implements BridgeService {
     private String listenAddress;
     private HashMap<Integer, SocketClient> connectedSockets;
     private ServerListener serverListener;
+    
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT,
+		MessageFormat.HTML
+	};
 
     @Override
     public void connect(String argString) {
@@ -148,4 +161,9 @@ public class SocketService implements BridgeService {
             ShadowManager.log(Level.INFO, "TCP client has disconnnected");
         }
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 }

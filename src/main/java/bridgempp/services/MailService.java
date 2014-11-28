@@ -6,9 +6,11 @@
 package bridgempp.services;
 
 import bridgempp.BridgeService;
-import bridgempp.CommandInterpreter;
 import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
+
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.protocol.IMAPProtocol;
@@ -17,6 +19,7 @@ import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -39,6 +42,11 @@ public class MailService implements BridgeService {
     private String smtphost;
     private String smtpport;
 
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT,
+		MessageFormat.HTML
+	};
+    
     @Override
     public void connect(String argumentString) {
         ShadowManager.log(Level.INFO, "Loading Mail Service...");
@@ -201,5 +209,10 @@ public class MailService implements BridgeService {
             }
         }
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 
 }

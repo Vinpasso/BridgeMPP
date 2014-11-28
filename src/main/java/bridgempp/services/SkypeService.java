@@ -6,6 +6,9 @@
 package bridgempp.services;
 
 import bridgempp.*;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
+
 import com.skype.*;
 
 import java.util.ArrayList;
@@ -19,7 +22,9 @@ import java.util.logging.Logger;
 public class SkypeService implements BridgeService {
 
     private ArrayList<Endpoint> endpoints;
-
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT
+	};
     @Override
     public void connect(String args) {
         try {
@@ -96,4 +101,9 @@ public class SkypeService implements BridgeService {
         public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException {
         }
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 }

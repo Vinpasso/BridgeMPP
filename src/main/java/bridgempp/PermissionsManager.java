@@ -76,11 +76,11 @@ public class PermissionsManager {
         ShadowManager.log(Level.INFO, "Saved all access keys...");
     }
 
-    static boolean removeKey(String keyName) {
+    public static boolean removeKey(String keyName) {
         return accessKeys.remove(keyName) != null;
     }
 
-    static String listKeys() {
+    public static String listKeys() {
         String list = "";
         for (AccessKey key : accessKeys.values()) {
             list += key.toString() + "\n";

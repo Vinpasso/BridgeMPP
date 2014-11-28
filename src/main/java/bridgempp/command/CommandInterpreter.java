@@ -3,8 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bridgempp;
+package bridgempp.command;
 
+import bridgempp.Endpoint;
+import bridgempp.GroupManager;
+import bridgempp.Message;
+import bridgempp.PermissionsManager;
+import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
 

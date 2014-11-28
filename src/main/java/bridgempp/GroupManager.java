@@ -106,7 +106,7 @@ public class GroupManager {
         return listGroups;
     }
 
-    static void removeEndpointFromAllGroups(Endpoint endpoint) {
+    public static void removeEndpointFromAllGroups(Endpoint endpoint) {
         for (int i = 0; i < groups.size(); i++) {
             groups.get(i).removeEndpoint(endpoint);
         }

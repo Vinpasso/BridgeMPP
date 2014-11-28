@@ -3,11 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bridgempp;
+package bridgempp.services;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
+
+import bridgempp.BridgeService;
+import bridgempp.Endpoint;
+import bridgempp.Message;
+import bridgempp.ShadowManager;
+import bridgempp.command.CommandInterpreter;
+import bridgempp.messageformat.MessageFormat;
 
 /**
  *
@@ -19,6 +26,10 @@ public class ConsoleService implements BridgeService {
     ConsoleReader reader;
     Thread consoleThread;
     private ArrayList<Endpoint> endpoints;
+    
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
+		MessageFormat.PLAIN_TEXT
+	};
 
     @Override
     public void connect(String args) {
@@ -77,4 +88,9 @@ public class ConsoleService implements BridgeService {
         }
 
     }
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats() {
+		return supportedMessageFormats;
+	}
 }
