@@ -26,7 +26,6 @@ public class BridgeMPP {
         PermissionsManager.loadAccessKeys();
         ServiceManager.loadAllServices();
         GroupManager.loadAllGroups();
-        ConsoleService console = (ConsoleService)ServiceManager.getService("Console");
         ShadowManager.log(Level.INFO, "Server Initialization completed");
     }
     

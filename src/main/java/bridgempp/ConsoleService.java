@@ -38,11 +38,6 @@ public class ConsoleService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(Message message) {
-        sendMessage(message);
-    }
-
-    @Override
     public void sendMessage(Message message) {
         System.out.println(message.toComplexString());
     }

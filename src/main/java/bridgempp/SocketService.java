@@ -5,14 +5,15 @@
  */
 package bridgempp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,11 +56,6 @@ public class SocketService implements BridgeService {
             Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }
-
-    @Override
-    public void returnToSender(Message message) {
-        sendMessage(message);
     }
 
     @Override
@@ -132,18 +128,23 @@ public class SocketService implements BridgeService {
         public void run() {
             ShadowManager.log(Level.INFO, "TCP client has connected");
             try {
-                Scanner scanner = new Scanner(socket.getInputStream(), "UTF-8");
-                while (scanner.hasNext()) {
-                    String line = scanner.nextLine();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+                while (true) {
+                    String line = bufferedReader.readLine();
                     Message message = new Message(endpoint, line);
                     CommandInterpreter.processMessage(message);
                 }
-                socket.close();
-                GroupManager.removeEndpointFromAllGroups(endpoint);
-                connectedSockets.remove(randomIdentifier);
+
             } catch (IOException ex) {
                 Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
             }
+            try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            GroupManager.removeEndpointFromAllGroups(endpoint);
+            connectedSockets.remove(randomIdentifier);
             ShadowManager.log(Level.INFO, "TCP client has disconnnected");
         }
     }

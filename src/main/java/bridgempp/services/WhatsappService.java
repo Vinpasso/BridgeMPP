@@ -62,10 +62,6 @@ public class WhatsappService implements BridgeService {
         yowsup.destroy();
     }
 
-    @Override
-    public void returnToSender(Message message) {
-        sendMessage(message);
-    }
 
     @Override
     public void sendMessage(Message message) {
@@ -163,6 +159,7 @@ public class WhatsappService implements BridgeService {
                         while (error.hasNext()) {
                             System.err.println(error.nextLine());
                         }
+                        error.close();
                         ShadowManager.log(Level.INFO, "Stopping Yowsup Error Listener");
                     }
                 }, "Whatsapp Error Listener").start();

@@ -17,9 +17,6 @@ public interface BridgeService {
     //Deinitialize Service
     public void disconnect();
     
-    //When delivery Fails notify User
-    public void returnToSender(Message message);
-    
     //Send message bridged from other Messages
     public void sendMessage(Message message);
     

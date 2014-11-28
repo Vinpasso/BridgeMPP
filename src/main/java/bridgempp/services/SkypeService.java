@@ -37,11 +37,6 @@ public class SkypeService implements BridgeService {
     }
 
     @Override
-    public void returnToSender(Message message) {
-        sendMessage(message);
-    }
-
-    @Override
     public void sendMessage(Message message) {
         try {
             Chat[] chats = Skype.getAllChats();

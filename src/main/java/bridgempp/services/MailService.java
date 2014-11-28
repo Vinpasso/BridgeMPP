@@ -33,7 +33,7 @@ public class MailService implements BridgeService {
     private Store store;
     private IMAPFolder folder;
     private String imaphost;
-    private String imapport;
+    private int imapport;
     private String username;
     private String password;
     private String smtphost;
@@ -49,7 +49,7 @@ public class MailService implements BridgeService {
             throw new UnsupportedOperationException("Incorrect Arguments for mailer service");
         }
         imaphost = args[0];
-        imapport = args[1];
+        imapport = Integer.parseInt(args[1]);
         smtphost = args[2];
         smtpport = args[3];
         username = args[4];
@@ -62,7 +62,7 @@ public class MailService implements BridgeService {
             System.getProperties().setProperty("mail.smtp.port", smtpport);
             session = Session.getDefaultInstance(System.getProperties(), null);
             store = session.getStore("imaps");
-            store.connect(imaphost, username, password);
+            store.connect(imaphost, imapport, username, password);
             folder = (IMAPFolder) store.getFolder("Inbox");
             folder.open(Folder.READ_WRITE);
             new Thread(new MailMessageListener(), "Mail Message Listener").start();
@@ -82,11 +82,6 @@ public class MailService implements BridgeService {
         } catch (MessagingException ex) {
             Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    @Override
-    public void returnToSender(bridgempp.Message message) {
-        sendMessage(message);
     }
 
     @Override
