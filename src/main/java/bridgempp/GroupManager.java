@@ -5,10 +5,11 @@
  */
 package bridgempp;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.configuration.ConfigurationException;
 
 /**
  *

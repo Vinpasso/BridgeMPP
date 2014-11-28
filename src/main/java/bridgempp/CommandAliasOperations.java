@@ -6,6 +6,7 @@
 package bridgempp;
 
 import bridgempp.PermissionsManager.Permission;
+
 import java.util.Scanner;
 import java.util.logging.Level;
 

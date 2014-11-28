@@ -5,16 +5,9 @@
  */
 package bridgempp.services;
 
-import bridgempp.BridgeService;
-import bridgempp.CommandInterpreter;
-import bridgempp.Endpoint;
-import bridgempp.Message;
-import bridgempp.ShadowManager;
-import com.skype.Chat;
-import com.skype.ChatMessage;
-import com.skype.ChatMessageListener;
-import com.skype.Skype;
-import com.skype.SkypeException;
+import bridgempp.*;
+import com.skype.*;
+
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;

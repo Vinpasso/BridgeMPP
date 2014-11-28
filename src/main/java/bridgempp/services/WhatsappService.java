@@ -5,21 +5,11 @@
  */
 package bridgempp.services;
 
-import bridgempp.BridgeMPP;
-import bridgempp.BridgeService;
-import bridgempp.CommandInterpreter;
-import bridgempp.Endpoint;
-import bridgempp.Message;
-import bridgempp.ShadowManager;
-import java.util.Base64;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import bridgempp.*;
+
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;

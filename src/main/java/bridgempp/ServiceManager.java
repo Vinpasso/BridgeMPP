@@ -9,6 +9,7 @@ import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
 import bridgempp.services.WhatsappService;
 import bridgempp.services.XMPPService;
+
 import java.util.ArrayList;
 import java.util.logging.Level;
 
