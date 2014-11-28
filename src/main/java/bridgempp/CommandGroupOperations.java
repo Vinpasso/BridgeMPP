@@ -28,12 +28,12 @@ public class CommandGroupOperations {
             boolean success = removeGroup(CommandInterpreter.getStringFromArgument(message.getMessage()));
             if (success) {
                 ShadowManager.log(Level.FINE, "Group has been removed: " + CommandInterpreter.getStringFromArgument(message.getMessage()));
-                message.getSender().sendOperatorMessage("BridgeMPP: Group has been removed");
+                message.getSender().sendOperatorMessage("Group has been removed");
             } else {
-                message.getSender().sendOperatorMessage("BridgeMPP: Error: Group not found");
+                message.getSender().sendOperatorMessage("Error: Group not found");
             }
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
@@ -53,20 +53,20 @@ public class CommandGroupOperations {
             if (group != null) {
                 ShadowManager.log(Level.FINE, message.getSender().toString() + " has been subscribed: " + group.getName());
                 group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been added to Group: " + group.getName()));
-                message.getSender().sendOperatorMessage("BridgeMPP: Group has been subscribed");
+                message.getSender().sendOperatorMessage("Group has been subscribed");
             } else {
-                message.getSender().sendOperatorMessage("BridgeMPP: Error: Group not found");
+                message.getSender().sendOperatorMessage("Error: Group not found");
             }
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdListGroups(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_GROUPS)) {
-            message.getSender().sendOperatorMessage("BridgeMPP: Listing Groups:\nBridgeMPP: " + GroupManager.listGroups().replaceAll("\n", "\nBridgeMPP: ") + "BridgeMPP: Finished listing Groups");
+            message.getSender().sendOperatorMessage("Listing Groups:\nBridgeMPP: " + GroupManager.listGroups().replaceAll("\n", "\nBridgeMPP: ") + "BridgeMPP: Finished listing Groups");
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
@@ -76,12 +76,12 @@ public class CommandGroupOperations {
             if (group != null) {
                 ShadowManager.log(Level.FINE, message.getSender().toString() + " has been unsubscribed: " + group.getName());
                 group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been removed from Group: " + group.getName()));
-                message.getSender().sendOperatorMessage("BridgeMPP: Group has been unsubscribed");
+                message.getSender().sendOperatorMessage("Group has been unsubscribed");
             } else {
-                message.getSender().sendOperatorMessage("BridgeMPP: Error: Group not found");
+                message.getSender().sendOperatorMessage("Error: Group not found");
             }
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
@@ -99,12 +99,12 @@ public class CommandGroupOperations {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_MEMBERS)) {
             Group group = GroupManager.findGroup(CommandInterpreter.getStringFromArgument(message.getMessage()));
             if (group == null) {
-                message.getSender().sendOperatorMessage("BridgeMPP: Error: No such group");
+                message.getSender().sendOperatorMessage("Error: No such group");
                 return;
             }
-            message.getSender().sendOperatorMessage("BridgeMPP: Listing Members:\nBridgeMPP: " + group.toString().replaceAll("\n", "\nBridgeMPP: ") + "Finished listing Members");
+            message.getSender().sendOperatorMessage("Listing Members:\nBridgeMPP: " + group.toString().replaceAll("\n", "\nBridgeMPP: ") + "Finished listing Members");
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
@@ -112,13 +112,13 @@ public class CommandGroupOperations {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.CREATE_REMOVE_GROUP)) {
             Group group = createGroup(CommandInterpreter.getStringFromArgument(message.getMessage()));
             if (group == null) {
-                message.getSender().sendOperatorMessage("BridgeMPP: Error: Group already exists");
+                message.getSender().sendOperatorMessage("Error: Group already exists");
             } else {
                 ShadowManager.log(Level.FINE, "Group has been created: " + group.getName());
-                message.getSender().sendOperatorMessage("BridgeMPP: Group has been created: " + group.getName());
+                message.getSender().sendOperatorMessage("Group has been created: " + group.getName());
             }
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 

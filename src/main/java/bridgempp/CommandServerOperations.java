@@ -16,10 +16,10 @@ public class CommandServerOperations {
     static void cmdExit(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.EXIT)) {
             ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + message.getSender().toString());
-            message.getSender().sendOperatorMessage("BridgeMPP: Shutting down");
+            message.getSender().sendOperatorMessage("Shutting down");
             BridgeMPP.exit();
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
     

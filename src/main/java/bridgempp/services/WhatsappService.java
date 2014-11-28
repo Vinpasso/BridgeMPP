@@ -205,6 +205,7 @@ public class WhatsappService implements BridgeService {
                         Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                senderThread.interrupt();
                 yowsup.destroyForcibly();
             } catch (IOException ex) {
                 Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);

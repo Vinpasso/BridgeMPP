@@ -60,7 +60,7 @@ public class CommandInterpreter {
         } else if (operator.startsWith("!importalias")) {
             CommandAliasOperations.cmdImportAliasList(message);
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Error: Command not found");
+            message.getSender().sendOperatorMessage("Error: Command not found");
         }
     }
 

@@ -17,21 +17,21 @@ public class CommandShadowOperations {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
             ShadowManager.log(Level.WARNING, "Shadow has been subscribed by " + message.getSender().toString());
             ShadowManager.shadowEndpoints.add(message.getSender());
-            message.getSender().sendOperatorMessage("BridgeMPP: Your endpoint has been added to the list of Shadows");
+            message.getSender().sendOperatorMessage("Your endpoint has been added to the list of Shadows");
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdListShadows(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_SHADOW)) {
-            message.getSender().sendOperatorMessage("BridgeMPP: Listing shadows");
+            message.getSender().sendOperatorMessage("Listing shadows");
             for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
-                message.getSender().sendOperatorMessage("BridgeMPP: Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
+                message.getSender().sendOperatorMessage("Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
             }
-            message.getSender().sendOperatorMessage("BridgeMPP: Done listing shadows");
+            message.getSender().sendOperatorMessage("Done listing shadows");
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 
@@ -39,9 +39,9 @@ public class CommandShadowOperations {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
             ShadowManager.log(Level.WARNING, "Shadow has been removed by " + message.getSender().toString());
             ShadowManager.shadowEndpoints.remove(message.getSender());
-            message.getSender().sendOperatorMessage("BridgeMPP: Your endpoint has been removed from the list of Shadows");
+            message.getSender().sendOperatorMessage("Your endpoint has been removed from the list of Shadows");
         } else {
-            message.getSender().sendOperatorMessage("BridgeMPP: Access denied");
+            message.getSender().sendOperatorMessage("Access denied");
         }
     }
 

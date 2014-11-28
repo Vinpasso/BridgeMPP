@@ -40,6 +40,16 @@ public class CommandAliasOperations {
             message.getSender().sendOperatorMessage("Access Denied");
         }
     }
+    
+    static void removeAlias(Message message)
+    {
+    	if(!message.getSender().hasAlias())
+    	{
+    		message.getSender().sendOperatorMessage("No aliases found");
+    	}
+    	EndpointTranslator.removeHumanReadableEndpoint(message.getSender());
+    	message.getSender().sendOperatorMessage("Aliases successfully deleted");
+    }
 
     //If user is written in outlook Last Name, First Name format then rearrange it to First Name Last Name
     private static String rearrangeNameFormat(String name) {

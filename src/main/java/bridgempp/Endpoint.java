@@ -33,7 +33,7 @@ public class Endpoint {
     }
 
     public void sendOperatorMessage(String message) {
-        sendMessage(new Message(this, this, null, message));
+        sendMessage(new Message(this, this, null, "BridgeMPP: " + message));
     }
 
     //Get this endpoints Carrier Service
