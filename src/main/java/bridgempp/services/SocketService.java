@@ -8,6 +8,7 @@ package bridgempp.services;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
@@ -31,136 +34,161 @@ import bridgempp.messageformat.MessageFormat;
  */
 public class SocketService implements BridgeService {
 
-    private ServerSocket serverSocket;
-    private int listenPort;
-    private String listenAddress;
-    private HashMap<Integer, SocketClient> connectedSockets;
-    private ServerListener serverListener;
-    
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
-		MessageFormat.PLAIN_TEXT,
-		MessageFormat.HTML
-	};
+	private ServerSocket serverSocket;
+	private int listenPort;
+	private String listenAddress;
+	private HashMap<Integer, SocketClient> connectedSockets;
+	private ServerListener serverListener;
+	private boolean protoXMLCarry;
 
-    @Override
-    public void connect(String argString) {
-        String[] args = argString.split("; ");
-        if (args.length != 2) {
-            throw new UnsupportedOperationException("Incorrect options for Socket Service: " + argString);
-        }
-        ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
+			MessageFormat.PLAIN_TEXT };
 
-        listenPort = Integer.parseInt(args[1]);
-        listenAddress = args[0];
-        connectedSockets = new HashMap<>();
-        serverListener = new ServerListener();
-        new Thread(serverListener, "Socket Server Listener").start();
-        ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
-    }
+	@Override
+	public void connect(String argString) {
+		String[] args = argString.split("; ");
+		if (args.length != 2) {
+			throw new UnsupportedOperationException("Incorrect options for Socket Service: " + argString);
+		}
+		ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
 
-    @Override
-    public void disconnect() {
-        try {
-            serverSocket.close();
-            for (SocketClient client : connectedSockets.values()) {
-                client.socket.close();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		listenPort = Integer.parseInt(args[1]);
+		listenAddress = args[0];
+		connectedSockets = new HashMap<>();
+		serverListener = new ServerListener();
+		new Thread(serverListener, "Socket Server Listener").start();
+		ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
+	}
 
-    }
+	@Override
+	public void disconnect() {
+		try {
+			serverSocket.close();
+			for (SocketClient client : connectedSockets.values()) {
+				client.socket.close();
+			}
+		} catch (IOException ex) {
+			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+		}
 
-    @Override
-    public void sendMessage(Message message) {
-        try {
-            connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket.getOutputStream().write((message.toComplexString() + "\n").getBytes("UTF-8"));
-        } catch (IOException ex) {
-            Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+	}
 
-    @Override
-    public String getName() {
-        return "TCPSocket";
-    }
+	@Override
+	public void sendMessage(Message message) {
+		try {
+			OutputStream out = connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket
+					.getOutputStream();
+			out.write(((protoXMLCarry ? "<message>" : "") + message.toComplexString(getSupportedMessageFormats()) + (protoXMLCarry ? "</message>\n"
+					: "\n")).getBytes("UTF-8"));
+		} catch (IOException ex) {
+			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 
-    @Override
-    public boolean isPersistent() {
-        return false;
-    }
+	@Override
+	public String getName() {
+		return "TCPSocket";
+	}
 
-    //Non Persistent Service. Adding an endpoint from save does nothing
-    @Override
-    public void addEndpoint(Endpoint endpoint) {
-    }
+	@Override
+	public boolean isPersistent() {
+		return false;
+	}
 
-    class ServerListener implements Runnable {
+	// Non Persistent Service. Adding an endpoint from save does nothing
+	@Override
+	public void addEndpoint(Endpoint endpoint) {
+	}
 
-        @Override
-        public void run() {
-            ShadowManager.log(Level.INFO, "Starting TCP Server Socket Listener");
+	@Override
+	public void interpretCommand(Message message) {
+		if (message.getPlainTextMessage().toLowerCase().startsWith("!protoxmlcarry")) {
+			protoXMLCarry = true;
+			return;
+		}
+		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+	}
 
-            try {
-                serverSocket = new ServerSocket(listenPort, 10, InetAddress.getByName(listenAddress));
-                serverSocket.setSoTimeout(5000);
-                while (!serverSocket.isClosed()) {
-                    try {
-                        int randomIdentifier;
-                        do {
-                            randomIdentifier = new Random().nextInt(Integer.MAX_VALUE);
-                        } while (connectedSockets.containsKey(randomIdentifier));
+	class ServerListener implements Runnable {
 
-                        Socket socket = serverSocket.accept();
-                        SocketClient socketClient = new SocketClient(socket, new Endpoint(SocketService.this, randomIdentifier + ""));
-                        socketClient.randomIdentifier = randomIdentifier;
-                        connectedSockets.put(randomIdentifier, socketClient);
-                        new Thread(socketClient, "Socket TCP Connection").start();
-                    } catch (SocketTimeoutException e) {
-                    }
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+		@Override
+		public void run() {
+			ShadowManager.log(Level.INFO, "Starting TCP Server Socket Listener");
 
-    }
+			try {
+				serverSocket = new ServerSocket(listenPort, 10, InetAddress.getByName(listenAddress));
+				serverSocket.setSoTimeout(5000);
+				while (!serverSocket.isClosed()) {
+					try {
+						int randomIdentifier;
+						do {
+							randomIdentifier = new Random().nextInt(Integer.MAX_VALUE);
+						} while (connectedSockets.containsKey(randomIdentifier));
 
-    class SocketClient implements Runnable {
+						Socket socket = serverSocket.accept();
+						SocketClient socketClient = new SocketClient(socket, new Endpoint(SocketService.this,
+								randomIdentifier + ""));
+						socketClient.randomIdentifier = randomIdentifier;
+						connectedSockets.put(randomIdentifier, socketClient);
+						new Thread(socketClient, "Socket TCP Connection").start();
+					} catch (SocketTimeoutException e) {
+					}
+				}
+			} catch (IOException ex) {
+				Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
 
-        Socket socket;
-        Endpoint endpoint;
-        int randomIdentifier;
+	}
 
-        public SocketClient(Socket socket, Endpoint endpoint) {
-            this.socket = socket;
-            this.endpoint = endpoint;
-        }
+	class SocketClient implements Runnable {
 
-        @Override
-        public void run() {
-            ShadowManager.log(Level.INFO, "TCP client has connected");
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-                while (true) {
-                    String line = bufferedReader.readLine();
-                    Message message = new Message(endpoint, line);
-                    CommandInterpreter.processMessage(message);
-                }
+		Socket socket;
+		Endpoint endpoint;
+		int randomIdentifier;
 
-            } catch (IOException ex) {
-                Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
+		public SocketClient(Socket socket, Endpoint endpoint) {
+			this.socket = socket;
+			this.endpoint = endpoint;
+		}
+
+		@Override
+		public void run() {
+			ShadowManager.log(Level.INFO, "TCP client has connected");
+			try {
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+						"UTF-8"));
+				while (true) {
+					if (protoXMLCarry) {
+						String buffer = "";
+						do {
+							buffer += bufferedReader.readLine() + "\n";
+						} while (bufferedReader.ready());
+						buffer = buffer.trim();
+						Matcher matcher = Pattern.compile("(?<=<message>)[^<]+(?=<\\/message>)").matcher(buffer);
+						while (matcher.find()) {
+							Message message = Message.parseMessage(matcher.group());
+							CommandInterpreter.processMessage(message);
+						}
+					} else {
+						CommandInterpreter.processMessage(new Message(endpoint, bufferedReader.readLine(),
+								MessageFormat.PLAIN_TEXT));
+					}
+				}
+
+			} catch (IOException ex) {
+				Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			try {
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-            GroupManager.removeEndpointFromAllGroups(endpoint);
-            connectedSockets.remove(randomIdentifier);
-            ShadowManager.log(Level.INFO, "TCP client has disconnnected");
-        }
-    }
+			GroupManager.removeEndpointFromAllGroups(endpoint);
+			connectedSockets.remove(randomIdentifier);
+			ShadowManager.log(Level.INFO, "TCP client has disconnnected");
+		}
+	}
 
 	@Override
 	public MessageFormat[] getSupportedMessageFormats() {

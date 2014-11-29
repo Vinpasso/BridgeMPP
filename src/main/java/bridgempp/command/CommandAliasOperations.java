@@ -24,7 +24,7 @@ public class CommandAliasOperations {
         if (!message.getSender().hasAlias()) {
             message.getSender().sendOperatorMessage("You already have an Alias, overwriting your old Alias");
         }
-        String newAlias = CommandInterpreter.getStringFromArgument(message.getMessage());
+        String newAlias = CommandInterpreter.getStringFromArgument(message.getPlainTextMessage());
         ShadowManager.log(Level.FINER, "Endpoint: " + message.getSender().toString() + " now has assigned Alias: " + newAlias);
         EndpointTranslator.saveHumanReadableEndpoint(message.getSender(), newAlias);
         message.getSender().sendOperatorMessage("Alias successfully assigned");
@@ -32,11 +32,12 @@ public class CommandAliasOperations {
 
     static void cmdImportAliasList(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), Permission.IMPORT_ALIAS)) {
-            Scanner scanner = new Scanner(CommandInterpreter.getStringFromArgument(message.getMessage()));
+            Scanner scanner = new Scanner(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
             scanner.useDelimiter(";");
             while (scanner.hasNext()) {
                 EndpointTranslator.saveHumanReadableEndpoint(new Endpoint(null, scanner.next()), rearrangeNameFormat(scanner.next()));
             }
+            scanner.close();
             message.getSender().sendOperatorMessage("Alias List successfully imported");
         }
         else

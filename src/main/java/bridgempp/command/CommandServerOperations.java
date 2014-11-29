@@ -11,7 +11,6 @@ import bridgempp.BridgeMPP;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
-import bridgempp.PermissionsManager.Permission;
 
 /**
  *

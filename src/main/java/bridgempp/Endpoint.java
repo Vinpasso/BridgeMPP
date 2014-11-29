@@ -7,6 +7,8 @@ package bridgempp;
 
 import org.apache.commons.configuration.XMLConfiguration;
 
+import bridgempp.messageformat.MessageFormat;
+
 /**
  *
  * @author Vinpasso
@@ -33,7 +35,7 @@ public class Endpoint {
     }
 
     public void sendOperatorMessage(String message) {
-        sendMessage(new Message(this, this, null, "BridgeMPP: " + message));
+        sendMessage(new Message(this, this, null, "BridgeMPP: " + message, MessageFormat.PLAIN_TEXT));
     }
 
     //Get this endpoints Carrier Service

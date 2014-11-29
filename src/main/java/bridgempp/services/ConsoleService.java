@@ -22,75 +22,81 @@ import bridgempp.messageformat.MessageFormat;
  */
 public class ConsoleService implements BridgeService {
 
-    Scanner scanner;
-    ConsoleReader reader;
-    Thread consoleThread;
-    private ArrayList<Endpoint> endpoints;
-    
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
-		MessageFormat.PLAIN_TEXT
-	};
+	Scanner scanner;
+	ConsoleReader reader;
+	Thread consoleThread;
+	private ArrayList<Endpoint> endpoints;
 
-    @Override
-    public void connect(String args) {
-        ShadowManager.log(Level.INFO, "Console Service is being loaded...");
-        endpoints = new ArrayList<>();
-        scanner = new Scanner(System.in);
-        reader = new ConsoleReader();
-        consoleThread = new Thread(reader, "Console Reader");
-        consoleThread.start();
-        ShadowManager.log(Level.INFO, "Console Service has been loaded...");
-    }
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
-    @Override
-    public void disconnect() {
-        ShadowManager.log(Level.WARNING, "Console service has been disconnected...");
-        scanner.close();
-    }
+	@Override
+	public void connect(String args) {
+		ShadowManager.log(Level.INFO, "Console Service is being loaded...");
+		endpoints = new ArrayList<>();
+		scanner = new Scanner(System.in);
+		reader = new ConsoleReader();
+		consoleThread = new Thread(reader, "Console Reader");
+		consoleThread.start();
+		ShadowManager.log(Level.INFO, "Console Service has been loaded...");
+	}
 
-    @Override
-    public void sendMessage(Message message) {
-        System.out.println(message.toComplexString());
-    }
+	@Override
+	public void disconnect() {
+		ShadowManager.log(Level.WARNING,
+				"Console service has been disconnected...");
+		scanner.close();
+	}
 
-    @Override
-    public String getName() {
-        return "Console";
-    }
+	@Override
+	public void sendMessage(Message message) {
+		System.out.println(message
+				.toComplexString(getSupportedMessageFormats()));
+	}
 
-    @Override
-    public boolean isPersistent() {
-        return true;
-    }
+	@Override
+	public String getName() {
+		return "Console";
+	}
 
-    //Only one Endpoint. Adding a second does nothing
-    @Override
-    public void addEndpoint(Endpoint endpoint) {
-        endpoints.add(endpoint);
-    }
+	@Override
+	public boolean isPersistent() {
+		return true;
+	}
 
-    class ConsoleReader implements Runnable {
+	// Only one Endpoint. Adding a second does nothing
+	@Override
+	public void addEndpoint(Endpoint endpoint) {
+		endpoints.add(endpoint);
+	}
 
-        public ConsoleReader() {
-            if (endpoints.isEmpty()) {
-                endpoints.add(new Endpoint(ConsoleService.this, "Server"));
-            }
-        }
+	class ConsoleReader implements Runnable {
 
-        @Override
-        public void run() {
-            ShadowManager.log(Level.FINE, "Console reader is running...");
-            while (scanner.hasNext()) {
-                Message message = new Message(endpoints.get(0), scanner.nextLine());
-                CommandInterpreter.processMessage(message);
-            }
-            ShadowManager.log(Level.FINE, "Console reader has closed");
-        }
+		public ConsoleReader() {
+			if (endpoints.isEmpty()) {
+				endpoints.add(new Endpoint(ConsoleService.this, "Server"));
+			}
+		}
 
-    }
+		@Override
+		public void run() {
+			ShadowManager.log(Level.FINE, "Console reader is running...");
+			while (scanner.hasNext()) {
+				Message message = new Message(endpoints.get(0),
+						scanner.nextLine(), getSupportedMessageFormats()[0]);
+				CommandInterpreter.processMessage(message);
+			}
+			ShadowManager.log(Level.FINE, "Console reader has closed");
+		}
+
+	}
 
 	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
+	}
+	
+	@Override
+	public void interpretCommand(Message message) {
+		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 }

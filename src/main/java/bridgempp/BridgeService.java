@@ -27,6 +27,8 @@ public interface BridgeService {
     //Check whether this Service is persistent across restarts
     public boolean isPersistent();
     
+    public void interpretCommand(Message message);
+    
     //Add Endpoint from Save to list of Endpoints
     public void addEndpoint(Endpoint endpoint);
     

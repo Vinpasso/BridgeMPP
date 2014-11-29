@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
-import bridgempp.PermissionsManager.Permission;
 
 /**
  *
@@ -19,7 +18,7 @@ import bridgempp.PermissionsManager.Permission;
 public class CommandPermissionOperations {
 
     static void cmdUseKey(Message message) {
-        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getMessage()), message.getSender());
+        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getSender());
         if (success) {
             ShadowManager.log(Level.INFO, message.getSender().toString() + " has used key and now has " + message.getSender().getPermissions());
             message.getSender().sendOperatorMessage("Rights granted successfully. Your new rights are: " + message.getSender().getPermissions());
@@ -34,7 +33,7 @@ public class CommandPermissionOperations {
 
     static void cmdGeneratePermanentKey(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_PERMANENT_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage()) & message.getSender().getPermissions();
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getSender().getPermissions();
             ShadowManager.log(Level.INFO, message.getSender().toString() + " has created permanent key with permissions " + permissions);
             message.getSender().sendOperatorMessage("Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
         } else {
@@ -43,7 +42,7 @@ public class CommandPermissionOperations {
     }
 
     static void cmdRemovePermissions(Message message) {
-        int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage());
+        int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage());
         if (permissions < 0) {
             message.getSender().sendOperatorMessage("Invalid Argument: Required Integer: New Permissions");
             return;
@@ -54,7 +53,7 @@ public class CommandPermissionOperations {
 
     static void cmdGenerateOneTimeKey(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_ONETIME_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(message.getMessage()) & message.getSender().getPermissions();
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getSender().getPermissions();
             ShadowManager.log(Level.INFO, message.getSender().toString() + " has created temporary key with permissions " + permissions);
             message.getSender().sendOperatorMessage("Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
         } else {
@@ -64,7 +63,7 @@ public class CommandPermissionOperations {
 
     static void cmdRemoveKey(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.REMOVE_KEYS)) {
-            boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getMessage()));
+            boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
             if (success) {
                 ShadowManager.log(Level.INFO, message.getSender().toString() + " has removed key");
                 message.getSender().sendOperatorMessage("Successfully removed key");

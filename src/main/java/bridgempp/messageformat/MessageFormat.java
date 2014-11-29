@@ -34,5 +34,16 @@ public abstract class MessageFormat {
 		}
 		return parentFormat.convertToFormat(convertToParent(message), other);
 	}
+	public static MessageFormat parseMessageFormat(String messageFormat) {
+		if(PLAIN_TEXT.getName().equals(messageFormat))
+		{
+			return PLAIN_TEXT;
+		}
+		if(HTML.getName().equals(messageFormat))
+		{
+			return HTML;
+		}
+		return null;
+	}
 	
 }

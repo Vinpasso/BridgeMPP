@@ -15,10 +15,8 @@ public class BridgeChat implements BridgeService {
 
 	private Socket socket;
 	private Endpoint endpoint;
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[]{
-				MessageFormat.PLAIN_TEXT,
-				MessageFormat.HTML
-			};
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
+			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect(String argList) {
@@ -39,8 +37,11 @@ public class BridgeChat implements BridgeService {
 				public void run() {
 					try {
 						while (true) {
-							CommandInterpreter.processMessage(new Message(endpoint, BridgeChatProtoBuf.UserEvent.parseFrom(socket
-									.getInputStream()).getChatMessage()));
+							CommandInterpreter.processMessage(new Message(
+									endpoint, BridgeChatProtoBuf.UserEvent
+											.parseFrom(socket.getInputStream())
+											.getChatMessage(),
+									getSupportedMessageFormats()[0]));
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -66,10 +67,12 @@ public class BridgeChat implements BridgeService {
 	@Override
 	public void sendMessage(Message message) {
 		try {
-			BridgeChatProtoBuf.UserEvent.newBuilder()
+			BridgeChatProtoBuf.UserEvent
+					.newBuilder()
 					.setUsername(message.getSender().toString())
-					.setChatMessage(message.toComplexString()).build()
-					.writeTo(socket.getOutputStream());
+					.setChatMessage(
+							message.toComplexString(getSupportedMessageFormats()))
+					.build().writeTo(socket.getOutputStream());
 			;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -90,11 +93,17 @@ public class BridgeChat implements BridgeService {
 	public void addEndpoint(Endpoint endpoint) {
 		this.endpoint = endpoint;
 	}
-	
+
 	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
 	}
+	
+	@Override
+	public void interpretCommand(Message message) {
+		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+	}
+	
 
 	public static final class BridgeChatProtoBuf {
 		private BridgeChatProtoBuf() {
@@ -203,7 +212,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -947,7 +955,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -1481,7 +1488,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -2424,7 +2430,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -2953,7 +2958,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -4074,7 +4078,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
@@ -4685,7 +4688,6 @@ public class BridgeChat implements BridgeService {
 					com.google.protobuf.ExtensionRegistryLite extensionRegistry)
 					throws com.google.protobuf.InvalidProtocolBufferException {
 				initFields();
-				int mutable_bitField0_ = 0;
 				com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
 						.newBuilder();
 				try {
