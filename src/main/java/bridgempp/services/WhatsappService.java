@@ -11,11 +11,12 @@ import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -26,13 +27,13 @@ public class WhatsappService implements BridgeService {
 	private ArrayList<Endpoint> endpoints;
 
 	private Process yowsup;
-	private Scanner scanner;
+	private BufferedReader bufferedReader;
 	// private PrintStream printStream;
 	private LinkedBlockingQueue<String> senderQueue;
 	private Thread senderThread;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
-			MessageFormat.PLAIN_TEXT };
+		MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect(String argString) {
@@ -69,13 +70,10 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void sendMessage(Message message) {
-		try {
-			senderQueue.add(message.getTarget().getTarget());
-			senderQueue.add(Base64.getEncoder().encodeToString(
-					message.toSimpleString(getSupportedMessageFormats()).getBytes("UTF-8")));
-		} catch (UnsupportedEncodingException ex) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
-		}
+		senderQueue.add("<message \"type=\"" + (message.getMessageFormat().equals(MessageFormat.PLAIN_TEXT)?"text":"media") + 
+				"to=\"" + message.getTarget().getTarget() + 
+				"\"body=\"" + message.toSimpleString(getSupportedMessageFormats()) +
+				"/>");
 	}
 
 	@Override
@@ -92,7 +90,7 @@ public class WhatsappService implements BridgeService {
 	public void addEndpoint(Endpoint endpoint) {
 		endpoints.add(endpoint);
 	}
-	
+
 	@Override
 	public void interpretCommand(bridgempp.Message message) {
 		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
@@ -101,11 +99,14 @@ public class WhatsappService implements BridgeService {
 	private class WhatsappSender implements Runnable {
 
 		private PrintStream realOutputStream;
-		private boolean isBody = false;
 		private long lastMessage = 0;
 
 		public WhatsappSender(OutputStream realOutputStream) {
-			this.realOutputStream = new PrintStream(realOutputStream, true);
+			try {
+				this.realOutputStream = new PrintStream(realOutputStream, true, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -117,17 +118,11 @@ public class WhatsappService implements BridgeService {
 					if (line == null) {
 						return;
 					}
+					if(System.currentTimeMillis() - lastMessage < 10000) {
+						Thread.sleep(10000);
+					}
 					realOutputStream.println(line);
-
-					if (isBody) {
-						lastMessage = System.currentTimeMillis();
-						isBody = false;
-					} else {
-						isBody = true;
-					}
-					if (isBody && System.currentTimeMillis() - lastMessage < 10000) {
-						Thread.sleep(System.currentTimeMillis() - lastMessage);
-					}
+					lastMessage = System.currentTimeMillis();
 				}
 			} catch (InterruptedException ex) {
 				Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
@@ -178,52 +173,85 @@ public class WhatsappService implements BridgeService {
 				}, "Whatsapp Error Listener").start();
 				senderThread = new Thread(new WhatsappSender(yowsup.getOutputStream()), "Whatsapp Sender");
 				senderThread.start();
-				scanner = new Scanner(yowsup.getInputStream());
+				bufferedReader = new BufferedReader(new InputStreamReader(yowsup.getInputStream(), "UTF-8"));
 				ShadowManager.log(Level.INFO, "Started Yowsup Process");
 				while (true) {
-					try {
-						String line = scanner.nextLine();
-						if (!line.contains(" [") || !line.contains("]:")) {
-							ShadowManager.log(Level.INFO, "Restarting Yowsup process due to: " + line);
-							break;
+					String buffer = "";
+					do
+					{
+						buffer += bufferedReader.readLine() + "\n";
+					} while(bufferedReader.ready());
+					Matcher matcher = Pattern.compile("(?<=<message>).+?(?=<\\/message>)", Pattern.DOTALL).matcher(buffer);
+					while(matcher.find())
+					{
+						String message = matcher.group();
+						Message parsedMessage = parseMessage(message);
+						if(parsedMessage == null)
+						{
+							throw new UnsupportedOperationException("Non parseable Message: " + message);
 						}
-						String sender = line.substring(0, line.indexOf(" ["));
-						String extra = "";
-						if (sender.endsWith("@g.us")) {
-							extra = sender.substring(0, sender.indexOf("@s.whatsapp.net")) + "@s.whatsapp.net";
-							sender = sender.substring(extra.length() + 1);
-						}
-						String message = new String(Base64.getDecoder().decode(
-								line.substring(line.indexOf("]:") + 2).trim()), "UTF-8");
-						boolean found = false;
-						for (int i = 0; i < endpoints.size(); i++) {
-							if (endpoints.get(i).getTarget().equals(sender)) {
-								endpoints.get(i).setExtra(extra);
-								Message bMessage = new Message(endpoints.get(i), message, MessageFormat.PLAIN_TEXT);
-								CommandInterpreter.processMessage(bMessage);
-								found = true;
-								break;
-							}
-						}
-						if (!found) {
-							Endpoint endpoint = new Endpoint(WhatsappService.this, sender);
-							endpoint.setExtra(extra);
-							endpoints.add(endpoint);
-							Message bMessage = new Message(endpoint, message, MessageFormat.PLAIN_TEXT);
-							CommandInterpreter.processMessage(bMessage);
-						}
-					} catch (UnsupportedEncodingException ex) {
-						Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
+						CommandInterpreter.processMessage(parsedMessage);
 					}
 				}
-				senderThread.interrupt();
-				yowsup.destroyForcibly();
-			} catch (IOException ex) {
+			} catch (UnsupportedOperationException | IOException ex) {
 				Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
 			}
+			senderThread.interrupt();
+			yowsup.destroyForcibly();
 			ShadowManager.log(Level.INFO, "Stopped Yowsup Process");
 		}
 
+		private Message parseMessage(String message) {
+			Matcher matcher = Pattern.compile(".").matcher(message);
+			Message constructedMessage = new Message();
+			while(matcher.find())
+			{
+				String value = matcher.group().substring(matcher.group().indexOf(": ") + 2);
+				switch(matcher.group().substring(0, matcher.group().indexOf(": ")))
+				{
+				case "Message":
+					break;
+				case "ID":
+					break;
+				case "From":
+					for(int i = 0; i < endpoints.size(); i++)
+					{
+						if(endpoints.get(i).getTarget().equals(matcher.group().substring(matcher.group().indexOf(": " + 2))))
+						{
+							constructedMessage.setSender(endpoints.get(i));
+						}
+					}
+					if(constructedMessage.getTarget() == null)
+					{
+						Endpoint endpoint = new Endpoint(WhatsappService.this, matcher.group().substring(matcher.group().indexOf(": ") + 2));
+						endpoints.add(endpoint);
+						constructedMessage.setSender(endpoint);
+					}
+					break;
+				case "Type":
+					if(value.equals("text"))
+					{
+						constructedMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
+					}
+					else if(value.equals("media"))
+					{
+						constructedMessage.setMessageFormat(MessageFormat.HTML);
+					}
+					break;
+				case "Participant":
+					constructedMessage.getSender().setExtra(value);
+					break;
+				case "Body":
+					constructedMessage.setMessage(value);
+					break;
+				case "URL":
+					constructedMessage.setMessage("<img style='' alt='WhatsApp Image " + value + "' src=" + value + "/>");
+					break;
+				}
+
+			}
+			return constructedMessage;
+		}
 	}
 
 	@Override
