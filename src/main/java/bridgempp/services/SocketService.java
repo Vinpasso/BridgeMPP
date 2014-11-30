@@ -170,7 +170,7 @@ public class SocketService implements BridgeService {
 							buffer += line + "\n";
 						} while (bufferedReader.ready());
 						buffer = buffer.trim();
-						Matcher matcher = Pattern.compile("(?<=<message>)[^<]+(?=<\\/message>)").matcher(buffer);
+						Matcher matcher = Pattern.compile("(?<=<message>).+(?=<\\/message>)", Pattern.DOTALL).matcher(buffer);
 						while (matcher.find()) {
 							Message message = Message.parseMessage(matcher.group());
 							message.setSender(endpoint);
