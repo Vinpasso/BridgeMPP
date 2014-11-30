@@ -144,20 +144,14 @@ public class Message {
     public static Message parseMessage(String complexString)
     {
     	Message message = new Message();
-    	Pattern pattern = Pattern.compile("[^(:\\ |\\ -->\\ )]+");
-    	Matcher matcher = pattern.matcher(complexString);
-    	if(matcher.find() && matcher.find() && matcher.find() && matcher.find())
+    	String[] messageSplit = complexString.split("\\s*(?::| -->)\\s+", 5);
+    	if(messageSplit.length == 5)
     	{
-    		matcher.reset();
-    		matcher.find();
-        	message.setMessageFormat(MessageFormat.parseMessageFormat(matcher.group()));
-    		matcher.find();
-    		message.setGroup(GroupManager.findGroup(matcher.group()));
-    		matcher.find();
+        	message.setMessageFormat(MessageFormat.parseMessageFormat(messageSplit[0]));
+    		message.setGroup(GroupManager.findGroup(messageSplit[1]));
     		//Endpoint Sender
-    		matcher.find();
     		//Endpoint Recipient
-    		message.setMessage(complexString.substring(matcher.end() + 2));
+    		message.setMessage(messageSplit[4]);
     	}
     	else
     	{

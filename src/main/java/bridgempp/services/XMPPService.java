@@ -96,6 +96,8 @@ public class XMPPService implements BridgeService {
 		try {
 			ShadowManager.log(Level.INFO, "Stopping XMPP Service...");
 			connection.disconnect();
+			//Prevent Executor services from idling in the background
+			connection = null;
 			ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
 		} catch (SmackException.NotConnectedException ex) {
 			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);

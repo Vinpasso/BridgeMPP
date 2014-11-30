@@ -19,6 +19,10 @@ public abstract class MessageFormat {
 		{
 			return true;
 		}
+		if(parentFormat == null)
+		{
+			return false;
+		}
 		return parentFormat.canConvertToFormat(other);
 	}
 	

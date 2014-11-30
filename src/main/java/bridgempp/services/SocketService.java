@@ -39,7 +39,7 @@ public class SocketService implements BridgeService {
 	private String listenAddress;
 	private HashMap<Integer, SocketClient> connectedSockets;
 	private ServerListener serverListener;
-	private boolean protoXMLCarry;
+	private boolean protoXMLCarry = false;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
 			MessageFormat.PLAIN_TEXT };
@@ -168,6 +168,7 @@ public class SocketService implements BridgeService {
 						Matcher matcher = Pattern.compile("(?<=<message>)[^<]+(?=<\\/message>)").matcher(buffer);
 						while (matcher.find()) {
 							Message message = Message.parseMessage(matcher.group());
+							message.setSender(endpoint);
 							CommandInterpreter.processMessage(message);
 						}
 					} else {
