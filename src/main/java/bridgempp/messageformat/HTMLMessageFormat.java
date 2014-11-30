@@ -12,6 +12,10 @@ import javax.swing.text.html.HTMLEditorKit;
 
 public class HTMLMessageFormat extends MessageFormat {
 
+	public HTMLMessageFormat() {
+		parentFormat = MessageFormat.PLAIN_TEXT;
+	}
+	
 	@Override
 	public String getName() {
 		return "HTML";
@@ -24,7 +28,7 @@ public class HTMLMessageFormat extends MessageFormat {
 		document.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
 		try {
 			kit.read(new StringReader(message), document, 0);
-			return document.getText(0, document.getLength());
+			return document.getText(0, document.getLength()).trim();
 		} catch (IOException | BadLocationException e) {
 			Logger.getLogger(HTMLMessageFormat.class.getName()).log(Level.SEVERE, null, e);
 		}

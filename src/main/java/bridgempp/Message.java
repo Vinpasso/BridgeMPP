@@ -141,7 +141,7 @@ public class Message {
     public static Message parseMessage(String complexString)
     {
     	Message message = new Message();
-    	String[] messageSplit = complexString.split("\\s*(?::| -->)\\s+", 5);
+    	String[] messageSplit = complexString.split("\\s*(?::|-->)\\s+", 5);
     	if(messageSplit.length == 5)
     	{
         	message.setMessageFormat(MessageFormat.parseMessageFormat(messageSplit[0]));

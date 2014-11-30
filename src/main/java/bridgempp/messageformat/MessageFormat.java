@@ -4,7 +4,7 @@ public abstract class MessageFormat {
 	public static MessageFormat PLAIN_TEXT = new PlainTextMessageFormat();
 	public static MessageFormat HTML = new HTMLMessageFormat();
 	
-	private MessageFormat parentFormat;
+	protected MessageFormat parentFormat;
 	
 	public abstract String getName();
 	public abstract String convertToParent(String message);

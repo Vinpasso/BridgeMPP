@@ -20,6 +20,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.spark.util.DummySSLSocketFactory;
 
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class XMPPService implements BridgeService {
 		try {
 			ShadowManager.log(Level.INFO, "Stopping XMPP Service...");
 			connection.disconnect();
-			//Prevent Executor services from idling in the background
+			// Prevent Executor services from idling in the background
 			connection = null;
 			ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
 		} catch (SmackException.NotConnectedException ex) {
@@ -106,8 +107,7 @@ public class XMPPService implements BridgeService {
 
 	@Override
 	public void sendMessage(bridgempp.Message message) {
-		activeChats.get(message.getTarget().getTarget()).sendMessage(
-				message.toSimpleString(getSupportedMessageFormats()));
+		activeChats.get(message.getTarget().getTarget()).sendMessage(message);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class XMPPService implements BridgeService {
 
 	interface XMPPMessageListener {
 
-		public void sendMessage(String message);
+		public void sendMessage(bridgempp.Message message);
 	}
 
 	class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListener {
@@ -186,10 +186,16 @@ public class XMPPService implements BridgeService {
 		}
 
 		@Override
-		public void sendMessage(String message) {
+		public void sendMessage(bridgempp.Message message) {
 			try {
-				chat.sendMessage(message);
-			} catch (XMPPException | SmackException.NotConnectedException ex) {
+				Message sendMessage = new Message();
+				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.HTML))
+				{
+					XHTMLManager.addBody(sendMessage, message.toSimpleString(supportedMessageFormats));
+				}
+				sendMessage.addBody(null, message.getPlainTextMessage());
+				chat.sendMessage(sendMessage);
+			} catch (SmackException.NotConnectedException ex) {
 				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
@@ -255,9 +261,18 @@ public class XMPPService implements BridgeService {
 		}
 
 		@Override
-		public void sendMessage(String message) {
+		public void sendMessage(bridgempp.Message message) {
 			try {
-				multiUserChat.sendMessage(message);
+				Message sendMessage = new Message(multiUserChat.getRoom(), Message.Type.groupchat);
+				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.HTML))
+				{
+					XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + message.toSimpleString(supportedMessageFormats) + "</body>");
+				}
+				else
+				{
+					sendMessage.addBody(null, message.getPlainTextMessage());
+				}
+				multiUserChat.sendMessage(sendMessage);
 			} catch (XMPPException | SmackException.NotConnectedException ex) {
 				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -271,11 +286,15 @@ public class XMPPService implements BridgeService {
 					|| message.getFrom().contains(multiUserChat.getRoom() + "/" + multiUserChat.getNickname())) {
 				return;
 			}
-			endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/") + 1));
+			String jid = multiUserChat.getOccupant(message.getFrom()).getJid();
+			if (jid != null) {
+				endpoint.setExtra(jid.substring(0, jid.indexOf("/")));
+			} else {
+				endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/")));
+			}
 			CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
 					getSupportedMessageFormats()[0]));
 		}
-
 	}
 
 	@Override
