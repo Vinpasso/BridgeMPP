@@ -162,7 +162,12 @@ public class SocketService implements BridgeService {
 					if (protoXMLCarry) {
 						String buffer = "";
 						do {
-							buffer += bufferedReader.readLine() + "\n";
+							String line = bufferedReader.readLine();
+							if(line == null)
+							{
+								throw new IOException("End of Stream");
+							}
+							buffer += line + "\n";
 						} while (bufferedReader.ready());
 						buffer = buffer.trim();
 						Matcher matcher = Pattern.compile("(?<=<message>)[^<]+(?=<\\/message>)").matcher(buffer);
