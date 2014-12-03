@@ -193,7 +193,10 @@ public class XMPPService implements BridgeService {
 				{
 					XHTMLManager.addBody(sendMessage, message.toSimpleString(supportedMessageFormats));
 				}
-				sendMessage.addBody(null, message.getPlainTextMessage());
+				else
+				{
+					sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT}));
+				}
 				chat.sendMessage(sendMessage);
 			} catch (SmackException.NotConnectedException ex) {
 				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
@@ -270,7 +273,7 @@ public class XMPPService implements BridgeService {
 				}
 				else
 				{
-					sendMessage.addBody(null, message.getPlainTextMessage());
+					sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT}));
 				}
 				multiUserChat.sendMessage(sendMessage);
 			} catch (XMPPException | SmackException.NotConnectedException ex) {

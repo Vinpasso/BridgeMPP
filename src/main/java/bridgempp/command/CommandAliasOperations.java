@@ -13,6 +13,7 @@ import bridgempp.PermissionsManager.Permission;
 
 import java.util.Scanner;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -32,12 +33,14 @@ public class CommandAliasOperations {
 
     static void cmdImportAliasList(Message message) {
         if (CommandInterpreter.checkPermission(message.getSender(), Permission.IMPORT_ALIAS)) {
-            Scanner scanner = new Scanner(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-            scanner.useDelimiter(";");
-            while (scanner.hasNext()) {
-                EndpointTranslator.saveHumanReadableEndpoint(new Endpoint(null, scanner.next()), rearrangeNameFormat(scanner.next()));
+            String[] commands = CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()).split("; ");
+            if(commands.length % 2 != 0)
+            {
+            	message.getSender().sendOperatorMessage("Length of Commands not even! Last import will be dropped");
             }
-            scanner.close();
+            for(int i = 0; i < commands.length - 1; i += 2) {
+                EndpointTranslator.saveHumanReadableEndpoint(new Endpoint(null, commands[i]), rearrangeNameFormat(commands[i+1]));
+            }
             message.getSender().sendOperatorMessage("Alias List successfully imported");
         }
         else
