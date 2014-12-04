@@ -227,6 +227,10 @@ public class SocketService implements BridgeService {
 						if (protoMessage.hasGroup()) {
 							bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
 						}
+						if(bridgeMessage.getMessageFormat() == null)
+						{
+							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
+						}
 						CommandInterpreter.processMessage(bridgeMessage);
 						break;
 					case XML_Embedded:

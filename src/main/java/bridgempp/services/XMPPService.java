@@ -38,7 +38,7 @@ public class XMPPService implements BridgeService {
 	private ChatManager chatmanager;
 	private HashMap<String, XMPPMessageListener> activeChats;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
 			MessageFormat.PLAIN_TEXT };
 
 	public XMPPService() {
@@ -189,7 +189,7 @@ public class XMPPService implements BridgeService {
 		public void sendMessage(bridgempp.Message message) {
 			try {
 				Message sendMessage = new Message();
-				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.HTML))
+				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML))
 				{
 					XHTMLManager.addBody(sendMessage, message.toSimpleString(supportedMessageFormats));
 				}
@@ -267,7 +267,7 @@ public class XMPPService implements BridgeService {
 		public void sendMessage(bridgempp.Message message) {
 			try {
 				Message sendMessage = new Message(multiUserChat.getRoom(), Message.Type.groupchat);
-				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.HTML))
+				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML))
 				{
 					XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + message.toSimpleString(supportedMessageFormats) + "</body>");
 				}
