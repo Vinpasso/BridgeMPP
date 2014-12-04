@@ -21,6 +21,7 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
+import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 import org.jivesoftware.spark.util.DummySSLSocketFactory;
 
 import java.io.IOException;
@@ -189,14 +190,11 @@ public class XMPPService implements BridgeService {
 		public void sendMessage(bridgempp.Message message) {
 			try {
 				Message sendMessage = new Message();
-				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML))
-				{
+				if (message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML)) {
 					XHTMLManager.addBody(sendMessage, message.toSimpleString(supportedMessageFormats));
 				}
-				else
-				{
-					sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT}));
-				}
+
+				sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
 				chat.sendMessage(sendMessage);
 			} catch (SmackException.NotConnectedException ex) {
 				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
@@ -267,11 +265,13 @@ public class XMPPService implements BridgeService {
 		public void sendMessage(bridgempp.Message message) {
 			try {
 				Message sendMessage = new Message(multiUserChat.getRoom(), Message.Type.groupchat);
-				if(message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML))
-				{
-					XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + message.toSimpleString(supportedMessageFormats) + "</body>");
+				if (message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML)) {
+					XHTMLManager.addBody(
+							sendMessage,
+							"<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+									+ message.toSimpleString(supportedMessageFormats) + "</body>");
 				}
-				sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT}));
+				sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
 				multiUserChat.sendMessage(sendMessage);
 			} catch (XMPPException | SmackException.NotConnectedException ex) {
 				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
