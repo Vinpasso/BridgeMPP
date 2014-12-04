@@ -48,6 +48,10 @@ public abstract class MessageFormat {
 		{
 			return HTML;
 		}
+		if(XHTML.getName().equals(messageFormat))
+		{
+			return XHTML;
+		}
 		return null;
 	}
 	

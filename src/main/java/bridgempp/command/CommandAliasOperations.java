@@ -5,15 +5,13 @@
  */
 package bridgempp.command;
 
+import java.util.logging.Level;
+
 import bridgempp.Endpoint;
 import bridgempp.EndpointTranslator;
 import bridgempp.Message;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
-
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
+import bridgempp.ShadowManager;
 
 /**
  *

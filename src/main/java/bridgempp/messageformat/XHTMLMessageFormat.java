@@ -4,7 +4,7 @@ package bridgempp.messageformat;
 public class XHTMLMessageFormat extends MessageFormat {
 
 	public XHTMLMessageFormat() {
-		parentFormat = MessageFormat.XHTML;
+		parentFormat = MessageFormat.HTML;
 	}
 	
 	@Override
