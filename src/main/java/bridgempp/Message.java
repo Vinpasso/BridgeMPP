@@ -73,7 +73,7 @@ public class Message {
     			return format;
     		}
     	}
-    	return null;
+    	return MessageFormat.PLAIN_TEXT;
     }
     
     
