@@ -48,8 +48,8 @@ public class XMPPService implements BridgeService {
 	private HashMap<String, XMPPMessageListener> activeChats;
 	private HashMap<String, String> cachedObjects;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
-			MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
+			MessageFormat.PLAIN_TEXT };
 
 	public XMPPService() {
 		activeChats = new HashMap<>();
@@ -65,14 +65,12 @@ public class XMPPService implements BridgeService {
 
 			String[] args = parameters.split("; ");
 			if (args.length != 7) {
-				throw new UnsupportedOperationException(
-						"XMPP Configuration Error: " + parameters);
+				throw new UnsupportedOperationException("XMPP Configuration Error: " + parameters);
 			}
-			ConnectionConfiguration configuration = new ConnectionConfiguration(
-					args[0], Integer.parseInt(args[1]), args[2]);
+			ConnectionConfiguration configuration = new ConnectionConfiguration(args[0], Integer.parseInt(args[1]),
+					args[2]);
 			if (Boolean.parseBoolean(args[6])) {
-				configuration
-						.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+				configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
 				configuration.setSocketFactory(new DummySSLSocketFactory());
 			}
 			connection = new XMPPTCPConnection(configuration);
@@ -81,40 +79,34 @@ public class XMPPService implements BridgeService {
 			Presence presence = new Presence(Presence.Type.available);
 			presence.setStatus(args[5]);
 			connection.sendPacket(presence);
-			connection.addPacketListener(new XMPPRosterListener(),
-					new PacketFilter() {
+			connection.addPacketListener(new XMPPRosterListener(), new PacketFilter() {
 
-						@Override
-						public boolean accept(Packet packet) {
-							if (packet instanceof Presence) {
-								if (((Presence) packet).getType().equals(
-										Presence.Type.subscribe)) {
-									return true;
-								}
-							}
-							return false;
+				@Override
+				public boolean accept(Packet packet) {
+					if (packet instanceof Presence) {
+						if (((Presence) packet).getType().equals(Presence.Type.subscribe)) {
+							return true;
 						}
+					}
+					return false;
+				}
 
-					});
-			connection.getRoster().setSubscriptionMode(
-					Roster.SubscriptionMode.manual);
+			});
+			connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
 			chatmanager = ChatManager.getInstanceFor(connection);
 			chatmanager.addChatListener(new XMPPChatListener());
-			MultiUserChat.addInvitationListener(connection,
-					new XMPPMultiUserChatListener());
+			MultiUserChat.addInvitationListener(connection, new XMPPMultiUserChatListener());
 			ShadowManager.log(Level.INFO, "Started XMPP Service");
 			ProviderManager.addIQProvider("data", "urn:xmpp:bob", new BOB());
-			connection.addPacketListener(new XMPPIQPacketListener(),
-					new PacketFilter() {
+			connection.addPacketListener(new XMPPIQPacketListener(), new PacketFilter() {
 
-						@Override
-						public boolean accept(Packet packet) {
-							return packet instanceof BOBIQ;
-						}
-					});
+				@Override
+				public boolean accept(Packet packet) {
+					return packet instanceof BOBIQ;
+				}
+			});
 		} catch (XMPPException | SmackException | IOException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 	}
@@ -128,8 +120,7 @@ public class XMPPService implements BridgeService {
 			connection = null;
 			ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
 		} catch (SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -151,43 +142,35 @@ public class XMPPService implements BridgeService {
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
 		if (endpoint.getExtra().isEmpty()) {
-			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(
-					endpoint);
+			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(endpoint);
 			listener.chat.addMessageListener(listener);
 		} else {
-			XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(
-					endpoint);
+			XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(endpoint);
 			listener.multiUserChat.addMessageListener(listener);
 		}
 	}
 
 	@Override
 	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(
-				getClass().getSimpleName() + ": No supported Protocol options");
+		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	private class XMPPRosterListener implements PacketListener {
 
 		@Override
-		public void processPacket(Packet packet)
-				throws SmackException.NotConnectedException {
+		public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 			try {
 				Presence presence = (Presence) packet;
 				Presence subscribed = new Presence(Presence.Type.subscribed);
 				subscribed.setTo(packet.getFrom());
 				connection.sendPacket(subscribed);
-				connection.getRoster().createEntry(presence.getFrom(),
-						presence.getFrom(), null);
-				Presence subscribeRequest = new Presence(
-						Presence.Type.subscribe);
+				connection.getRoster().createEntry(presence.getFrom(), presence.getFrom(), null);
+				Presence subscribeRequest = new Presence(Presence.Type.subscribe);
 				subscribeRequest.setTo(packet.getFrom());
 				connection.sendPacket(subscribeRequest);
-			} catch (SmackException.NotLoggedInException
-					| SmackException.NoResponseException
+			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException
 					| XMPPException.XMPPErrorException ex) {
-				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -197,8 +180,7 @@ public class XMPPService implements BridgeService {
 		public void sendMessage(bridgempp.Message message);
 	}
 
-	class XMPPSingleChatMessageListener implements XMPPMessageListener,
-			MessageListener {
+	class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListener {
 
 		Endpoint endpoint;
 		private Chat chat;
@@ -218,39 +200,24 @@ public class XMPPService implements BridgeService {
 
 		@Override
 		public void processMessage(Chat chat, Message message) {
-			CommandInterpreter.processMessage(new bridgempp.Message(endpoint,
-					message.getBody(), getSupportedMessageFormats()[0]));
+			CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
+					getSupportedMessageFormats()[0]));
 		}
 
 		@Override
 		public void sendMessage(bridgempp.Message message) {
 			try {
 				Message sendMessage = new Message();
-				if (message.chooseMessageFormat(supportedMessageFormats)
-						.equals(MessageFormat.XHTML)) {
-					String messageContents = message
-							.toSimpleString(supportedMessageFormats);
-					Matcher matcher = Pattern
-							.compile(
-									"<img src=\"data:image\\/jpeg;base64,(.*?)\".*?\\/>")
-							.matcher(messageContents);
-					while (matcher.find()) {
-						String data = matcher.group(1);
-						String identifier = data.hashCode() + "@bob.xmpp.org";
-						messageContents.replace(data, "cid:" + identifier);
-						cachedObjects.put(identifier, data);
-					}
+				if (message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML)) {
+					String messageContents = message.toSimpleString(supportedMessageFormats);
+					messageContents = cacheEmbeddedBase64Image(messageContents);
 					XHTMLManager.addBody(sendMessage, messageContents);
 				}
 
-				sendMessage
-						.addBody(
-								null,
-								message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
+				sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
 				chat.sendMessage(sendMessage);
 			} catch (SmackException.NotConnectedException ex) {
-				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -268,54 +235,43 @@ public class XMPPService implements BridgeService {
 	class XMPPMultiUserChatListener implements InvitationListener {
 
 		@Override
-		public void invitationReceived(XMPPConnection conn, String room,
-				String inviter, String reason, String password, Message message) {
+		public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason,
+				String password, Message message) {
 			try {
 				MultiUserChat multiUserChat = new MultiUserChat(conn, room);
 				DiscussionHistory discussionHistory = new DiscussionHistory();
 				discussionHistory.setMaxStanzas(0);
-				multiUserChat.join("BridgeMPP", password, discussionHistory,
-						conn.getPacketReplyTimeout());
-				multiUserChat
-						.addMessageListener(new XMPPMultiUserMessageListener(
-								multiUserChat));
-			} catch (XMPPException.XMPPErrorException
-					| SmackException.NoResponseException
+				multiUserChat.join("BridgeMPP", password, discussionHistory, conn.getPacketReplyTimeout());
+				multiUserChat.addMessageListener(new XMPPMultiUserMessageListener(multiUserChat));
+			} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 					| SmackException.NotConnectedException ex) {
-				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 
 	}
 
-	class XMPPMultiUserMessageListener implements XMPPMessageListener,
-			PacketListener {
+	class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListener {
 
 		Endpoint endpoint;
 		MultiUserChat multiUserChat;
 
 		public XMPPMultiUserMessageListener(Chat chat) {
-			throw new UnsupportedOperationException(
-					"Attempted to create multiuserchat from Single Chat");
+			throw new UnsupportedOperationException("Attempted to create multiuserchat from Single Chat");
 		}
 
 		// For resumed Chats
 		public XMPPMultiUserMessageListener(Endpoint endpoint) {
 			try {
-				multiUserChat = new MultiUserChat(connection,
-						endpoint.getTarget());
+				multiUserChat = new MultiUserChat(connection, endpoint.getTarget());
 				DiscussionHistory discussionHistory = new DiscussionHistory();
 				discussionHistory.setMaxStanzas(0);
-				multiUserChat.join("BridgeMPP", "", discussionHistory,
-						connection.getPacketReplyTimeout());
+				multiUserChat.join("BridgeMPP", "", discussionHistory, connection.getPacketReplyTimeout());
 				this.endpoint = endpoint;
 				activeChats.put(endpoint.getTarget(), this);
-			} catch (XMPPException.XMPPErrorException
-					| SmackException.NoResponseException
+			} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 					| SmackException.NotConnectedException ex) {
-				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 
@@ -328,68 +284,56 @@ public class XMPPService implements BridgeService {
 		@Override
 		public void sendMessage(bridgempp.Message message) {
 			try {
-				Message sendMessage = new Message(multiUserChat.getRoom(),
-						Message.Type.groupchat);
-				if (message.chooseMessageFormat(supportedMessageFormats)
-						.equals(MessageFormat.XHTML)) {
-					String messageContents = message
-							.toSimpleString(supportedMessageFormats);
-					Matcher matcher = Pattern
-							.compile(
-									"<img src=\"data:image\\/jpeg;base64,(.*?)\".*?\\/>")
-							.matcher(messageContents);
-					while (matcher.find()) {
-						String data = matcher.group(1);
-						String identifier = data.hashCode()
-								+ "@bob.xmpp.org";
-						messageContents = messageContents.replace(
-								"data:image/jpeg;base64," + data, "cid:" + identifier);
-						cachedObjects.put(identifier, data);
-					}
-
-					XHTMLManager.addBody(sendMessage,
-							"<body xmlns=\"http://www.w3.org/1999/xhtml\">"
-									+ messageContents + "</body>");
+				Message sendMessage = new Message(multiUserChat.getRoom(), Message.Type.groupchat);
+				if (message.chooseMessageFormat(supportedMessageFormats).equals(MessageFormat.XHTML)) {
+					String messageContents = message.toSimpleString(supportedMessageFormats);
+					messageContents = cacheEmbeddedBase64Image(messageContents);
+					XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + messageContents
+							+ "</body>");
 				}
-				sendMessage
-						.addBody(
-								null,
-								message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
+				sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
 				multiUserChat.sendMessage(sendMessage);
 			} catch (XMPPException | SmackException.NotConnectedException ex) {
-				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 
 		@Override
-		public void processPacket(Packet packet)
-				throws SmackException.NotConnectedException {
+		public void processPacket(Packet packet) throws SmackException.NotConnectedException {
 			Message message = (Message) packet;
-			if (message.getType() != Message.Type.groupchat
-					|| message.getBody() == null
-					|| !message.getFrom().contains(
-							multiUserChat.getRoom() + "/")
-					|| message.getFrom().contains(
-							multiUserChat.getRoom() + "/"
-									+ multiUserChat.getNickname())) {
+			if (message.getType() != Message.Type.groupchat || message.getBody() == null
+					|| !message.getFrom().contains(multiUserChat.getRoom() + "/")
+					|| message.getFrom().contains(multiUserChat.getRoom() + "/" + multiUserChat.getNickname())) {
 				return;
 			}
 			String jid = multiUserChat.getOccupant(message.getFrom()).getJid();
 			if (jid != null) {
 				endpoint.setExtra(jid.substring(0, jid.indexOf("/")));
 			} else {
-				endpoint.setExtra(message.getFrom().substring(
-						message.getFrom().indexOf("/")));
+				endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/")));
 			}
-			CommandInterpreter.processMessage(new bridgempp.Message(endpoint,
-					message.getBody(), getSupportedMessageFormats()[0]));
+			CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
+					getSupportedMessageFormats()[0]));
 		}
 	}
 
 	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
+	}
+
+	private String cacheEmbeddedBase64Image(String messageContents) {
+		Matcher matcher = Pattern.compile("<img src=\"data:image\\/jpeg;base64,(.*?)\".*?\\/>").matcher(
+				messageContents);
+		cachedObjects.clear();
+		while (matcher.find()) {
+			String data = matcher.group(1);
+			String identifier = data.hashCode() + "@bob.xmpp.org";
+			messageContents = messageContents
+					.replace("data:image/jpeg;base64," + data, "cid:" + identifier);
+			cachedObjects.put(identifier, data);
+		}
+		return messageContents;
 	}
 
 	public class XMPPIQPacketListener implements PacketListener {
@@ -424,12 +368,10 @@ public class XMPPService implements BridgeService {
 				}
 				int eventType = parser.next();
 
-				if (eventType == XmlPullParser.START_TAG
-						&& "data".equals(parser.getName())) {
+				if (eventType == XmlPullParser.START_TAG && "data".equals(parser.getName())) {
 					// Initialize the variables from the parsed XML
 					bOBIQ.hash = parser.getAttributeValue("", "cid");
-				} else if (eventType == XmlPullParser.END_TAG
-						&& "data".equals(parser.getName())) {
+				} else if (eventType == XmlPullParser.END_TAG && "data".equals(parser.getName())) {
 					done = true;
 				}
 			}
@@ -441,8 +383,7 @@ public class XMPPService implements BridgeService {
 			private String data;
 
 			public CharSequence getChildElementXML() {
-				return "<data xmlns='urn:xmpp:bob' cid='" + hash
-						+ "' type='image/jpeg'>" + data + "</data>";
+				return "<data xmlns='urn:xmpp:bob' cid='" + hash + "' type='image/jpeg'>" + data + "</data>";
 			}
 		}
 	}
