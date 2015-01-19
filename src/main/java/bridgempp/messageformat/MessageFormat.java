@@ -1,9 +1,10 @@
 package bridgempp.messageformat;
 
 public abstract class MessageFormat {
-	public static final MessageFormat XHTML = new XHTMLMessageFormat();
 	public static MessageFormat PLAIN_TEXT = new PlainTextMessageFormat();
 	public static MessageFormat HTML = new HTMLMessageFormat();
+	public static MessageFormat XHTML = new XHTMLMessageFormat();
+
 	
 	protected MessageFormat parentFormat;
 	

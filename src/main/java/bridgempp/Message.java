@@ -175,4 +175,8 @@ public class Message {
 	public void setMessageFormat(MessageFormat messageFormat) {
 		this.messageFormat = messageFormat;
 	}
+
+	public String getMessageRaw() {
+		return message;
+	}
 }

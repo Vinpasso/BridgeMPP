@@ -76,7 +76,7 @@ public class CommandInterpreter {
 
 	// Process incomming messages and forward them to targets
 	public static void processMessage(Message message) {
-		if (message.getPlainTextMessage() == null || message.getPlainTextMessage().length() == 0) {
+		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0) {
 			return;
 		}
 		if (isCommand(message.getPlainTextMessage())) {
