@@ -1,0 +1,8 @@
+message Message
+{
+	required string messageFormat = 1;
+	required string message = 2;
+	optional string sender = 10;
+	optional string target = 11;
+	optional string group = 12;
+}
