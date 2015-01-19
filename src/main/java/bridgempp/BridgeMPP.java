@@ -53,6 +53,7 @@ public class BridgeMPP {
 			
 			@Override
 			public void run() {
+				System.out.println("Exit Time set to: " + parseLong);
 				try {
 					Thread.sleep(parseLong);
 				} catch (InterruptedException e) {
@@ -102,6 +103,7 @@ public class BridgeMPP {
         		{
         			long startTime = System.currentTimeMillis();
         			try {
+        				thread.interrupt();
 						thread.join(60000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();

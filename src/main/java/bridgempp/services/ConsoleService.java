@@ -44,7 +44,7 @@ public class ConsoleService implements BridgeService {
 	public void disconnect() {
 		ShadowManager.log(Level.WARNING,
 				"Console service has been disconnected...");
-		scanner.close();
+		scanner = null;
 	}
 
 	@Override
