@@ -22,12 +22,45 @@ public class BridgeMPP {
 	 *            the command line arguments
 	 */
 	public static void main(String[] args) {
+		if(args.length != 0)
+		{
+			for(int i = 0; i < args.length; i++)
+			{
+				if(args[i].trim().equalsIgnoreCase("-stopTime"))
+				{
+					try
+					{
+						startExitSync(Long.parseLong(args[i + 1]));
+					}
+					catch(Exception e)
+					{
+						System.err.println("Syntax Error");
+						System.exit(0);
+					}
+				}
+			}
+		}
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
 		ConfigurationManager.initializeConfiguration();
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
 		GroupManager.loadAllGroups();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
+	}
+
+	private static void startExitSync(final long parseLong) {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(parseLong);
+				} catch (InterruptedException e) {
+					System.err.println("Exit Sync Interrupted! Emergency Shutdown!");
+				}
+				exit();
+			}
+		}).start();
 	}
 
 	public static String getPathLocation() {
