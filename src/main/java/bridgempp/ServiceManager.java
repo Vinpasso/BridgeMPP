@@ -76,4 +76,8 @@ public class ServiceManager {
         }
         return null;
     }
+
+	public static ArrayList<BridgeService> listServices() {
+		return services;
+	}
 }

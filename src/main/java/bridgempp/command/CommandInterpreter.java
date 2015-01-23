@@ -5,6 +5,11 @@
  */
 package bridgempp.command;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import bridgempp.Endpoint;
 import bridgempp.GroupManager;
 import bridgempp.Message;
@@ -19,13 +24,29 @@ import bridgempp.PermissionsManager.Permissions;
  */
 public class CommandInterpreter {
 
+	protected static Pattern commandPattern;
+	protected static Class<?>[] commandClasses;
+
+	static {
+		commandPattern = Pattern.compile("^!(.*?)($|\\s+?(.+?)$)",
+				Pattern.MULTILINE);
+		commandClasses = new Class[] { CommandAliasOperations.class,
+				CommandGroupOperations.class,
+				CommandPermissionOperations.class,
+				CommandServerOperations.class, CommandShadowOperations.class,
+				CommandCommandInterpreterOperations.class };
+	}
+
 	// Interpret a Message message with leading !
 	public static void interpretCommand(Message message) {
 		if (message.getPlainTextMessage().charAt(0) != '!') {
-			message.getSender().sendOperatorMessage(
-					"Internal Server Error! Command " + message.getPlainTextMessage()
-							+ " not a message.getMessage() but recieved interpret request");
-			throw new UnsupportedOperationException("Interpret Command: " + message.getPlainTextMessage()
+			message.getSender()
+					.sendOperatorMessage(
+							"Internal Server Error! Command "
+									+ message.getPlainTextMessage()
+									+ " not a message.getMessage() but recieved interpret request");
+			throw new UnsupportedOperationException("Interpret Command: "
+					+ message.getPlainTextMessage()
 					+ " Not a message.getMessage()");
 		}
 		String operator = message.getPlainTextMessage().toLowerCase();
@@ -74,13 +95,70 @@ public class CommandInterpreter {
 		}
 	}
 
+	public static void interpretCommandNew(Message message) {
+		Matcher matcher = commandPattern.matcher(message.getPlainTextMessage());
+		while (matcher.find()) {
+			String command = matcher.group(1);
+			if (command == null || command.equals("")) {
+				message.getSender().sendOperatorMessage(
+						"Please enter a valid command sequence");
+				continue;
+			}
+			// String argument = "";
+			// if (matcher.groupCount() == 3) {
+			// argument = matcher.group(3);
+			// }
+			boolean success = false;
+			try {
+				for (Class<?> commandClass : commandClasses) {
+					try {
+						Method permissionsMethod = commandClass
+								.getMethod("perm" + command);
+						Permission requiredPermissions = (Permission) permissionsMethod
+								.invoke(null, (Object[]) null);
+						if (!PermissionsManager.hasPermissions(
+								message.getSender(),
+								requiredPermissions.ordinal())) {
+							message.getSender().sendOperatorMessage(
+									"Access Denied: Insufficient Permissions");
+						}
+
+						Method commandMethod = commandClass.getMethod("cmd"
+								+ command, Message.class);
+						commandMethod.invoke(null, message);
+						success = true;
+						break;
+					} catch (NoSuchMethodException e) {
+					}
+				}
+			} catch (SecurityException e) {
+				message.getSender().sendOperatorMessage(
+						"No security access available");
+			} catch (IllegalAccessException e) {
+				message.getSender().sendOperatorMessage(
+						"Illegal security access");
+			} catch (IllegalArgumentException e) {
+				message.getSender().sendOperatorMessage(
+						"Illegal argument access");
+			} catch (InvocationTargetException e) {
+				message.getSender().sendOperatorMessage(
+						"Illegal Invocation target access");
+			}
+			if (!success) {
+				message.getSender().sendOperatorMessage(
+						"No Command found with name: " + command);
+			}
+		}
+	}
+
 	// Process incomming messages and forward them to targets
 	public static void processMessage(Message message) {
-		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0) {
+		if (message.getPlainTextMessage() == null
+				|| message.getMessageRaw().length() == 0) {
 			return;
 		}
 		if (isCommand(message.getPlainTextMessage())) {
-			interpretCommand(message);
+			interpretCommandNew(message);
 		} else {
 			for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
 				ShadowManager.shadowEndpoints.get(i).sendMessage(message);
@@ -88,7 +166,8 @@ public class CommandInterpreter {
 			if (message.getGroup() != null) {
 				message.getGroup().sendMessageWithoutLoopback(message);
 			} else {
-				GroupManager.sendMessageToAllSubscribedGroupsWithoutLoopback(message);
+				GroupManager
+						.sendMessageToAllSubscribedGroupsWithoutLoopback(message);
 			}
 		}
 	}
@@ -107,7 +186,8 @@ public class CommandInterpreter {
 			return -1;
 		}
 		try {
-			return Integer.parseInt(command.substring(command.indexOf(" ") + 1).trim());
+			return Integer.parseInt(command.substring(command.indexOf(" ") + 1)
+					.trim());
 		} catch (NumberFormatException e) {
 			return -1;
 		}
@@ -122,9 +202,27 @@ public class CommandInterpreter {
 	}
 
 	// Check if sender has Access
-	public static boolean checkPermission(Endpoint endpoint, Permission permission) {
+	public static boolean checkPermission(Endpoint endpoint,
+			Permission permission) {
 		int permissions = Permissions.getPermission(permission);
 		return PermissionsManager.hasPermissions(endpoint, permissions);
+	}
+
+	public static String formatHelp(String helpDescription) {
+		try {
+			return "cmd"
+					+ Thread.currentThread().getStackTrace()[2].getMethodName()
+							.substring(4)
+					+ "(): Required Permission: "
+					+ ((Permission) Class.forName(Thread.currentThread().getStackTrace()[2].getClassName()).getMethod(
+							"perm"
+									+ Thread.currentThread().getStackTrace()[2]
+											.getMethodName().substring(4))
+							.invoke(null)).toString()
+					+ ". " + helpDescription;
+		} catch (Exception e) {
+			return "Failed to generate Help Topic: Description: " + helpDescription;
+		}
 	}
 
 }

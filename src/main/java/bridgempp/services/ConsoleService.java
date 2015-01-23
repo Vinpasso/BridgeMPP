@@ -5,13 +5,13 @@
  */
 package bridgempp.services;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
 import bridgempp.Message;
+import bridgempp.PermissionsManager.Permissions;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
@@ -20,19 +20,17 @@ import bridgempp.messageformat.MessageFormat;
  *
  * @author Vinpasso
  */
-public class ConsoleService implements BridgeService {
+public class ConsoleService extends BridgeService {
 
 	Scanner scanner;
 	ConsoleReader reader;
 	Thread consoleThread;
-	private ArrayList<Endpoint> endpoints;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect(String args) {
 		ShadowManager.log(Level.INFO, "Console Service is being loaded...");
-		endpoints = new ArrayList<>();
 		scanner = new Scanner(System.in);
 		reader = new ConsoleReader();
 		consoleThread = new Thread(reader, "Console Reader");
@@ -75,6 +73,7 @@ public class ConsoleService implements BridgeService {
 			if (endpoints.isEmpty()) {
 				endpoints.add(new Endpoint(ConsoleService.this, "Server"));
 			}
+			endpoints.get(0).setPermissions(Permissions.getAdminPermissions());
 		}
 
 		@Override

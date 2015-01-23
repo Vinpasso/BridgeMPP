@@ -21,9 +21,7 @@ import java.util.logging.Logger;
  *
  * @author Vinpasso
  */
-public class WhatsappService implements BridgeService {
-
-	private ArrayList<Endpoint> endpoints;
+public class WhatsappService extends BridgeService {
 
 	private Process yowsup;
 	private Scanner scanner;

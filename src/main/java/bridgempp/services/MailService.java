@@ -29,9 +29,8 @@ import java.util.logging.Logger;
  *
  * @author Vinpasso
  */
-public class MailService implements BridgeService {
+public class MailService extends BridgeService {
 
-	private ArrayList<Endpoint> endpoints;
 	private Session session;
 	private Store store;
 	private IMAPFolder folder;

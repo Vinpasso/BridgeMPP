@@ -33,7 +33,7 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
  *
  * @author Vinpasso
  */
-public class SocketService implements BridgeService {
+public class SocketService extends BridgeService {
 
 	private ServerSocket serverSocket;
 	private int listenPort;

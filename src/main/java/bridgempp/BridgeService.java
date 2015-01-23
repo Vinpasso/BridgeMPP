@@ -5,6 +5,8 @@
  */
 package bridgempp;
 
+import java.util.ArrayList;
+
 import bridgempp.messageformat.MessageFormat;
 
 
@@ -12,26 +14,46 @@ import bridgempp.messageformat.MessageFormat;
  *
  * @author Vinpasso
  */
-public interface BridgeService {
-    
+public abstract class BridgeService {
+	protected ArrayList<Endpoint> endpoints;
+	
     //Initialize Service
-    public void connect(String args);
+    public abstract void connect(String args);
     //Deinitialize Service
-    public void disconnect();
+    public abstract void disconnect();
     
     //Send message bridged from other Messages
-    public void sendMessage(Message message);
+    public abstract void sendMessage(Message message);
     
     //Get user-friendly name of this Service
-    public String getName();
+    public abstract String getName();
     //Check whether this Service is persistent across restarts
-    public boolean isPersistent();
+    public abstract boolean isPersistent();
     
-    public void interpretCommand(Message message);
+    public abstract void interpretCommand(Message message);
     
     //Add Endpoint from Save to list of Endpoints
-    public void addEndpoint(Endpoint endpoint);
+    public abstract void addEndpoint(Endpoint endpoint);
     
     //Get the Supported Message Encodings by this Endpoint in order of descending priority
-    public MessageFormat[] getSupportedMessageFormats();
+    public abstract MessageFormat[] getSupportedMessageFormats();
+    
+	public BridgeService()
+	{
+		endpoints = new ArrayList<>();
+	}
+	
+	public ArrayList<Endpoint> listRegisteredEndpoints()
+	{
+		return endpoints;
+	}
+	
+	public void broadcastMessage(Message message)
+	{
+		for(Endpoint endpoint : endpoints)
+		{
+			message.setTarget(endpoint);
+			endpoint.sendMessage(message);
+		}
+	}
 }

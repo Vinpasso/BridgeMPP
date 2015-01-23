@@ -142,7 +142,7 @@ public class PermissionsManager {
     }
 
     public static enum Permission {
-
+    	NONE,
         DIRECT_MESSAGE,
         SUBSCRIBE_UNSUBSCRIBE_GROUP,
         CREATE_REMOVE_GROUP,
@@ -155,13 +155,19 @@ public class PermissionsManager {
         GENERATE_ONETIME_KEYS,
         GENERATE_PERMANENT_KEYS,
         REMOVE_KEYS,
-        LIST_KEYS
+        LIST_KEYS, 
+        BROADCAST
     }
 
     public static class Permissions {
 
         public static int getPermission(Permission permission) {
             return (int) Math.pow(2, permission.ordinal());
+        }
+        
+        public static int getAdminPermissions()
+        {
+        	return (int) (Math.pow(2, Permission.values().length) - 1);
         }
     }
 }

@@ -10,14 +10,15 @@ import java.util.logging.Level;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
+import bridgempp.PermissionsManager.Permission;
 
 /**
  *
  * @author Vinpasso
  */
-public class CommandPermissionOperations {
+public class CommandPermissionOperations extends CommandInterpreter {
 
-    static void cmdUseKey(Message message) {
+    public static void cmdUseKey(Message message) {
         boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getSender());
         if (success) {
             ShadowManager.log(Level.INFO, message.getSender().toString() + " has used key and now has " + message.getSender().getPermissions());
@@ -26,8 +27,16 @@ public class CommandPermissionOperations {
             message.getSender().sendOperatorMessage("Key Failure. Incorrect Key");
         }
     }
+    
+	public static Permission permUseKey() {
+		return Permission.NONE;
+	}
 
-    static void cmdPrintPermissions(Message message) {
+	public static String helpUseKey() {
+		return formatHelp("Use a Key granted by the Server Admin to gain Permissions");
+	}
+
+    public static void cmdPrintPermissions(Message message) {
         message.getSender().sendOperatorMessage("Your rights are " + message.getSender().getPermissions());
     }
 

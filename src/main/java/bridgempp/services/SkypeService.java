@@ -19,9 +19,8 @@ import java.util.logging.Logger;
  *
  * @author Vinpasso
  */
-public class SkypeService implements BridgeService {
+public class SkypeService extends BridgeService {
 
-	private ArrayList<Endpoint> endpoints;
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override

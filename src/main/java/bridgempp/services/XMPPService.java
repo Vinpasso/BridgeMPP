@@ -14,7 +14,6 @@ import bridgempp.services.XMPPService.BOB.BOBIQ;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
@@ -41,7 +40,7 @@ import java.util.regex.Pattern;
  *
  * @author Vinpasso
  */
-public class XMPPService implements BridgeService {
+public class XMPPService extends BridgeService {
 
 	private XMPPTCPConnection connection;
 	private ChatManager chatmanager;

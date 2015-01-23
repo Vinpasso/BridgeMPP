@@ -11,10 +11,10 @@ import bridgempp.Message;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 
-public class BridgeChat implements BridgeService {
+public class BridgeChat extends BridgeService {
 
 	private Socket socket;
-	private Endpoint endpoint;
+	//private Endpoint endpoint;
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
 			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
@@ -25,7 +25,7 @@ public class BridgeChat implements BridgeService {
 			throw new UnsupportedOperationException(
 					"Incorrect number of Options for BridgeChat");
 		}
-		endpoint = new Endpoint(this, "BridgeChat");
+		endpoints.add(new Endpoint(this, "BridgeChat"));
 		try {
 			socket = new Socket(args[0], Integer.parseInt(args[1]));
 			socket.getOutputStream().write(
@@ -38,7 +38,7 @@ public class BridgeChat implements BridgeService {
 					try {
 						while (true) {
 							CommandInterpreter.processMessage(new Message(
-									endpoint, BridgeChatProtoBuf.UserEvent
+									endpoints.get(0), BridgeChatProtoBuf.UserEvent
 											.parseFrom(socket.getInputStream())
 											.getChatMessage(),
 									getSupportedMessageFormats()[0]));
@@ -91,7 +91,7 @@ public class BridgeChat implements BridgeService {
 
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
-		this.endpoint = endpoint;
+		endpoints.add(endpoint);
 	}
 
 	@Override
