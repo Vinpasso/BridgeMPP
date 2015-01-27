@@ -41,7 +41,7 @@ public class SocketService implements BridgeService {
 	private HashMap<Integer, SocketClient> connectedSockets;
 	private ServerListener serverListener;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
 			MessageFormat.PLAIN_TEXT };
 
 	@Override
