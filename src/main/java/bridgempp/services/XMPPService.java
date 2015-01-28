@@ -32,6 +32,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -325,10 +326,17 @@ public class XMPPService implements BridgeService {
 	private String cacheEmbeddedBase64Image(String messageContents) {
 		Matcher matcher = Pattern.compile("<img src=\"data:image\\/jpeg;base64,(.*?)\".*?\\/>").matcher(
 				messageContents);
-		cachedObjects.clear();
+		//cachedObjects.clear();
+		for(String key : new HashSet<String>(cachedObjects.keySet()))
+		{
+			if(System.currentTimeMillis() - Long.parseLong(key.substring(0, key.indexOf('@'))) > 3600000l)
+			{
+				cachedObjects.remove(key);
+			}
+		}
 		while (matcher.find()) {
 			String data = matcher.group(1);
-			String identifier = data.hashCode() + "@bob.xmpp.org";
+			String identifier = System.currentTimeMillis() + "@bob.xmpp.org";
 			messageContents = messageContents
 					.replace("data:image/jpeg;base64," + data, "cid:" + identifier);
 			cachedObjects.put(identifier, data);
