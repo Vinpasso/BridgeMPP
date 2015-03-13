@@ -11,6 +11,7 @@ import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -24,39 +25,28 @@ import java.util.regex.Pattern;
  */
 public class WhatsappService implements BridgeService {
 
-	private ArrayList<Endpoint> endpoints;
+	private HashMap<String, Endpoint> endpoints;
 
 	private Process yowsup;
 	private BufferedReader bufferedReader;
 	// private PrintStream printStream;
 	private LinkedBlockingQueue<String> senderQueue;
 	private Thread senderThread;
+	private String phone;
+	private String password;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
-		MessageFormat.PLAIN_TEXT };
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect(String argString) {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
 		String[] args = argString.split("; ");
-		if (args.length != 3) {
+		if (args.length != 2) {
 			throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
 		}
-		String yowsupConfig = "cc=" + args[0] + "\nphone=" + args[1] + "\npassword=" + args[2];
-		try {
-			File configFile = new File(BridgeMPP.getPathLocation() + "/yowsup/src/credentials.config");
-			if (!configFile.exists()) {
-				configFile.createNewFile();
-			}
-			PrintWriter configFileWriter = new PrintWriter(configFile);
-			configFileWriter.println(yowsupConfig);
-			configFileWriter.close();
-		} catch (FileNotFoundException ex) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		endpoints = new ArrayList<>();
+		phone = args[0];
+		password = args[1];
+		endpoints = new HashMap<>();
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
@@ -70,10 +60,7 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void sendMessage(Message message) {
-		senderQueue.add("<message \"type=\"" + (message.getMessageFormat().equals(MessageFormat.PLAIN_TEXT)?"text":"media") + 
-				"to=\"" + message.getTarget().getTarget() + 
-				"\"body=\"" + message.toSimpleString(getSupportedMessageFormats()) +
-				"/>");
+		senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" + message.getMessage(supportedMessageFormats) + "\"");
 	}
 
 	@Override
@@ -88,7 +75,7 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
-		endpoints.add(endpoint);
+		endpoints.put(endpoint.getTarget(), endpoint);
 	}
 
 	@Override
@@ -152,8 +139,7 @@ public class WhatsappService implements BridgeService {
 				String pythonCommand = System.getProperty("os.name").toLowerCase().contains("win") ? "C:\\python27\\python.exe"
 						: "python";
 				ProcessBuilder builder = new ProcessBuilder(pythonCommand, "-u", BridgeMPP.getPathLocation()
-						+ "/yowsup/src/yowsup-cli", "-c", BridgeMPP.getPathLocation()
-						+ "/yowsup/src/credentials.config", "-i", "4915110865845", "-k", "-a");
+						+ "/yowsup/src/yowsup-cli", "demos", "-l " + phone + ":" + password, "--yowsup");
 				builder.directory(new File(BridgeMPP.getPathLocation() + "/yowsup/src/"));
 				builder.environment().put("PYTHONPATH", BridgeMPP.getPathLocation() + "/yowsup/src/");
 				yowsup = builder.start();
@@ -171,6 +157,7 @@ public class WhatsappService implements BridgeService {
 						ShadowManager.log(Level.INFO, "Stopping Yowsup Error Listener");
 					}
 				}, "Whatsapp Error Listener").start();
+				yowsup.getOutputStream().write("/L\n".getBytes()); //LOGIN
 				senderThread = new Thread(new WhatsappSender(yowsup.getOutputStream()), "Whatsapp Sender");
 				senderThread.start();
 				bufferedReader = new BufferedReader(new InputStreamReader(yowsup.getInputStream(), "UTF-8"));
@@ -181,15 +168,25 @@ public class WhatsappService implements BridgeService {
 					{
 						buffer += bufferedReader.readLine() + "\n";
 					} while(bufferedReader.ready());
-					Matcher matcher = Pattern.compile("(?<=<message>).+?(?=<\\/message>)", Pattern.DOTALL).matcher(buffer);
+					Matcher matcher = Pattern.compile("\\[([^[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*(.*?)\\nMessage \\S+ Sent delivered receipt", Pattern.DOTALL).matcher(buffer);
 					while(matcher.find())
 					{
-						String message = matcher.group();
-						Message parsedMessage = parseMessage(message);
-						if(parsedMessage == null)
+						String author = "Unknown";
+						String group = matcher.group(1);
+						String message = matcher.group(4);
+						Endpoint endpoint;
+						if(endpoints.containsKey(group))
 						{
-							throw new UnsupportedOperationException("Non parseable Message: " + message);
+							endpoint = endpoints.get(group);
+							endpoint.setExtra(author);
 						}
+						else
+						{
+							endpoint = new Endpoint(WhatsappService.this, group);
+							endpoint.setExtra(author);
+							endpoints.put(group, endpoint);
+						}
+						Message parsedMessage = new Message(endpoint, message, MessageFormat.PLAIN_TEXT);
 						CommandInterpreter.processMessage(parsedMessage);
 					}
 				}
@@ -199,58 +196,6 @@ public class WhatsappService implements BridgeService {
 			senderThread.interrupt();
 			yowsup.destroyForcibly();
 			ShadowManager.log(Level.INFO, "Stopped Yowsup Process");
-		}
-
-		private Message parseMessage(String message) {
-			Matcher matcher = Pattern.compile(".").matcher(message);
-			Message constructedMessage = new Message();
-			while(matcher.find())
-			{
-				String value = matcher.group().substring(matcher.group().indexOf(": ") + 2);
-				switch(matcher.group().substring(0, matcher.group().indexOf(": ")))
-				{
-				case "Message":
-					break;
-				case "ID":
-					break;
-				case "From":
-					for(int i = 0; i < endpoints.size(); i++)
-					{
-						if(endpoints.get(i).getTarget().equals(matcher.group().substring(matcher.group().indexOf(": " + 2))))
-						{
-							constructedMessage.setSender(endpoints.get(i));
-						}
-					}
-					if(constructedMessage.getTarget() == null)
-					{
-						Endpoint endpoint = new Endpoint(WhatsappService.this, matcher.group().substring(matcher.group().indexOf(": ") + 2));
-						endpoints.add(endpoint);
-						constructedMessage.setSender(endpoint);
-					}
-					break;
-				case "Type":
-					if(value.equals("text"))
-					{
-						constructedMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
-					}
-					else if(value.equals("media"))
-					{
-						constructedMessage.setMessageFormat(MessageFormat.HTML);
-					}
-					break;
-				case "Participant":
-					constructedMessage.getSender().setExtra(value);
-					break;
-				case "Body":
-					constructedMessage.setMessage(value);
-					break;
-				case "URL":
-					constructedMessage.setMessage("<img style='' alt='WhatsApp Image " + value + "' src=" + value + "/>");
-					break;
-				}
-
-			}
-			return constructedMessage;
 		}
 	}
 
