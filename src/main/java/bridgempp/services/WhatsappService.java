@@ -63,7 +63,7 @@ public class WhatsappService implements BridgeService {
 	@Override
 	public void sendMessage(Message message) {
 		try {
-			senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" + message.getSender().toString(true) + ": " + Base64.getEncoder().encodeToString(message.getMessage(supportedMessageFormats).getBytes("UTF-8")) + "\"");
+			senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" +  Base64.getEncoder().encodeToString((message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats)).getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
 			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
 		}
@@ -182,7 +182,7 @@ public class WhatsappService implements BridgeService {
 					Matcher matcher = Pattern.compile("\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)").matcher(buffer);
 					while(matcher.find())
 					{
-						String author = "Unknown";
+						String author = matcher.group(3);
 						String group = matcher.group(1);
 						String message = new String(Base64.getDecoder().decode(matcher.group(4)), "UTF-8");
 						Endpoint endpoint;
@@ -197,7 +197,7 @@ public class WhatsappService implements BridgeService {
 							endpoint.setExtra(author);
 							endpoints.put(group, endpoint);
 						}
-						Message parsedMessage = new Message(endpoint, new String(Base64.getDecoder().decode(message), "UTF-8"), MessageFormat.PLAIN_TEXT);
+						Message parsedMessage = new Message(endpoint, message, MessageFormat.PLAIN_TEXT);
 						CommandInterpreter.processMessage(parsedMessage);
 					}
 				}

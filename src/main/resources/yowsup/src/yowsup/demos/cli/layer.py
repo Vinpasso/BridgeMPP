@@ -250,7 +250,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
     @clicmd("Send message to a friend")
     def message_send(self, number, content):
         if self.assertConnected():
-            outgoingMessage = TextMessageProtocolEntity(base64.b64decode(content.decode('ascii')) if sys.version_info >= (3,0) else base64.b64decode(content.decode('ascii')), to = self.aliasToJid(number))
+            outgoingMessage = TextMessageProtocolEntity(base64.b64decode(content) if sys.version_info >= (3,0) else base64.b64decode(content), to = self.aliasToJid(number))
             self.toLower(outgoingMessage)
 
     @clicmd("Broadcast message. numbers should comma separated phone numbers")
