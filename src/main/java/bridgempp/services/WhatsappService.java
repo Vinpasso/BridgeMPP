@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +62,11 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void sendMessage(Message message) {
-		senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" + message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats) + "\"");
+		try {
+			senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" + message.getSender().toString(true) + ": " + Base64.getEncoder().encodeToString(message.getMessage(supportedMessageFormats).getBytes("UTF-8")) + "\"");
+		} catch (UnsupportedEncodingException e) {
+			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
+		}
 	}
 
 	@Override
@@ -174,12 +179,12 @@ public class WhatsappService implements BridgeService {
 						break;
 					}
 					Logger.getLogger(WhatsappService.class.getName()).log(Level.INFO, "YOWSUP Buffer: " + buffer);
-					Matcher matcher = Pattern.compile("\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*(.*?)\\nMessage \\S+ Sent delivered receipt", Pattern.DOTALL).matcher(buffer);
+					Matcher matcher = Pattern.compile("\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)").matcher(buffer);
 					while(matcher.find())
 					{
 						String author = "Unknown";
 						String group = matcher.group(1);
-						String message = matcher.group(4);
+						String message = new String(Base64.getDecoder().decode(matcher.group(4)), "UTF-8");
 						Endpoint endpoint;
 						if(endpoints.containsKey(group))
 						{
