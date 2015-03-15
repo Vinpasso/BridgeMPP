@@ -163,7 +163,8 @@ public class WhatsappService implements BridgeService {
 						ShadowManager.log(Level.INFO, "Stopping Yowsup Error Listener");
 					}
 				}, "Whatsapp Error Listener").start();
-				yowsup.getOutputStream().write(("/login " + phone + " " + password + "\n").getBytes()); //LOGIN
+				yowsup.getOutputStream().write(("/login " + phone + " " + password + "\n\n\n").getBytes()); //LOGIN
+				yowsup.getOutputStream().flush(); //Make sure Login actually happens
 				senderThread = new Thread(new WhatsappSender(yowsup.getOutputStream()), "Whatsapp Sender");
 				senderThread.start();
 				bufferedReader = new BufferedReader(new InputStreamReader(yowsup.getInputStream(), "UTF-8"));
