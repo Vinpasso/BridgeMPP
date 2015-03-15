@@ -64,10 +64,22 @@ public class MailService implements BridgeService {
 		try {
 
 			System.getProperties().setProperty("mail.store.protocol", "imaps");
+			System.getProperties().setProperty("mail.smtp.submitter", "username");
 			System.getProperties().setProperty("mail.smtp.auth", "true");
 			System.getProperties().setProperty("mail.smtp.host", smtphost);
 			System.getProperties().setProperty("mail.smtp.port", smtpport);
-			session = Session.getDefaultInstance(System.getProperties(), null);
+			
+			
+			Authenticator authenticator = new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication()
+				{
+					return new PasswordAuthentication(username, password);
+				}
+				
+			};
+					
+			session = Session.getDefaultInstance(System.getProperties(), authenticator);
 			store = session.getStore("imaps");
 			store.connect(imaphost, imapport, username, password);
 			folder = (IMAPFolder) store.getFolder("Inbox");
@@ -191,10 +203,13 @@ public class MailService implements BridgeService {
 
 		@Override
 		public void messagesAdded(MessageCountEvent e) {
-			/*
-			 * Message[] messages = e.getMessages(); for(Message message :
-			 * messages) { processMessage(message); }
-			 */
+			try {
+				for (Message message : folder.getMessages()) {
+					processMessage(message);
+				}
+			} catch (MessagingException e1) {
+				Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, "Mailbox error", e1);
+			}
 		}
 
 		@Override
@@ -224,6 +239,9 @@ public class MailService implements BridgeService {
 						message.getContent().toString(),
 						getSupportedMessageFormats()[0]);
 				CommandInterpreter.processMessage(bMessage);
+				folder.setFlags(new Message[] { message }, new Flags(
+						Flags.Flag.DELETED), true);
+				folder.expunge();
 			} catch (MessagingException | IOException ex) {
 				Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
 						null, ex);

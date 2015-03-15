@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class GroupManager {
 
-    private static ArrayList<Group> groups;
+    private static ArrayList<Group> groups = new ArrayList<>();
 
     //Create an empty new group and add it to the list of Groups
     public static Group newGroup() {
@@ -63,7 +63,6 @@ public class GroupManager {
     public static void loadAllGroups() {
         ShadowManager.log(Level.INFO, "Loading all groups...");
 
-        groups = new ArrayList<>();
         int numGroups = ConfigurationManager.groupConfiguration.getRoot().getChild(0).getChildrenCount();
         for (int g = 0; g < numGroups; g++) {
             Group group = new Group();
