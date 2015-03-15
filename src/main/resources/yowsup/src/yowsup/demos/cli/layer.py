@@ -381,7 +381,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
             FROM = message.getFrom(),
             TIME = formattedDate,
             MESSAGE = messageOut.encode('latin-1').decode() if sys.version_info >= (3, 0) else messageOut,
-            MESSAGE_ID = message.getId()
+            MESSAGE_ID = message.getParticipant()
             )
 
         self.output(output, tag = None, prompt = not self.sendReceipts)
