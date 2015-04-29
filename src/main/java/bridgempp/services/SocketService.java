@@ -64,7 +64,8 @@ public class SocketService implements BridgeService {
 	public void disconnect() {
 		try {
 			serverSocket.close();
-			for (SocketClient client : connectedSockets.values()) {
+			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>)connectedSockets.clone();
+			for (SocketClient client : tempConnected.values()) {
 				client.socket.close();
 			}
 		} catch (IOException ex) {
