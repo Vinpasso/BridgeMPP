@@ -368,7 +368,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
         messageOut = ""
         if message.getType() == "text":
             #self.output(message.getBody(), tag = "%s [%s]"%(message.getFrom(), formattedDate))
-            messageOut = base64.b64encode(self.getTextMessageBody(message).encode('utf-8')).decode('ascii')
+            messageOut = base64.b64encode(self.getTextMessageBody(message).encode('latin-1').decode('utf-8').encode('utf-8')).decode('ascii')
         elif message.getType() == "media":
             messageOut = self.getMediaMessageBody(message)
         else:
