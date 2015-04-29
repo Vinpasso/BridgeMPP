@@ -56,4 +56,9 @@ public class ShadowManager {
         public void close() throws SecurityException {
         }
     }
+
+	public static void log(Level level, String message, Exception e) {
+		log(level, message);
+		e.printStackTrace();
+	}
 }

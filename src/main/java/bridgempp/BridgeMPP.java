@@ -83,9 +83,16 @@ public class BridgeMPP {
 	public static void exit()
     {
         ShadowManager.log(Level.INFO, "Server shutdown commencing...");
+        try
+        {
         PermissionsManager.saveAccessKeys();
         GroupManager.saveAllGroups();
         ServiceManager.unloadAllServices();
+        }
+        catch(Exception e)
+        {
+        	ShadowManager.log(Level.WARNING, "Clean server shutdown has failed. Will forcefully continue shutdown", e);
+        }
         ShadowManager.log(Level.INFO, "Server shutdown completed");
         ShadowManager.log(Level.INFO, "Syncing System Exit (60 Seconds)");
         long syncTime = 0;
