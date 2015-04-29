@@ -370,7 +370,8 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
             #self.output(message.getBody(), tag = "%s [%s]"%(message.getFrom(), formattedDate))
             messageOut = base64.b64encode(self.getTextMessageBody(message).encode('latin-1').decode('utf-8').encode('utf-8')).decode('ascii')
         elif message.getType() == "media":
-            messageOut = self.getMediaMessageBody(message)
+            #messageOut = self.getMediaMessageBody(message)
+            messageOut = base64.b64encode(self.getMediaMessageBody(message).encode('latin-1').decode('utf-8').encode('utf-8')).decode('ascii')
         else:
             messageOut = "Unknown message type %s " % message.getType()
             print(messageOut.toProtocolTreeNode())
