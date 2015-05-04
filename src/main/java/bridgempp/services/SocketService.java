@@ -16,6 +16,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -235,6 +236,7 @@ public class SocketService implements BridgeService {
 						}
 						if(bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
 						{
+							Logger.getLogger(SocketService.class.getName()).log(Level.INFO, "Received PING empty message from " + endpoint.toString(true));
 							break;
 						}
 						CommandInterpreter.processMessage(bridgeMessage);
