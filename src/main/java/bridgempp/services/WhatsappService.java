@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  *
  * @author Vinpasso
@@ -43,13 +42,15 @@ public class WhatsappService implements BridgeService {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
 		String[] args = argString.split("; ");
 		if (args.length != 2) {
-			throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
+			throw new UnsupportedOperationException(
+					"Incorrect Parameters for Whatsapp Service: " + argString);
 		}
 		phone = args[0];
 		password = args[1];
 		endpoints = new HashMap<>();
 		senderQueue = new LinkedBlockingQueue<>();
-		new Thread(new WhatsappMessageListener(), "Whatsapp Message Listener").start();
+		new Thread(new WhatsappMessageListener(), "Whatsapp Message Listener")
+				.start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
 	}
 
@@ -62,9 +63,25 @@ public class WhatsappService implements BridgeService {
 	@Override
 	public void sendMessage(Message message) {
 		try {
-			senderQueue.add("/message send " + message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@")) + " \"" +  Base64.getEncoder().encodeToString((message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats)).getBytes("UTF-8")) + "\"");
+			senderQueue
+					.add("/message send "
+							+ message
+									.getTarget()
+									.getTarget()
+									.substring(
+											0,
+											message.getTarget().getTarget()
+													.indexOf("@"))
+							+ " \""
+							+ Base64.getEncoder()
+									.encodeToString(
+											(message.getSender().toString(true)
+													+ ": " + message
+													.getMessage(supportedMessageFormats))
+													.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
+			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE,
+					"Base64 Encode: No such UTF-8", e);
 		}
 	}
 
@@ -85,7 +102,8 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+		message.getSender().sendOperatorMessage(
+				getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	private class WhatsappSender implements Runnable {
@@ -95,7 +113,8 @@ public class WhatsappService implements BridgeService {
 
 		public WhatsappSender(OutputStream realOutputStream) {
 			try {
-				this.realOutputStream = new PrintStream(realOutputStream, true, "UTF-8");
+				this.realOutputStream = new PrintStream(realOutputStream, true,
+						"UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -110,14 +129,15 @@ public class WhatsappService implements BridgeService {
 					if (line == null) {
 						return;
 					}
-					if(System.currentTimeMillis() - lastMessage < 10000) {
+					if (System.currentTimeMillis() - lastMessage < 10000) {
 						Thread.sleep(10000);
 					}
 					realOutputStream.println(line);
 					lastMessage = System.currentTimeMillis();
 				}
 			} catch (InterruptedException ex) {
-				Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(WhatsappService.class.getName()).log(
+						Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -126,83 +146,91 @@ public class WhatsappService implements BridgeService {
 
 		@Override
 		public void run() {
-			while (true) {
-				ShadowManager.log(Level.INFO, "Whatsapp Message Listener starting up");
-				process();
-				ShadowManager.log(Level.INFO, "Whatsapp Message Listener shutting down");
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException ex) {
-					Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
-				}
-			}
+			ShadowManager.log(Level.INFO,
+					"Whatsapp Message Listener starting up");
+			process();
+			ShadowManager.log(Level.INFO,
+					"Whatsapp Message Listener shutting down");
 		}
 
 		public void process() {
 			try {
 				ShadowManager.log(Level.INFO, "Starting Yowsup Process...");
-				String pythonCommand = System.getProperty("os.name").toLowerCase().contains("win") ? "C:\\python27\\python.exe"
+				String pythonCommand = System.getProperty("os.name")
+						.toLowerCase().contains("win") ? "C:\\python27\\python.exe"
 						: "python3";
-				ProcessBuilder builder = new ProcessBuilder(pythonCommand, "-u", BridgeMPP.getPathLocation()
-						+ "/yowsup/src/yowsup-cli", "demos", "-l " + phone + ":" + password, "--yowsup");
-				builder.directory(new File(BridgeMPP.getPathLocation() + "/yowsup/src/"));
-				builder.environment().put("PYTHONPATH", BridgeMPP.getPathLocation() + "/yowsup/src/");
+				ProcessBuilder builder = new ProcessBuilder(pythonCommand,
+						"-u", BridgeMPP.getPathLocation()
+								+ "/yowsup/src/yowsup-cli", "demos", "-l "
+								+ phone + ":" + password, "--yowsup");
+				builder.directory(new File(BridgeMPP.getPathLocation()
+						+ "/yowsup/src/"));
+				builder.environment().put("PYTHONPATH",
+						BridgeMPP.getPathLocation() + "/yowsup/src/");
 				yowsup = builder.start();
 				new Thread(new Runnable() {
 
 					@Override
 					public void run() {
-						ShadowManager.log(Level.INFO, "Starting Yowsup Error Listener...");
+						ShadowManager.log(Level.INFO,
+								"Starting Yowsup Error Listener...");
 
 						Scanner error = new Scanner(yowsup.getErrorStream());
 						while (error.hasNext()) {
 							System.err.println(error.nextLine());
 						}
 						error.close();
-						ShadowManager.log(Level.INFO, "Stopping Yowsup Error Listener");
+						ShadowManager.log(Level.INFO,
+								"Stopping Yowsup Error Listener");
 					}
 				}, "Whatsapp Error Listener").start();
-				yowsup.getOutputStream().write(("/login " + phone + " " + password + "\n\n\n").getBytes()); //LOGIN
-				yowsup.getOutputStream().flush(); //Make sure Login actually happens
-				senderThread = new Thread(new WhatsappSender(yowsup.getOutputStream()), "Whatsapp Sender");
+				yowsup.getOutputStream().write(
+						("/login " + phone + " " + password + "\n\n\n")
+								.getBytes()); // LOGIN
+				yowsup.getOutputStream().flush(); // Make sure Login actually
+													// happens
+				senderThread = new Thread(new WhatsappSender(
+						yowsup.getOutputStream()), "Whatsapp Sender");
 				senderThread.start();
-				bufferedReader = new BufferedReader(new InputStreamReader(yowsup.getInputStream(), "UTF-8"));
+				bufferedReader = new BufferedReader(new InputStreamReader(
+						yowsup.getInputStream(), "UTF-8"));
 				ShadowManager.log(Level.INFO, "Started Yowsup Process");
 				while (true) {
 					String buffer = "";
-					do
-					{
+					do {
 						buffer += bufferedReader.readLine() + "\n";
-					} while(bufferedReader.ready());
-					if(buffer.trim().equals("null"))
-					{
+					} while (bufferedReader.ready());
+					if (buffer.trim().equals("null")) {
 						break;
 					}
-					Logger.getLogger(WhatsappService.class.getName()).log(Level.INFO, "YOWSUP Buffer: " + buffer);
-					Matcher matcher = Pattern.compile("\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)").matcher(buffer);
-					while(matcher.find())
-					{
+					Logger.getLogger(WhatsappService.class.getName()).log(
+							Level.INFO, "YOWSUP Buffer: " + buffer);
+					Matcher matcher = Pattern
+							.compile(
+									"\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)")
+							.matcher(buffer);
+					while (matcher.find()) {
 						String author = matcher.group(3);
 						String group = matcher.group(1);
-						String message = new String(Base64.getDecoder().decode(matcher.group(4)), "UTF-8");
+						String message = new String(Base64.getDecoder().decode(
+								matcher.group(4)), "UTF-8");
 						Endpoint endpoint;
-						if(endpoints.containsKey(group))
-						{
+						if (endpoints.containsKey(group)) {
 							endpoint = endpoints.get(group);
 							endpoint.setExtra(author);
-						}
-						else
-						{
+						} else {
 							endpoint = new Endpoint(WhatsappService.this, group);
 							endpoint.setExtra(author);
 							endpoints.put(group, endpoint);
 						}
-						Message parsedMessage = new Message(endpoint, message, MessageFormat.PLAIN_TEXT);
+						Message parsedMessage = new Message(endpoint, message,
+								MessageFormat.PLAIN_TEXT);
 						CommandInterpreter.processMessage(parsedMessage);
 					}
 				}
 			} catch (UnsupportedOperationException | IOException ex) {
-				Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(WhatsappService.class.getName()).log(
+						Level.SEVERE, null, ex);
 			}
 			senderThread.interrupt();
 			yowsup.destroyForcibly();
