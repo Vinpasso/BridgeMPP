@@ -233,6 +233,10 @@ public class SocketService implements BridgeService {
 						{
 							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
 						}
+						if(bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
+						{
+							break;
+						}
 						CommandInterpreter.processMessage(bridgeMessage);
 						break;
 					case XML_Embedded:
