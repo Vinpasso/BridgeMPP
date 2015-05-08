@@ -7,8 +7,8 @@ import sys
 from yowsup.common import YowConstants
 import datetime
 import os
-import base64
 import logging
+import base64
 from yowsup.layers.protocol_receipts.protocolentities    import *
 from yowsup.layers.protocol_groups.protocolentities      import *
 from yowsup.layers.protocol_presence.protocolentities    import *
@@ -170,6 +170,12 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
     ######################################
 
     ####### contacts/ profiles ####################
+    @clicmd("Set status text")
+    def status_set(self, text):
+        if self.assertConnected():
+            entity = SetStatusIqProtocolEntity(text)
+            self.toLower(entity)
+
     @clicmd("Get profile picture for contact")
     def contact_picture(self, jid):
         if self.assertConnected():
@@ -196,12 +202,20 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
             self.toLower(entity)
 
     @clicmd("Invite to group")
-    def group_invite(self, group_jid, jid):
+    def group_invite(self, group_jid, jids):
         if self.assertConnected():
-            entity = AddParticipantsIqProtocolEntity(self.aliasToJid(group_jid), self.aliasToJid(jid))
+            jids = [self.aliasToJid(jid) for jid in jids.split(',')]
+            entity = AddParticipantsIqProtocolEntity(self.aliasToJid(group_jid), jids)
             self.toLower(entity)
 
-    @clicmd("Get pariticipants in a group")
+    @clicmd("Kick from group")
+    def group_kick(self, group_jid, jids):
+        if self.assertConnected():
+            jids = [self.aliasToJid(jid) for jid in jids.split(',')]
+            entity = RemoveParticipantsIqProtocolEntity(self.aliasToJid(group_jid), jids)
+            self.toLower(entity)
+
+    @clicmd("Get participants in a group")
     def group_participants(self, group_jid):
         if self.assertConnected():
             entity = ParticipantsGroupsIqProtocolEntity(self.aliasToJid(group_jid))
@@ -211,6 +225,12 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
     def group_setSubject(self, jid, subject):
         if self.assertConnected():
             entity = SubjectGroupsIqProtocolEntity(self.aliasToJid(jid), subject)
+            self.toLower(entity)
+
+    @clicmd("Get group info")
+    def group_info(self, group_jid):
+        if self.assertConnected():
+            entity = InfoGroupsIqProtocolEntity(self.aliasToJid(group_jid))
             self.toLower(entity)
 
     @clicmd("Get shared keys")
@@ -330,7 +350,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
 
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
-        ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", "delivery")
+        ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", entity.getType(), entity.getFrom())
         self.toLower(ack)
 
     @ProtocolEntityCallback("ack")
@@ -368,21 +388,21 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
         messageOut = ""
         if message.getType() == "text":
             #self.output(message.getBody(), tag = "%s [%s]"%(message.getFrom(), formattedDate))
-            messageOut = base64.b64encode(self.getTextMessageBody(message).encode('latin-1').decode('utf-8').encode('utf-8')).decode('ascii')
+            messageOut = self.getTextMessageBody(message)
         elif message.getType() == "media":
-            #messageOut = self.getMediaMessageBody(message)
-            messageOut = base64.b64encode(self.getMediaMessageBody(message).encode('latin-1').decode('utf-8').encode('utf-8')).decode('ascii')
+            messageOut = self.getMediaMessageBody(message)
         else:
             messageOut = "Unknown message type %s " % message.getType()
             print(messageOut.toProtocolTreeNode())
 
 
         formattedDate = datetime.datetime.fromtimestamp(message.getTimestamp()).strftime('%d-%m-%Y %H:%M')
+        sender = message.getFrom() if not message.isGroupMessage() else "%s/%s" % (message.getParticipant(False), message.getFrom())
         output = self.__class__.MESSAGE_FORMAT.format(
-            FROM = message.getFrom(),
+            FROM = sender,
             TIME = formattedDate,
             MESSAGE = messageOut.encode('latin-1').decode() if sys.version_info >= (3, 0) else messageOut,
-            MESSAGE_ID = message.getParticipant()
+            MESSAGE_ID = message.getId()
             )
 
         self.output(output, tag = None, prompt = not self.sendReceipts)
