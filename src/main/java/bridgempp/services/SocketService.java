@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,7 @@ public class SocketService implements BridgeService {
 	private int listenPort;
 	private String listenAddress;
 	private HashMap<Integer, SocketClient> connectedSockets;
+	private LinkedList<Integer> pendingDeletion;
 	private ServerListener serverListener;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
@@ -185,6 +187,7 @@ public class SocketService implements BridgeService {
 					if (System.currentTimeMillis() > lastKeepAlive + 60000) {
 						sendKeepAliveMessages();
 					}
+					removePendingDeletions();
 				}
 			} catch (IOException ex) {
 				Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
@@ -196,6 +199,13 @@ public class SocketService implements BridgeService {
 				sendMessage(new Message(client.endpoint, client.endpoint, null, "", MessageFormat.PLAIN_TEXT));
 			}
 			lastKeepAlive = System.currentTimeMillis();
+		}
+
+		private void removePendingDeletions() {
+			while (!pendingDeletion.isEmpty()) {
+				Integer index = pendingDeletion.removeFirst();
+				connectedSockets.remove(index);
+			}
 		}
 
 	}
@@ -284,7 +294,7 @@ public class SocketService implements BridgeService {
 				e.printStackTrace();
 			}
 			GroupManager.removeEndpointFromAllGroups(endpoint);
-			connectedSockets.remove(randomIdentifier);
+			pendingDeletion.add(randomIdentifier);
 			ShadowManager.log(Level.INFO, "TCP client has disconnnected");
 		}
 	}
