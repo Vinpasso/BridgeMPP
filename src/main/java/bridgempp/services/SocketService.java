@@ -207,7 +207,7 @@ public class SocketService implements BridgeService {
 			ShadowManager.log(Level.INFO, "TCP client has connected");
 			try {
 				int initialProtocol = socket.getInputStream().read();
-				if (initialProtocol > 0x30) {
+				if (initialProtocol >= 0x30) {
 					initialProtocol -= 0x30;
 				}
 				protoCarry = ProtoCarry.values()[initialProtocol];
