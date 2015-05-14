@@ -23,7 +23,7 @@ public class EndpointTranslator {
         return "";
     }
 
-    public static void saveHumanReadableEndpoint(Endpoint endpoint, String endpointName) {
+    public static synchronized void saveHumanReadableEndpoint(Endpoint endpoint, String endpointName) {
         try {
             ConfigurationManager.endpointConfiguration.setProperty("endpoints.id" + computeEndpointID(endpoint.getIdentifer()), endpointName);
             ConfigurationManager.endpointConfiguration.save();
@@ -32,7 +32,7 @@ public class EndpointTranslator {
         }
     }
 
-    public static void removeHumanReadableEndpoint(Endpoint endpoint) {
+    public static synchronized void removeHumanReadableEndpoint(Endpoint endpoint) {
         ConfigurationManager.endpointConfiguration.clearProperty("endpoints.id" + computeEndpointID(endpoint.getIdentifer()));
     }
 
