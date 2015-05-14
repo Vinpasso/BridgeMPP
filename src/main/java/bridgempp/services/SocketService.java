@@ -16,7 +16,6 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +65,7 @@ public class SocketService implements BridgeService {
 		try {
 			serverSocket.close();
 			@SuppressWarnings("unchecked")
-			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>)connectedSockets.clone();
+			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>) connectedSockets.clone();
 			for (SocketClient client : tempConnected.values()) {
 				client.socket.close();
 			}
@@ -159,6 +158,7 @@ public class SocketService implements BridgeService {
 	}
 
 	class ServerListener implements Runnable {
+		private long lastKeepAlive = 0;
 
 		@Override
 		public void run() {
@@ -182,10 +182,20 @@ public class SocketService implements BridgeService {
 						new Thread(socketClient, "Socket TCP Connection").start();
 					} catch (SocketTimeoutException e) {
 					}
+					if (System.currentTimeMillis() > lastKeepAlive + 60000) {
+						sendKeepAliveMessages();
+					}
 				}
 			} catch (IOException ex) {
 				Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
 			}
+		}
+
+		private void sendKeepAliveMessages() {
+			for (SocketClient client : connectedSockets.values()) {
+				sendMessage(new Message(client.endpoint, client.endpoint, null, "", MessageFormat.PLAIN_TEXT));
+			}
+			lastKeepAlive = System.currentTimeMillis();
 		}
 
 	}
@@ -212,14 +222,10 @@ public class SocketService implements BridgeService {
 				}
 				protoCarry = ProtoCarry.values()[initialProtocol];
 				BufferedReader bufferedReader = null;
-				if(protoCarry == ProtoCarry.ProtoBuf)
-				{
-					
-				}
-				else
-				{
-					bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-							"UTF-8"));
+				if (protoCarry == ProtoCarry.ProtoBuf) {
+
+				} else {
+					bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 				}
 				while (true) {
 					switch (protoCarry) {
@@ -230,13 +236,12 @@ public class SocketService implements BridgeService {
 						if (protoMessage.hasGroup()) {
 							bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
 						}
-						if(bridgeMessage.getMessageFormat() == null)
-						{
+						if (bridgeMessage.getMessageFormat() == null) {
 							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
 						}
-						if(bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
-						{
-							Logger.getLogger(SocketService.class.getName()).log(Level.INFO, "Received PING empty message from " + endpoint.toString(true));
+						if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0) {
+							Logger.getLogger(SocketService.class.getName()).log(Level.INFO,
+									"Received PING empty message from " + endpoint.toString(true));
 							break;
 						}
 						CommandInterpreter.processMessage(bridgeMessage);
@@ -271,9 +276,8 @@ public class SocketService implements BridgeService {
 			}
 			disconnect();
 		}
-		
-		public void disconnect()
-		{
+
+		public void disconnect() {
 			try {
 				socket.close();
 			} catch (IOException e) {
