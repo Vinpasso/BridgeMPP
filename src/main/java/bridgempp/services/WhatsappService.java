@@ -207,13 +207,13 @@ public class WhatsappService implements BridgeService {
 							Level.INFO, "YOWSUP Buffer: " + buffer);
 					Matcher matcher = Pattern
 							.compile(
-									"\\[([^\\[]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)")
+									"\\[([^\\/]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)")
 							.matcher(buffer);
 					while (matcher.find()) {
-						String author = matcher.group(3);
-						String group = matcher.group(1);
+						String author = matcher.group(1);
+						String group = matcher.group(2);
 						String message = new String(Base64.getDecoder().decode(
-								matcher.group(4)), "UTF-8");
+								matcher.group(5)), "UTF-8");
 						Endpoint endpoint;
 						if (endpoints.containsKey(group)) {
 							endpoint = endpoints.get(group);

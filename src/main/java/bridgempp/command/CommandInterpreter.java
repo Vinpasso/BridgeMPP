@@ -5,6 +5,9 @@
  */
 package bridgempp.command;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import bridgempp.Endpoint;
 import bridgempp.GroupManager;
 import bridgempp.Message;
@@ -12,6 +15,7 @@ import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
+import bridgempp.services.WhatsappService;
 
 /**
  *
@@ -82,6 +86,8 @@ public class CommandInterpreter {
 		if (isCommand(message.getPlainTextMessage())) {
 			interpretCommand(message);
 		} else {
+			Logger.getLogger(CommandInterpreter.class.getName()).log(
+					Level.INFO, "Routing Message: " + message.toString());
 			for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
 				ShadowManager.shadowEndpoints.get(i).sendMessage(message);
 			}
