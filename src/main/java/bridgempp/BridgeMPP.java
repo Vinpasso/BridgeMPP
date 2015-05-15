@@ -17,6 +17,8 @@ import java.util.logging.Logger;
  */
 public class BridgeMPP {
 
+	private static boolean shutdownCommencing = false;
+
 	/**
 	 * @param args
 	 *            the command line arguments
@@ -82,6 +84,11 @@ public class BridgeMPP {
 
 	public static void exit()
     {
+		if(shutdownCommencing)
+		{
+			return;
+		}
+		shutdownCommencing = true;
         ShadowManager.log(Level.INFO, "Server shutdown commencing...");
         try
         {

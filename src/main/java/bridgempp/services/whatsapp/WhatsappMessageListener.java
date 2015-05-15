@@ -38,6 +38,7 @@ class WhatsappMessageListener implements Runnable {
 		ShadowManager.log(Level.INFO, "Whatsapp Message Listener starting up");
 		process();
 		ShadowManager.log(Level.INFO, "Whatsapp Message Listener shutting down");
+		ShadowManager.fatal("Whatsapp Message Listener offline");
 	}
 
 	public void process() {
