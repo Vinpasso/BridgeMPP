@@ -277,7 +277,13 @@ public class SocketService implements BridgeService {
 						}
 						break;
 					case Plain_Text:
-						CommandInterpreter.processMessage(new Message(endpoint, bufferedReader.readLine(),
+						String messageLine = bufferedReader.readLine();
+						if(messageLine == null)
+						{
+							disconnect();
+							break;
+						}
+						CommandInterpreter.processMessage(new Message(endpoint, messageLine,
 								MessageFormat.PLAIN_TEXT));
 						break;
 					}
