@@ -15,7 +15,6 @@ import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
-import bridgempp.services.WhatsappService;
 
 /**
  *

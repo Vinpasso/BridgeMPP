@@ -8,9 +8,9 @@ package bridgempp;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
-import bridgempp.services.SocketService;
 import bridgempp.services.WhatsappService;
-import bridgempp.services.XMPPService;
+import bridgempp.services.socket.SocketService;
+import bridgempp.services.xmpp.XMPPService;
 
 import java.util.ArrayList;
 import java.util.logging.Level;

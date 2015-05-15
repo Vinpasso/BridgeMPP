@@ -61,4 +61,19 @@ public class ShadowManager {
 		log(level, message);
 		e.printStackTrace();
 	}
+
+	public static void info(String msg)
+	{
+		log(Level.INFO, msg);
+	}
+	
+	public static void fatal(Exception e) {
+		log(Level.SEVERE, "Fatal BridgeMPP Error\nWill respawn", e);
+		BridgeMPP.exit();
+	}
+
+	public static void fatal(String msg) {
+		log(Level.SEVERE, "Fatal BridgeMPP Error\nWill respawn\n" + msg);
+		BridgeMPP.exit();		
+	}
 }
