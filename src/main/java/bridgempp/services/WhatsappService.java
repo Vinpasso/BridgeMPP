@@ -210,7 +210,7 @@ public class WhatsappService implements BridgeService {
 									"\\[([^\\/]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)")
 							.matcher(buffer);
 					while (matcher.find()) {
-						String author = matcher.group(1);
+						String author = matcher.group(1) + "@s.whatsapp.net";
 						String group = matcher.group(2);
 						String message = new String(Base64.getDecoder().decode(
 								matcher.group(5)), "UTF-8");

@@ -217,6 +217,7 @@ public class SocketService implements BridgeService {
 		Endpoint endpoint;
 		int randomIdentifier;
 		ProtoCarry protoCarry = ProtoCarry.Plain_Text;
+		boolean running = true;
 
 		public SocketClient(Socket socket, Endpoint endpoint) {
 			this.socket = socket;
@@ -238,7 +239,7 @@ public class SocketService implements BridgeService {
 				} else {
 					bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 				}
-				while (true) {
+				while (running) {
 					switch (protoCarry) {
 					case ProtoBuf:
 						ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
@@ -289,6 +290,7 @@ public class SocketService implements BridgeService {
 		}
 
 		public void disconnect() {
+			running = false;
 			try {
 				socket.close();
 			} catch (IOException e) {
