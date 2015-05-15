@@ -8,8 +8,8 @@ package bridgempp;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
-import bridgempp.services.WhatsappService;
 import bridgempp.services.socket.SocketService;
+import bridgempp.services.whatsapp.WhatsappService;
 import bridgempp.services.xmpp.XMPPService;
 
 import java.util.ArrayList;

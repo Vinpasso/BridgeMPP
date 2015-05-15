@@ -51,7 +51,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
         self.username = None
         self.sendReceipts = True
         self.iqs = {}
-        self.disconnectAction = self.__class__.DISCONNECT_ACTION_PROMPT
+        self.disconnectAction = self.__class__.DISCONNECT_ACTION_EXIT
 
         #add aliases to make it user to use commands. for example you can then do:
         # /message send foobar "HI"
