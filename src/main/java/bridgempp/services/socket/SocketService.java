@@ -85,7 +85,7 @@ public class SocketService implements BridgeService {
 			case ProtoBuf:
 				ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();
 				protoMessageBuilder.setMessageFormat(message.getMessageFormat().getName());
-				protoMessageBuilder.setMessage(message.getMessage(new MessageFormat[] { message.getMessageFormat() }));
+				protoMessageBuilder.setMessage(message.getMessage(message.getMessageFormat()));
 				if (message.getGroup() != null) {
 					protoMessageBuilder.setGroup(message.getGroup().getName());
 				}

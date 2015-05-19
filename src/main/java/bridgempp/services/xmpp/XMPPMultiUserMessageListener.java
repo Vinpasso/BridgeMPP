@@ -64,7 +64,7 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 				XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + messageContents
 						+ "</body>");
 			}
-			sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
+			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
 			multiUserChat.sendMessage(sendMessage);
 		} catch (XMPPException | SmackException.NotConnectedException ex) {
 			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);

@@ -52,7 +52,7 @@ public class Message {
         return getMessage(new MessageFormat[] {MessageFormat.PLAIN_TEXT});
     }
     
-    public String getMessage(MessageFormat[] formats)
+    public String getMessage(MessageFormat... formats)
     {
     	for(MessageFormat format : formats)
     	{
@@ -126,11 +126,11 @@ public class Message {
         this.group = group;
     }
 
-    public String toSimpleString(MessageFormat[] messageFormats) {
+    public String toSimpleString(MessageFormat... messageFormats) {
         return ((getSender() != null)?getSender().toString():"Unknown") + ": " + getMessage(messageFormats);
     }
 
-    public String toComplexString(MessageFormat[] messageFormats) {
+    public String toComplexString(MessageFormat... messageFormats) {
     	String messageFormat = chooseMessageFormat(messageFormats).getName() + ": ";
         String group = (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: ";
         String sender = (getSender() != null)?getSender().toString():"Unknown";
@@ -159,7 +159,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return toComplexString(new MessageFormat[] {MessageFormat.PLAIN_TEXT});
+        return toComplexString(MessageFormat.PLAIN_TEXT);
     }
 
 	/**

@@ -53,7 +53,7 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 				XHTMLManager.addBody(sendMessage, messageContents);
 			}
 
-			sendMessage.addBody(null, message.toSimpleString(new MessageFormat[] { MessageFormat.PLAIN_TEXT }));
+			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
 			chat.sendMessage(sendMessage);
 		} catch (SmackException.NotConnectedException ex) {
 			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
