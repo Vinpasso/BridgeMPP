@@ -114,6 +114,6 @@ class SocketClient implements Runnable {
 		}
 		GroupManager.removeEndpointFromAllGroups(endpoint);
 		this.socketService.pendingDeletion.add(randomIdentifier);
-		ShadowManager.log(Level.INFO, "TCP client has disconnnected");
+		ShadowManager.log(Level.INFO, "TCP client has disconnected");
 	}
 }
