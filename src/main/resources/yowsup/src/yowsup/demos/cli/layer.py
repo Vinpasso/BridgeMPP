@@ -424,7 +424,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
        
 
     def getDownloadableMediaMessageBody(self, message):
-         return "[Media Type:{media_type}, Size:{media_size}, URL:{media_url}]".format(
+         return "[Media Type:{media_type}, Size:{media_size}, URL:{media_url} ]".format(
             media_type = message.getMediaType(),
             media_size = message.getMediaSize(),
             media_url = message.getMediaUrl()
