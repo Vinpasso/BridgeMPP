@@ -8,6 +8,7 @@ package bridgempp.command;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import bridgempp.BridgeMPP;
 import bridgempp.Endpoint;
 import bridgempp.GroupManager;
 import bridgempp.Message;
@@ -81,6 +82,11 @@ public class CommandInterpreter {
 	public static void processMessage(Message message) {
 		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0) {
 			return;
+		}
+		try {
+			BridgeMPP.syncLockdown();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		if (isCommand(message.getPlainTextMessage())) {
 			interpretCommand(message);

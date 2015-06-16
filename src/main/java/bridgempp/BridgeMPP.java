@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import bridgempp.util.LockdownLock;
+
 /**
  *
  * @author Vinpasso
@@ -18,12 +20,14 @@ import java.util.logging.Logger;
 public class BridgeMPP {
 
 	private static boolean shutdownCommencing = false;
+	private static LockdownLock lockdown = new LockdownLock();
 
 	/**
 	 * @param args
 	 *            the command line arguments
 	 */
 	public static void main(String[] args) {
+		lockdown();
 		if(args.length != 0)
 		{
 			for(int i = 0; i < args.length; i++)
@@ -47,6 +51,7 @@ public class BridgeMPP {
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
 		GroupManager.loadAllGroups();
+		allClear();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
 	}
 
@@ -128,4 +133,19 @@ public class BridgeMPP {
         ShadowManager.log(Level.INFO, "Killing Process");
         System.exit(0);
     }
+	
+	public static void lockdown()
+	{
+		lockdown.lock();
+	}
+	
+	public static void allClear()
+	{
+		lockdown.unlock();
+	}
+	
+	public static void syncLockdown() throws InterruptedException
+	{
+		lockdown.syncLock();
+	}
 }
