@@ -122,7 +122,7 @@ public class BridgeMPP {
         		{
         			long startTime = System.currentTimeMillis();
         			try {
-        				if(!thread.isDaemon())
+        				if(!thread.isDaemon() && !thread.getName().equalsIgnoreCase("DestroyJavaVM"))
         				{
             				thread.interrupt();
             				thread.join(60000);
