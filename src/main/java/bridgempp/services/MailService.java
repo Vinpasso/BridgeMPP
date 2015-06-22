@@ -41,6 +41,7 @@ public class MailService implements BridgeService {
 	private String password;
 	private String smtphost;
 	private String smtpport;
+	private IMAPFolder processedFolder;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
 			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
@@ -84,6 +85,12 @@ public class MailService implements BridgeService {
 			store.connect(imaphost, imapport, username, password);
 			folder = (IMAPFolder) store.getFolder("Inbox");
 			folder.open(Folder.READ_WRITE);
+			processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
+			if(!processedFolder.exists())
+			{
+				processedFolder.create(Folder.HOLDS_MESSAGES);
+			}
+			processedFolder.open(Folder.READ_WRITE);
 			new Thread(new MailMessageListener(), "Mail Message Listener")
 					.start();
 		} catch (NoSuchProviderException ex) {
@@ -100,6 +107,7 @@ public class MailService implements BridgeService {
 	public void disconnect() {
 		try {
 			folder.close(true);
+			processedFolder.close(true);
 			store.close();
 		} catch (MessagingException ex) {
 			Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
@@ -226,6 +234,7 @@ public class MailService implements BridgeService {
 										.toString(),
 								getSupportedMessageFormats()[0]);
 						CommandInterpreter.processMessage(bMessage);
+						folder.copyMessages(new Message[] { message }, processedFolder);
 						folder.setFlags(new Message[] { message }, new Flags(
 								Flags.Flag.DELETED), true);
 						folder.expunge();
