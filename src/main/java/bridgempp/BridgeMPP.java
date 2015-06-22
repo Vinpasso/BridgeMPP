@@ -122,8 +122,11 @@ public class BridgeMPP {
         		{
         			long startTime = System.currentTimeMillis();
         			try {
-        				thread.interrupt();
-						thread.join(60000);
+        				if(!thread.isDaemon())
+        				{
+            				thread.interrupt();
+            				thread.join(60000);
+        				}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
