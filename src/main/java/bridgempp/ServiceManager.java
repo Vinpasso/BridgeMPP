@@ -8,6 +8,7 @@ package bridgempp;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
+import bridgempp.services.facebook.FacebookService;
 import bridgempp.services.socket.SocketService;
 import bridgempp.services.whatsapp.WhatsappService;
 import bridgempp.services.xmpp.XMPPService;
@@ -52,6 +53,9 @@ public class ServiceManager {
 				break;
 			case "whatsappservice":
 				service = new WhatsappService();
+				break;
+			case "facebookservice":
+				service = new FacebookService();
 				break;
 			default:
 				throw new UnsupportedOperationException("Incorrect Servicetype in Service Declaration: " + type);

@@ -3,6 +3,9 @@ package bridgempp.services.facebook;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.logging.Level;
+
+import bridgempp.ShadowManager;
 
 import com.restfb.Connection;
 import com.restfb.types.Post;
@@ -41,7 +44,7 @@ public class FacebookPollService implements Runnable {
 					while(posts.get(lastUnreadPost + 1).hashCode() != lastSeen)
 					{
 						lastUnreadPost++;
-						if(lastUnreadPost >= posts.size())
+						if(lastUnreadPost >= posts.size() - 1)
 						{
 							break;
 						}
@@ -49,13 +52,15 @@ public class FacebookPollService implements Runnable {
 					for(int i = lastUnreadPost; i >= 0; i--)
 					{
 						service.processPost(nextElement, posts.get(i));
+						connections.remove(nextElement);
+						connections.put(nextElement, posts.get(i).hashCode());
 					}
 				}
 				Thread.sleep(POLL_FREQUENCY);
 			}
 		} catch(InterruptedException e)
 		{
-			//TODO: Shutdown
+			ShadowManager.log(Level.SEVERE, "Facebook Poll interrupted! Shutting down");
 		}
 	}
 

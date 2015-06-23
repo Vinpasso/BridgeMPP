@@ -1,7 +1,7 @@
 package bridgempp.services.facebook;
 
-import java.security.InvalidParameterException;
 import java.util.Hashtable;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -15,6 +15,7 @@ import com.restfb.types.Post;
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 
@@ -23,12 +24,19 @@ public class FacebookService implements BridgeService {
 	private FacebookClient facebook;
 	private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
 	private Hashtable<String, Endpoint> endpoints;
+	private FacebookPollService pollService;
 	
 	@Override
 	public void connect(String args) {
 		//ARGS is Access Token
+		ShadowManager.log(Level.INFO, "Facebook Client starting up");
 		endpoints = new Hashtable<>();
 		facebook = new DefaultFacebookClient(args, Version.VERSION_2_3);
+		pollService = new FacebookPollService(this);
+		Thread thread = new Thread(pollService);
+		thread.setName("Facebook Poll Service");
+		thread.start();
+		ShadowManager.log(Level.INFO, "Facebook Client ready");
 	}
 
 	@Override
@@ -66,6 +74,7 @@ public class FacebookService implements BridgeService {
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
 		endpoints.put(endpoint.getTarget(), endpoint);
+		pollService.addConnection(endpoint.getTarget());
 	}
 
 	@Override
