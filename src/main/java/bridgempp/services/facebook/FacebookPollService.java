@@ -5,13 +5,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.apache.commons.configuration.ConfigurationException;
-
-import bridgempp.ConfigurationManager;
+import bridgempp.BridgeMPP;
 import bridgempp.ShadowManager;
 
 import com.restfb.Connection;
-import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.Post;
 
 public class FacebookPollService implements Runnable {
@@ -26,15 +23,23 @@ public class FacebookPollService implements Runnable {
 		this.service = service;
 	}
 	
-	public void addConnection(String connection)
+	public void addConnection(String connection, String extra)
 	{
-		connections.put(connection, -1);
+		int lastSeen = -1;
+		try
+		{
+			lastSeen = Integer.parseInt(extra);
+		} catch(Exception e)
+		{}
+		connections.put(connection, lastSeen);
 	}
 
 	public void run()
 	{
 		try
 		{
+			//Wait for System to be ready
+			BridgeMPP.syncLockdown();
 			while(true)
 			{
 				Enumeration<String> connectionKeys = connections.keys();

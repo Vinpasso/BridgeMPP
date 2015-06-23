@@ -60,7 +60,9 @@ public class ServiceManager {
 				throw new UnsupportedOperationException("Incorrect Servicetype in Service Declaration: " + type);
 			}
 			services.add(service);
+			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
 			service.connect(options);
+			ShadowManager.log(Level.INFO, "Loaded Service: " + service.getName());
 		}
 		ShadowManager.log(Level.INFO, "All Services loaded");
 
@@ -69,7 +71,9 @@ public class ServiceManager {
 	public static void unloadAllServices() {
 		for (int i = 0; i < services.size(); i++) {
 			try {
+				ShadowManager.log(Level.INFO, "Unloading Service: " + services.get(i).getName());
 				services.get(i).disconnect();
+				ShadowManager.log(Level.INFO, "Unloaded Service: " + services.get(i).getName());
 			} catch (Exception e) {
 				ShadowManager.log(Level.INFO, "Unloading of Service " + services.get(i).getName() + " has failed", e);
 			}

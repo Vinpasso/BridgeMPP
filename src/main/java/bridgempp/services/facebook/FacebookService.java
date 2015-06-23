@@ -89,7 +89,7 @@ public class FacebookService implements BridgeService {
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
 		endpoints.put(endpoint.getTarget(), endpoint);
-		pollService.addConnection(endpoint.getTarget());
+		pollService.addConnection(endpoint.getTarget(), endpoint.getExtra());
 	}
 
 	@Override
@@ -106,7 +106,8 @@ public class FacebookService implements BridgeService {
 		{
 			endpoints.put(place, new Endpoint(this, place));
 		}
-		Message message = new Message(endpoints.get(place), post.toString(), MessageFormat.PLAIN_TEXT);
+		endpoints.get(place).setExtra(post.hashCode() + "");
+		Message message = new Message(endpoints.get(place), post.getStory() + ": " + post.getDescription(), MessageFormat.PLAIN_TEXT);
 		CommandInterpreter.processMessage(message);
 	}
 
