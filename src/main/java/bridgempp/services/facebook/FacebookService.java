@@ -26,13 +26,9 @@ public class FacebookService implements BridgeService {
 	
 	@Override
 	public void connect(String args) {
-		String[] parameters = args.split("; ");
-		if(args == null || args.length() != 2)
-		{
-			throw new InvalidParameterException("Unexpected Args: " + args.toString());
-		}
+		//ARGS is Access Token
 		endpoints = new Hashtable<>();
-		facebook = new DefaultFacebookClient(parameters[0], parameters[1], Version.VERSION_2_3);
+		facebook = new DefaultFacebookClient(args, Version.VERSION_2_3);
 	}
 
 	@Override
