@@ -4,7 +4,7 @@ public abstract class MessageFormat {
 	public static MessageFormat PLAIN_TEXT = new PlainTextMessageFormat();
 	public static MessageFormat HTML = new HTMLMessageFormat();
 	public static MessageFormat XHTML = new XHTMLMessageFormat();
-
+	public static MessageFormat[] PLAIN_TEXT_ONLY = new MessageFormat[] { PLAIN_TEXT };
 	
 	protected MessageFormat parentFormat;
 	
