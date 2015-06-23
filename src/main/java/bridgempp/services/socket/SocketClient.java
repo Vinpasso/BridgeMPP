@@ -100,7 +100,7 @@ class SocketClient implements Runnable {
 			}
 
 		} catch (IOException ex) {
-			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 		disconnect();
 	}

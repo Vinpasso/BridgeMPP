@@ -5,9 +5,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.configuration.ConfigurationException;
+
+import bridgempp.ConfigurationManager;
 import bridgempp.ShadowManager;
 
 import com.restfb.Connection;
+import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.Post;
 
 public class FacebookPollService implements Runnable {
@@ -63,5 +67,6 @@ public class FacebookPollService implements Runnable {
 			ShadowManager.log(Level.SEVERE, "Facebook Poll interrupted! Shutting down");
 		}
 	}
+	
 
 }

@@ -36,7 +36,7 @@ public class ConfigurationManager {
             permissionConfiguration.setEncoding("UTF-8");
             ShadowManager.log(Level.INFO, "Configuration files have been loaded");
         } catch (ConfigurationException ex) {
-            Logger.getLogger(ConfigurationManager.class.getName()).log(Level.SEVERE, null, ex);
+            ShadowManager.log(Level.SEVERE, "Error while initializing XML Configuration", ex);
         }
     }
 
@@ -49,4 +49,22 @@ public class ConfigurationManager {
         }
         return "";
     }
+    
+    public static String getServiceConfigurationIdentifier(String serviceIdentifier)
+    {
+		int serviceDefinitionCount = getServiceCount();
+    	for(int i = 0; i < serviceDefinitionCount; i++)
+    	{
+    		if(serviceConfiguration.getString("services.service(" + i + ").type").equalsIgnoreCase(serviceIdentifier))
+    		{
+    			return "services.service(" + i + ")";
+    		}
+    	}
+    	return null;
+    }
+
+	public static int getServiceCount() {
+		return ConfigurationManager.serviceConfiguration.getRootNode().getChild(0)
+				.getChildrenCount();
+	}
 }

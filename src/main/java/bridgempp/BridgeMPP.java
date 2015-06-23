@@ -81,8 +81,7 @@ public class BridgeMPP {
 			}
 			return path;
 		} catch (URISyntaxException ex) {
-			Logger.getLogger(BridgeMPP.class.getName()).log(Level.SEVERE, null,
-					ex);
+			ShadowManager.log(Level.SEVERE, "Cannot find URI of Jar!", ex);
 		}
 		return null;
 	}

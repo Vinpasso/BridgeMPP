@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 
@@ -49,7 +50,7 @@ public class BridgeChat implements BridgeService {
 				}
 			}).start();
 		} catch (NumberFormatException | IOException e) {
-			Logger.getLogger(BridgeChat.class.getName()).log(Level.SEVERE,
+			ShadowManager.log(Level.SEVERE,
 					null, e);
 		}
 	}

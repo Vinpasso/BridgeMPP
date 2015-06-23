@@ -92,7 +92,7 @@ public class GroupManager {
             }
             ConfigurationManager.groupConfiguration.save();
         } catch (ConfigurationException ex) {
-            Logger.getLogger(GroupManager.class.getName()).log(Level.SEVERE, null, ex);
+            ShadowManager.log(Level.SEVERE, "Error while saving all XML Configurations to File", ex);
         }
         ShadowManager.log(Level.INFO, "Saved all groups");
     }

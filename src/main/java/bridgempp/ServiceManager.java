@@ -29,8 +29,7 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Loading all Services...");
 
 		services = new ArrayList<>();
-		int serviceDefinitionCount = ConfigurationManager.serviceConfiguration.getRootNode().getChild(0)
-				.getChildrenCount();
+		int serviceDefinitionCount = ConfigurationManager.getServiceCount();
 		for (int i = 0; i < serviceDefinitionCount; i++) {
 			String type = ConfigurationManager.serviceConfiguration.getString("services.service(" + i + ").type");
 			String options = ConfigurationManager.serviceConfiguration.getString("services.service(" + i + ").options");

@@ -32,8 +32,7 @@ public class SkypeService implements BridgeService {
 			Skype.addChatMessageListener(new SkypeChatListener());
 			ShadowManager.log(Level.INFO, "Starting Skype Service...");
 		} catch (SkypeException ex) {
-			Logger.getLogger(SkypeService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -47,14 +46,12 @@ public class SkypeService implements BridgeService {
 			Chat[] chats = Skype.getAllChats();
 			for (int i = 0; i < chats.length; i++) {
 				if (chats[i].getId().equals(message.getTarget().getTarget())) {
-					chats[i].send(message
-							.toSimpleString(getSupportedMessageFormats()));
+					chats[i].send(message.toSimpleString(getSupportedMessageFormats()));
 					return;
 				}
 			}
 		} catch (SkypeException ex) {
-			Logger.getLogger(SkypeService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -72,7 +69,7 @@ public class SkypeService implements BridgeService {
 	public void addEndpoint(Endpoint endpoint) {
 		endpoints.add(endpoint);
 	}
-	
+
 	@Override
 	public void interpretCommand(Message message) {
 		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
@@ -85,16 +82,14 @@ public class SkypeService implements BridgeService {
 		}
 
 		@Override
-		public void chatMessageReceived(ChatMessage receivedChatMessage)
-				throws SkypeException {
+		public void chatMessageReceived(ChatMessage receivedChatMessage) throws SkypeException {
 			String chatID = receivedChatMessage.getChat().getId();
 			String message = receivedChatMessage.getContent();
 			String sender = receivedChatMessage.getSenderDisplayName();
 			for (int i = 0; i < endpoints.size(); i++) {
 				if (endpoints.get(i).getTarget().equals(chatID)) {
 					endpoints.get(i).setExtra(sender);
-					Message bMessage = new Message(endpoints.get(i), message,
-							getSupportedMessageFormats()[0]);
+					Message bMessage = new Message(endpoints.get(i), message, getSupportedMessageFormats()[0]);
 					CommandInterpreter.processMessage(bMessage);
 					return;
 				}
@@ -102,14 +97,12 @@ public class SkypeService implements BridgeService {
 			Endpoint endpoint = new Endpoint(SkypeService.this, chatID);
 			endpoint.setExtra(sender);
 			endpoints.add(endpoint);
-			Message bMessage = new Message(endpoint, message,
-					getSupportedMessageFormats()[0]);
+			Message bMessage = new Message(endpoint, message, getSupportedMessageFormats()[0]);
 			CommandInterpreter.processMessage(bMessage);
 		}
 
 		@Override
-		public void chatMessageSent(ChatMessage sentChatMessage)
-				throws SkypeException {
+		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException {
 		}
 	}
 

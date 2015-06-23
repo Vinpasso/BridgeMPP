@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import bridgempp.ShadowManager;
+
 class WhatsappSender implements Runnable {
 
 	/**
@@ -41,8 +43,7 @@ class WhatsappSender implements Runnable {
 				lastMessage = System.currentTimeMillis();
 			}
 		} catch (InterruptedException ex) {
-			Logger.getLogger(WhatsappService.class.getName()).log(
-					Level.SEVERE, null, ex);
+			ShadowManager.log(Level.WARNING, "Whatsapp Message Sender interrupted. Shutting down Whatsapp Message Sender");
 		}
 	}
 }

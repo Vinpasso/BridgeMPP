@@ -97,7 +97,7 @@ public class XMPPService implements BridgeService {
 				}
 			});
 		} catch (XMPPException | SmackException | IOException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 
 	}
@@ -111,7 +111,7 @@ public class XMPPService implements BridgeService {
 			connection = null;
 			ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
 		} catch (SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 

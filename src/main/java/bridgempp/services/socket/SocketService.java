@@ -32,6 +32,7 @@ public class SocketService implements BridgeService {
 	HashMap<Integer, SocketClient> connectedSockets;
 	LinkedList<Integer> pendingDeletion;
 	private ServerListener serverListener;
+	protected boolean pendingShutdown = false;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
 			MessageFormat.PLAIN_TEXT };
@@ -56,14 +57,14 @@ public class SocketService implements BridgeService {
 	@Override
 	public void disconnect() {
 		try {
-			serverSocket.close();
+			pendingShutdown  = true;
 			@SuppressWarnings("unchecked")
 			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>) connectedSockets.clone();
 			for (SocketClient client : tempConnected.values()) {
 				client.socket.close();
 			}
 		} catch (IOException ex) {
-			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 
 	}
@@ -100,7 +101,7 @@ public class SocketService implements BridgeService {
 				break;
 			}
 		} catch (IOException ex) {
-			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 			connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).disconnect();
 		}
 	}

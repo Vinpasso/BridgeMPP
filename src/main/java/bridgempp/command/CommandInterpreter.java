@@ -91,8 +91,7 @@ public class CommandInterpreter {
 		if (isCommand(message.getPlainTextMessage())) {
 			interpretCommand(message);
 		} else {
-			Logger.getLogger(CommandInterpreter.class.getName()).log(
-					Level.INFO, "Routing Message: " + message.toString());
+			ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 			for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
 				ShadowManager.shadowEndpoints.get(i).sendMessage(message);
 			}

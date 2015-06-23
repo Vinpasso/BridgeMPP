@@ -43,8 +43,8 @@ public class MailService implements BridgeService {
 	private String smtpport;
 	private IMAPFolder processedFolder;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
-			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
+			MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect(String argumentString) {
@@ -53,8 +53,7 @@ public class MailService implements BridgeService {
 		endpoints = new ArrayList<>();
 		String[] args = argumentString.split("; ");
 		if (args.length != 6) {
-			throw new UnsupportedOperationException(
-					"Incorrect Arguments for mailer service");
+			throw new UnsupportedOperationException("Incorrect Arguments for mailer service");
 		}
 		imaphost = args[0];
 		imapport = Integer.parseInt(args[1]);
@@ -69,36 +68,30 @@ public class MailService implements BridgeService {
 			System.getProperties().setProperty("mail.smtp.auth", "true");
 			System.getProperties().setProperty("mail.smtp.host", smtphost);
 			System.getProperties().setProperty("mail.smtp.port", smtpport);
-			
-			
+
 			Authenticator authenticator = new Authenticator() {
 				@Override
-				protected PasswordAuthentication getPasswordAuthentication()
-				{
+				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(username, password);
 				}
-				
+
 			};
-					
+
 			session = Session.getDefaultInstance(System.getProperties(), authenticator);
 			store = session.getStore("imaps");
 			store.connect(imaphost, imapport, username, password);
 			folder = (IMAPFolder) store.getFolder("Inbox");
 			folder.open(Folder.READ_WRITE);
 			processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
-			if(!processedFolder.exists())
-			{
+			if (!processedFolder.exists()) {
 				processedFolder.create(Folder.HOLDS_MESSAGES);
 			}
 			processedFolder.open(Folder.READ_WRITE);
-			new Thread(new MailMessageListener(), "Mail Message Listener")
-					.start();
+			new Thread(new MailMessageListener(), "Mail Message Listener").start();
 		} catch (NoSuchProviderException ex) {
-			Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		} catch (MessagingException ex) {
-			Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 		ShadowManager.log(Level.INFO, "Mail service loaded");
 	}
@@ -110,8 +103,7 @@ public class MailService implements BridgeService {
 			processedFolder.close(true);
 			store.close();
 		} catch (MessagingException ex) {
-			Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -120,16 +112,12 @@ public class MailService implements BridgeService {
 		try {
 			MimeMessage mimeMessage = new MimeMessage(session);
 			mimeMessage.setFrom(username);
-			mimeMessage.setRecipients(Message.RecipientType.TO, message
-					.getTarget().getTarget());
-			mimeMessage.setSubject(message
-					.toSimpleString(getSupportedMessageFormats()));
-			mimeMessage.setText(message
-					.toSimpleString(getSupportedMessageFormats()));
+			mimeMessage.setRecipients(Message.RecipientType.TO, message.getTarget().getTarget());
+			mimeMessage.setSubject(message.toSimpleString(getSupportedMessageFormats()));
+			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()));
 			Transport.send(mimeMessage, username, password);
 		} catch (MessagingException ex) {
-			Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
-					null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -163,30 +151,25 @@ public class MailService implements BridgeService {
 					try {
 						while (folder.isOpen()) {
 							try {
-								ShadowManager.log(Level.INFO,
-										"MailService: Sending Keep-Alive NOOP");
+								ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
 
 								folder.doCommand(new IMAPFolder.ProtocolCommand() {
 
 									@Override
-									public Object doCommand(
-											IMAPProtocol protocol)
-											throws ProtocolException {
+									public Object doCommand(IMAPProtocol protocol) throws ProtocolException {
 										protocol.simpleCommand("NOOP", null);
 										return null;
 									}
 								});
-								ShadowManager.log(Level.INFO,
-										"MailService: Sent Keep-Alive NOOP");
+								ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP");
 								Thread.sleep(KEEP_ALIVE_FREQUENCY);
 							} catch (MessagingException ex) {
-								Logger.getLogger(MailService.class.getName())
-										.log(Level.SEVERE, null, ex);
+								ShadowManager.log(Level.SEVERE, null, ex);
 							}
 						}
 					} catch (InterruptedException e) {
-						Logger.getLogger(MailService.class.getName()).log(
-								Level.SEVERE, null, e);
+						ShadowManager.log(Level.WARNING,
+								"Mail Message Listener interrupted. Shutting down Mail Message Listener");
 					}
 				}
 			}, "Mail Connection Renew Thread");
@@ -202,8 +185,7 @@ public class MailService implements BridgeService {
 					}
 					folder.idle();
 				} catch (MessagingException ex) {
-					Logger.getLogger(MailService.class.getName()).log(
-							Level.SEVERE, null, ex);
+					ShadowManager.log(Level.SEVERE, null, ex);
 				}
 			}
 			autoRenewThread.interrupt();
@@ -216,7 +198,7 @@ public class MailService implements BridgeService {
 					processMessage(message);
 				}
 			} catch (MessagingException e1) {
-				Logger.getLogger(MailService.class.getName()).log(Level.SEVERE, "Mailbox error", e1);
+				ShadowManager.log(Level.SEVERE, "Mailbox error", e1);
 			}
 		}
 
@@ -229,31 +211,24 @@ public class MailService implements BridgeService {
 				String sender = message.getFrom()[0].toString();
 				for (int i = 0; i < endpoints.size(); i++) {
 					if (endpoints.get(i).getTarget().equals(sender)) {
-						bridgempp.Message bMessage = new bridgempp.Message(
-								endpoints.get(i), message.getContent()
-										.toString(),
-								getSupportedMessageFormats()[0]);
+						bridgempp.Message bMessage = new bridgempp.Message(endpoints.get(i), message.getContent()
+								.toString(), getSupportedMessageFormats()[0]);
 						CommandInterpreter.processMessage(bMessage);
 						folder.copyMessages(new Message[] { message }, processedFolder);
-						folder.setFlags(new Message[] { message }, new Flags(
-								Flags.Flag.DELETED), true);
+						folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
 						folder.expunge();
 						return;
 					}
 				}
-				Endpoint endpoint = new Endpoint(MailService.this,
-						message.getFrom()[0].toString());
+				Endpoint endpoint = new Endpoint(MailService.this, message.getFrom()[0].toString());
 				endpoints.add(endpoint);
-				bridgempp.Message bMessage = new bridgempp.Message(endpoint,
-						message.getContent().toString(),
+				bridgempp.Message bMessage = new bridgempp.Message(endpoint, message.getContent().toString(),
 						getSupportedMessageFormats()[0]);
 				CommandInterpreter.processMessage(bMessage);
-				folder.setFlags(new Message[] { message }, new Flags(
-						Flags.Flag.DELETED), true);
+				folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
 				folder.expunge();
 			} catch (MessagingException | IOException ex) {
-				Logger.getLogger(MailService.class.getName()).log(Level.SEVERE,
-						null, ex);
+				ShadowManager.log(Level.SEVERE, null, ex);
 			}
 		}
 	}
