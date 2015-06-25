@@ -46,7 +46,7 @@ public class FacebookService implements BridgeService {
 
 	@Override
 	public void sendMessage(Message message) {
-		if(message.getMessageFormat().equals(MessageFormat.PLAIN_TEXT))
+		if(message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
 		{
 			facebook.publish(message.getTarget().getTarget(), FacebookType.class, Parameter.with("message", message.getPlainTextMessage()));
 		}
