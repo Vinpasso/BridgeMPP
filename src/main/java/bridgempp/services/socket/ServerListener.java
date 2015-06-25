@@ -34,20 +34,21 @@ class ServerListener implements Runnable {
 		ShadowManager.log(Level.INFO, "Starting TCP Server Socket Listener");
 
 		try {
-			this.socketService.serverSocket = new ServerSocket(this.socketService.listenPort, 10, InetAddress.getByName(this.socketService.listenAddress));
-			this.socketService.serverSocket.setSoTimeout(5000);
-			while (!this.socketService.serverSocket.isClosed()) {
+			socketService.serverSocket = new ServerSocket(socketService.listenPort, 10,
+					InetAddress.getByName(socketService.listenAddress));
+			socketService.serverSocket.setSoTimeout(5000);
+			while (!socketService.pendingShutdown && !socketService.serverSocket.isClosed()) {
 				try {
 					int randomIdentifier;
 					do {
 						randomIdentifier = new Random().nextInt(Integer.MAX_VALUE);
-					} while (this.socketService.connectedSockets.containsKey(randomIdentifier));
+					} while (socketService.connectedSockets.containsKey(randomIdentifier));
 
-					Socket socket = this.socketService.serverSocket.accept();
-					SocketClient socketClient = new SocketClient(this.socketService, socket, new Endpoint(this.socketService,
-							randomIdentifier + ""));
+					Socket socket = socketService.serverSocket.accept();
+					SocketClient socketClient = new SocketClient(socketService, socket, new Endpoint(
+							socketService, randomIdentifier + ""));
 					socketClient.randomIdentifier = randomIdentifier;
-					this.socketService.connectedSockets.put(randomIdentifier, socketClient);
+					socketService.connectedSockets.put(randomIdentifier, socketClient);
 					new Thread(socketClient, "Socket TCP Connection").start();
 				} catch (SocketTimeoutException e) {
 				}
@@ -57,21 +58,22 @@ class ServerListener implements Runnable {
 				removePendingDeletions();
 			}
 		} catch (IOException ex) {
-			Logger.getLogger(SocketService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	private void sendKeepAliveMessages() {
-		for (SocketClient client : this.socketService.connectedSockets.values()) {
-			this.socketService.sendMessage(new Message(client.endpoint, client.endpoint, null, "", MessageFormat.PLAIN_TEXT));
+		for (SocketClient client : socketService.connectedSockets.values()) {
+			socketService.sendMessage(new Message(client.endpoint, client.endpoint, null, "",
+					MessageFormat.PLAIN_TEXT));
 		}
 		lastKeepAlive = System.currentTimeMillis();
 	}
 
 	private void removePendingDeletions() {
-		while (!this.socketService.pendingDeletion.isEmpty()) {
-			Integer index = this.socketService.pendingDeletion.removeFirst();
-			this.socketService.connectedSockets.remove(index);
+		while (!socketService.pendingDeletion.isEmpty()) {
+			Integer index = socketService.pendingDeletion.removeFirst();
+			socketService.connectedSockets.remove(index);
 		}
 	}
 

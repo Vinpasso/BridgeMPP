@@ -73,7 +73,7 @@ class WhatsappMessageListener implements Runnable {
 				if (buffer.trim().equals("null")) {
 					break;
 				}
-				Logger.getLogger(WhatsappService.class.getName()).log(Level.INFO, "YOWSUP Buffer: " + buffer);
+				ShadowManager.log(Level.INFO, "YOWSUP Buffer: " + buffer);
 				Matcher matcher = REGEX_MESSAGE.matcher(buffer);
 				while (matcher.find()) {
 					String author = matcher.group(1) + "@s.whatsapp.net";
@@ -93,7 +93,7 @@ class WhatsappMessageListener implements Runnable {
 				}
 			}
 		} catch (UnsupportedOperationException | IOException ex) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 		this.whatsappService.senderThread.interrupt();
 		this.whatsappService.yowsup.destroyForcibly();

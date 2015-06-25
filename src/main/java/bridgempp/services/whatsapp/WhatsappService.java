@@ -38,15 +38,13 @@ public class WhatsappService implements BridgeService {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
 		String[] args = argString.split("; ");
 		if (args.length != 2) {
-			throw new UnsupportedOperationException(
-					"Incorrect Parameters for Whatsapp Service: " + argString);
+			throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
 		}
 		phone = args[0];
 		password = args[1];
 		endpoints = new HashMap<>();
 		senderQueue = new LinkedBlockingQueue<>();
-		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener")
-				.start();
+		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
 	}
 
@@ -59,25 +57,14 @@ public class WhatsappService implements BridgeService {
 	@Override
 	public void sendMessage(Message message) {
 		try {
-			senderQueue
-					.add("/message send "
-							+ message
-									.getTarget()
-									.getTarget()
-									.substring(
-											0,
-											message.getTarget().getTarget()
-													.indexOf("@"))
-							+ " \""
-							+ Base64.getEncoder()
-									.encodeToString(
-											(message.getSender().toString(true)
-													+ ": " + message
-													.getMessage(supportedMessageFormats))
-													.getBytes("UTF-8")) + "\"");
+			senderQueue.add("/message send "
+					+ message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@"))
+					+ " \""
+					+ Base64.getEncoder().encodeToString(
+							(message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats))
+									.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
-			Logger.getLogger(WhatsappService.class.getName()).log(Level.SEVERE,
-					"Base64 Encode: No such UTF-8", e);
+			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
 		}
 	}
 
@@ -98,8 +85,7 @@ public class WhatsappService implements BridgeService {
 
 	@Override
 	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(
-				getClass().getSimpleName() + ": No supported Protocol options");
+		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	@Override

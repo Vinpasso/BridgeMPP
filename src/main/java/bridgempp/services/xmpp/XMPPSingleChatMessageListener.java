@@ -10,6 +10,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.Endpoint;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 
@@ -56,7 +57,7 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
 			chat.sendMessage(sendMessage);
 		} catch (SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 }

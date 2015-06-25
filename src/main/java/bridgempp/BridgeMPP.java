@@ -47,6 +47,7 @@ public class BridgeMPP {
 			}
 		}
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
+		addShutdownHook();
 		ConfigurationManager.initializeConfiguration();
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
@@ -56,7 +57,7 @@ public class BridgeMPP {
 	}
 
 	private static void startExitSync(final long parseLong) {
-		new Thread(new Runnable() {
+		Thread timeThread = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
@@ -64,11 +65,13 @@ public class BridgeMPP {
 				try {
 					Thread.sleep(parseLong);
 				} catch (InterruptedException e) {
-					System.err.println("Exit Sync Interrupted! Emergency Shutdown!");
+					ShadowManager.log(Level.WARNING, "Server Exit Sync interrupted. Shutting down BridgeMPP");
 				}
 				exit();
 			}
-		}).start();
+		});
+		timeThread.setName("Exit Time Timer Thread");
+		timeThread.start();
 	}
 
 	public static String getPathLocation() {
@@ -81,8 +84,7 @@ public class BridgeMPP {
 			}
 			return path;
 		} catch (URISyntaxException ex) {
-			Logger.getLogger(BridgeMPP.class.getName()).log(Level.SEVERE, null,
-					ex);
+			ShadowManager.log(Level.SEVERE, "Cannot find URI of Jar!", ex);
 		}
 		return null;
 	}
@@ -95,6 +97,7 @@ public class BridgeMPP {
 		}
 		shutdownCommencing = true;
         ShadowManager.log(Level.INFO, "Server shutdown commencing...");
+        lockdown();
         try
         {
         PermissionsManager.saveAccessKeys();
@@ -124,17 +127,19 @@ public class BridgeMPP {
         			try {
         				if(!thread.isDaemon() && !thread.getName().equalsIgnoreCase("DestroyJavaVM"))
         				{
+        					ShadowManager.log(Level.INFO, "Waiting on Thread: " + thread.getName());
             				thread.interrupt();
             				thread.join(60000);
+        					ShadowManager.log(Level.INFO, "Thread has exited: " + thread.getName());
         				}
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+    					ShadowManager.log(Level.SEVERE, "Waiting on Thread " + thread.getName() + " for 60 seconds did not result in exit");
 					}
         			syncTime += System.currentTimeMillis() - startTime;
         		}
         	}
         ShadowManager.log(Level.INFO, "Killing Process");
-        System.exit(0);
+        Runtime.getRuntime().halt(0);
     }
 	
 	public static void lockdown()
@@ -150,5 +155,22 @@ public class BridgeMPP {
 	public static void syncLockdown() throws InterruptedException
 	{
 		lockdown.syncLock();
+	}
+	
+	public static void addShutdownHook()
+	{
+		ShadowManager.log(Level.INFO, "Registering OS System Shutdown Hook");
+		Thread hook = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				ShadowManager.log(Level.WARNING, "System shutdown triggered by JVM-Shutdown");
+				exit();
+			}
+			
+		});
+		hook.setName("OS Shutdown Hook Executor");
+		Runtime.getRuntime().addShutdownHook(hook);
+		ShadowManager.log(Level.INFO, "Registered OS System Shutdown Hook");
 	}
 }

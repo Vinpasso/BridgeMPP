@@ -5,6 +5,7 @@
  */
 package bridgempp.services;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -42,15 +43,13 @@ public class ConsoleService implements BridgeService {
 
 	@Override
 	public void disconnect() {
-		ShadowManager.log(Level.WARNING,
-				"Console service has been disconnected...");
-		scanner = null;
+		ShadowManager.log(Level.WARNING, "Console service has been disconnected...");
+		scanner.close();
 	}
 
 	@Override
 	public void sendMessage(Message message) {
-		System.out.println(message
-				.toComplexString(getSupportedMessageFormats()));
+		System.out.println(message.toComplexString(getSupportedMessageFormats()));
 	}
 
 	@Override
@@ -71,19 +70,28 @@ public class ConsoleService implements BridgeService {
 
 	class ConsoleReader implements Runnable {
 
-		public ConsoleReader() {
-			if (endpoints.isEmpty()) {
-				endpoints.add(new Endpoint(ConsoleService.this, "Server"));
-			}
-		}
-
 		@Override
 		public void run() {
 			ShadowManager.log(Level.FINE, "Console reader is running...");
-			while (scanner.hasNext()) {
-				Message message = new Message(endpoints.get(0),
-						scanner.nextLine(), getSupportedMessageFormats()[0]);
-				CommandInterpreter.processMessage(message);
+			try {
+				while (true) {
+					if (System.in.available() > 0) {
+						if (endpoints.size() == 0) {
+							endpoints.add(new Endpoint(ConsoleService.this, "Server"));
+						}
+						Message message = new Message(endpoints.get(0), scanner.nextLine(),
+								getSupportedMessageFormats()[0]);
+						CommandInterpreter.processMessage(message);
+					} else {
+						Thread.sleep(1000);
+					}
+				}
+			} catch (IllegalStateException e) {
+				ShadowManager.log(Level.WARNING, "System_IN was closed");
+			} catch (InterruptedException e) {
+				ShadowManager.log(Level.WARNING, "Shutting down Console Reader due to interrupt");
+			} catch (IOException e) {
+				ShadowManager.log(Level.WARNING, "System_IN was closed");
 			}
 			ShadowManager.log(Level.FINE, "Console reader has closed");
 		}
@@ -94,7 +102,7 @@ public class ConsoleService implements BridgeService {
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
 	}
-	
+
 	@Override
 	public void interpretCommand(Message message) {
 		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");

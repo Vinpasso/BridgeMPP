@@ -14,6 +14,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.Endpoint;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 
@@ -43,7 +44,7 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 			this.xmppService.activeChats.put(endpoint.getTarget(), this);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -67,7 +68,7 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
 			multiUserChat.sendMessage(sendMessage);
 		} catch (XMPPException | SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 

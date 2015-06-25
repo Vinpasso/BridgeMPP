@@ -9,6 +9,8 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
+import bridgempp.ShadowManager;
+
 class XMPPRosterListener implements PacketListener {
 
 	/**
@@ -36,7 +38,7 @@ class XMPPRosterListener implements PacketListener {
 			xmppService.connection.sendPacket(subscribeRequest);
 		} catch (SmackException.NotLoggedInException | SmackException.NoResponseException
 				| XMPPException.XMPPErrorException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 }

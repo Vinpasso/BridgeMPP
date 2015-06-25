@@ -11,6 +11,8 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
+import bridgempp.ShadowManager;
+
 class XMPPMultiUserChatListener implements InvitationListener {
 
 	/**
@@ -36,7 +38,7 @@ class XMPPMultiUserChatListener implements InvitationListener {
 			multiUserChat.addMessageListener(new XMPPMultiUserMessageListener(xmppService, multiUserChat));
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
-			Logger.getLogger(XMPPService.class.getName()).log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 

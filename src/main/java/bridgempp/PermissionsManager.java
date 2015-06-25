@@ -71,7 +71,7 @@ public class PermissionsManager {
             }
             ConfigurationManager.permissionConfiguration.save();
         } catch (ConfigurationException ex) {
-            Logger.getLogger(PermissionsManager.class.getName()).log(Level.SEVERE, null, ex);
+            ShadowManager.log(Level.SEVERE, "Error while saving Access Keys to XML Configuration", ex);
         }
         ShadowManager.log(Level.INFO, "Saved all access keys...");
     }

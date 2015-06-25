@@ -28,7 +28,7 @@ public class EndpointTranslator {
             ConfigurationManager.endpointConfiguration.setProperty("endpoints.id" + computeEndpointID(endpoint.getIdentifer()), endpointName);
             ConfigurationManager.endpointConfiguration.save();
         } catch (ConfigurationException ex) {
-            Logger.getLogger(EndpointTranslator.class.getName()).log(Level.SEVERE, null, ex);
+            ShadowManager.log(Level.SEVERE, "Error while adjusting XML Configuration with Human Readable Endpoint", ex);
         }
     }
 
