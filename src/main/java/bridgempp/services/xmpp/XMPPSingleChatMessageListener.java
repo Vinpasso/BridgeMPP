@@ -1,8 +1,6 @@
 package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
@@ -40,8 +38,13 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 
 	@Override
 	public void processMessage(Chat chat, Message message) {
+		MessageFormat messageFormat = MessageFormat.PLAIN_TEXT;
+		if(XHTMLManager.getBodies(message) != null)
+		{
+			messageFormat = MessageFormat.XHTML;
+		}
 		CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
-				xmppService.getSupportedMessageFormats()[0]));
+				messageFormat));
 	}
 
 	@Override

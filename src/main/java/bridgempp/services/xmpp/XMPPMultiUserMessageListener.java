@@ -1,8 +1,6 @@
 package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
@@ -86,7 +84,12 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 		} else {
 			endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/")));
 		}
+		MessageFormat messageFormat = MessageFormat.PLAIN_TEXT;
+		if(XHTMLManager.getBodies(message) != null)
+		{
+			messageFormat = MessageFormat.XHTML;
+		}
 		CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
-				this.xmppService.getSupportedMessageFormats()[0]));
+				messageFormat));
 	}
 }

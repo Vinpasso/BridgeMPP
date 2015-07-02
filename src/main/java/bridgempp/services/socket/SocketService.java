@@ -11,8 +11,6 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
 import bridgempp.Message;

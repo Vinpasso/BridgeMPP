@@ -9,8 +9,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import bridgempp.util.LockdownLock;
 
 /**

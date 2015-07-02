@@ -8,7 +8,6 @@ package bridgempp;
 import org.apache.commons.configuration.ConfigurationException;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

@@ -1,8 +1,6 @@
 package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;

@@ -4,8 +4,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import bridgempp.ShadowManager;
 
 class WhatsappSender implements Runnable {

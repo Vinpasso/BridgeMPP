@@ -6,8 +6,6 @@
 package bridgempp.command;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import bridgempp.BridgeMPP;
 import bridgempp.Endpoint;
 import bridgempp.GroupManager;
