@@ -38,13 +38,7 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 
 	@Override
 	public void processMessage(Chat chat, Message message) {
-		MessageFormat messageFormat = MessageFormat.PLAIN_TEXT;
-		if(XHTMLManager.getBodies(message) != null)
-		{
-			messageFormat = MessageFormat.XHTML;
-		}
-		CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
-				messageFormat));
+		xmppService.interpretXMPPMessage(endpoint, message);;
 	}
 
 	@Override

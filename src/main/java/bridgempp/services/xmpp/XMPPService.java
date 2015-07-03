@@ -8,16 +8,19 @@ package bridgempp.services.xmpp;
 import bridgempp.BridgeService;
 import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
+import bridgempp.command.CommandInterpreter;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.xmpp.BOB.BOBIQ;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.spark.util.DummySSLSocketFactory;
 
 import java.io.IOException;
@@ -169,6 +172,16 @@ public class XMPPService implements BridgeService {
 			cachedObjects.put(identifier, data);
 		}
 		return messageContents;
+	}
+
+	void interpretXMPPMessage(Endpoint endpoint, Message message) {
+		if (XHTMLManager.isXHTMLMessage(message)) {
+			CommandInterpreter.processMessage(new bridgempp.Message(endpoint, XHTMLManager.getBodies(message).get(0),
+					MessageFormat.XHTML));
+		} else {
+			CommandInterpreter.processMessage(new bridgempp.Message(endpoint, message.getBody(),
+					MessageFormat.PLAIN_TEXT));
+		}
 	}
 
 }
