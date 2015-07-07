@@ -12,8 +12,8 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
-import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListener {

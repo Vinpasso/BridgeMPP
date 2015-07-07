@@ -7,6 +7,7 @@ package bridgempp.services;
 
 import bridgempp.*;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 import com.skype.*;

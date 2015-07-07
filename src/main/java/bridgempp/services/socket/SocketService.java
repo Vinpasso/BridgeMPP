@@ -11,10 +11,11 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
+
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
 

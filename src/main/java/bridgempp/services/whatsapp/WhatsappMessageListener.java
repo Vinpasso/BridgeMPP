@@ -10,10 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import bridgempp.BridgeMPP;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 class WhatsappMessageListener implements Runnable {

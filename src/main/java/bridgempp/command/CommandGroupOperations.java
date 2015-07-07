@@ -7,12 +7,12 @@ package bridgempp.command;
 
 import java.util.logging.Level;
 
-import bridgempp.Endpoint;
-import bridgempp.Group;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
 import bridgempp.messageformat.MessageFormat;
 
 /**

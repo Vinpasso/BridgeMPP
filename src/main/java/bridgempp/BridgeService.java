@@ -5,6 +5,7 @@
  */
 package bridgempp;
 
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 

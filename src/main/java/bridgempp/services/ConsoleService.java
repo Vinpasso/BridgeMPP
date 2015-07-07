@@ -11,10 +11,10 @@ import java.util.Scanner;
 import java.util.logging.Level;
 
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 /**

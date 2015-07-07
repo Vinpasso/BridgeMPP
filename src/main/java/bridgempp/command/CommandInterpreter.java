@@ -8,13 +8,13 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
-import bridgempp.Endpoint;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
+import bridgempp.data.Endpoint;
 import bridgempp.statistics.StatisticsManager;
 
 /**

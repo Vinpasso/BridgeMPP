@@ -7,9 +7,10 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 import java.util.logging.Level;
-import bridgempp.Endpoint;
+
 import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 class ServerListener implements Runnable {

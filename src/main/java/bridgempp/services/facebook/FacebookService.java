@@ -17,10 +17,10 @@ import com.restfb.types.Post;
 
 import bridgempp.BridgeService;
 import bridgempp.ConfigurationManager;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 public class FacebookService implements BridgeService {

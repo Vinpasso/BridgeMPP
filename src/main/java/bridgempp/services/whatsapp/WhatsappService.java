@@ -6,6 +6,7 @@
 package bridgempp.services.whatsapp;
 
 import bridgempp.*;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;

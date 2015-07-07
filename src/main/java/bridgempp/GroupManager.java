@@ -7,6 +7,9 @@ package bridgempp;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
+
 import java.util.ArrayList;
 import java.util.logging.Level;
 

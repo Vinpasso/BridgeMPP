@@ -6,9 +6,9 @@
 package bridgempp.services;
 
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 import com.sun.mail.iap.ProtocolException;

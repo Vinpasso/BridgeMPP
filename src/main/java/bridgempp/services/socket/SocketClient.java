@@ -8,11 +8,11 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import bridgempp.Endpoint;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.socket.SocketService.ProtoCarry;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;

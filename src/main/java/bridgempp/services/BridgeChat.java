@@ -3,11 +3,12 @@ package bridgempp.services;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
+
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 public class BridgeChat implements BridgeService {

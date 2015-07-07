@@ -8,6 +8,8 @@ package bridgempp;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
+import bridgempp.data.Endpoint;
+
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
