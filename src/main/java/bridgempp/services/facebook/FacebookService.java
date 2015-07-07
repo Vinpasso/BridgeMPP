@@ -67,7 +67,7 @@ public class FacebookService implements BridgeService {
 		}
 		else
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException("Can not currently Post non Plain Text-able Messages");
 		}
 	}
 
@@ -106,9 +106,14 @@ public class FacebookService implements BridgeService {
 		{
 			endpoints.put(place, new Endpoint(this, place));
 		}
-		endpoints.get(place).setExtra(post.hashCode() + "");
-		Message message = new Message(endpoints.get(place), post.getStory() + ": " + post.getDescription(), MessageFormat.PLAIN_TEXT);
+		endpoints.get(place).setExtra(post.getId());
+		String postString = convertMessageToString(post);
+		Message message = new Message(endpoints.get(place), postString, MessageFormat.PLAIN_TEXT);
 		CommandInterpreter.processMessage(message);
+	}
+
+	private String convertMessageToString(Post post) {
+		return post.toString();
 	}
 
 	public String getAccessToken() {

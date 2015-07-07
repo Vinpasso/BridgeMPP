@@ -9,6 +9,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
+
+import bridgempp.statistics.StatisticsManager;
 import bridgempp.util.LockdownLock;
 
 /**
@@ -51,6 +53,7 @@ public class BridgeMPP
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
 		GroupManager.loadAllGroups();
+		StatisticsManager.loadStatistics();
 		allClear();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
 	}
@@ -109,6 +112,7 @@ public class BridgeMPP
 			PermissionsManager.saveAccessKeys();
 			GroupManager.saveAllGroups();
 			ServiceManager.unloadAllServices();
+			StatisticsManager.saveStatistics();
 		} catch (Exception e)
 		{
 			ShadowManager.log(Level.WARNING, "Clean server shutdown has failed. Will forcefully continue shutdown", e);

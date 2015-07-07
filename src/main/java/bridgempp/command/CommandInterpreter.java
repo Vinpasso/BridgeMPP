@@ -6,6 +6,7 @@
 package bridgempp.command;
 
 import java.util.logging.Level;
+
 import bridgempp.BridgeMPP;
 import bridgempp.Endpoint;
 import bridgempp.GroupManager;
@@ -14,6 +15,7 @@ import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
+import bridgempp.statistics.StatisticsManager;
 
 /**
  *
@@ -69,6 +71,8 @@ public class CommandInterpreter {
 			CommandAliasOperations.cmdCreateAlias(message);
 		} else if (operator.startsWith("!importalias")) {
 			CommandAliasOperations.cmdImportAliasList(message);
+		} else if (operator.startsWith("!statistics")) {
+			CommandStatisticsOperations.cmdShowStatistics(message);
 		} else if (operator.startsWith("!proto")) {
 			message.getSender().getService().interpretCommand(message);
 		} else {
@@ -86,6 +90,7 @@ public class CommandInterpreter {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		StatisticsManager.processMessage(message);
 		if (isCommand(message.getPlainTextMessage())) {
 			interpretCommand(message);
 		} else {
