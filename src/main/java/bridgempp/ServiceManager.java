@@ -69,6 +69,7 @@ public class ServiceManager {
 	}
 
 	public static void unloadAllServices() {
+		ShadowManager.log(Level.INFO, "Unloading all Services...");
 		for (int i = 0; i < services.size(); i++) {
 			try {
 				ShadowManager.log(Level.INFO, "Unloading Service: " + services.get(i).getName());
@@ -78,6 +79,7 @@ public class ServiceManager {
 				ShadowManager.log(Level.INFO, "Unloading of Service " + services.get(i).getName() + " has failed", e);
 			}
 		}
+		ShadowManager.log(Level.INFO, "Unloaded all Services...");
 	}
 
 	public static BridgeService getService(String name) {

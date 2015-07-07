@@ -73,6 +73,7 @@ public class GroupManager {
                 group.addEndpoint(endpoint);
             }
             groups.add(group);
+            ShadowManager.log(Level.INFO, "Loaded Group: " + group.getName());
         }
         ShadowManager.log(Level.INFO, "Loaded all groups");
     }
@@ -88,6 +89,7 @@ public class GroupManager {
                 for (int e = 0; e < group.getEndpoints().size(); e++) {
                     Endpoint.writeEndpoint(group.getEndpoints().get(e), ConfigurationManager.groupConfiguration, "groups.group.");
                 }
+                ShadowManager.log(Level.INFO, "Saved Group: " + group);
             }
             ConfigurationManager.groupConfiguration.save();
         } catch (ConfigurationException ex) {

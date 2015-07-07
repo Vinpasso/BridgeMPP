@@ -23,12 +23,14 @@ public class EndpointTranslator {
     }
 
     public static synchronized void saveHumanReadableEndpoint(Endpoint endpoint, String endpointName) {
-        try {
+        ShadowManager.log(Level.INFO, "Setting alias of " + endpoint.toString(false) + " to " + endpointName);
+    	try {
             ConfigurationManager.endpointConfiguration.setProperty("endpoints.id" + computeEndpointID(endpoint.getIdentifer()), endpointName);
             ConfigurationManager.endpointConfiguration.save();
         } catch (ConfigurationException ex) {
             ShadowManager.log(Level.SEVERE, "Error while adjusting XML Configuration with Human Readable Endpoint", ex);
         }
+        ShadowManager.log(Level.INFO, "New alias of " + endpoint.toString(false) + " is " + endpointName);
     }
 
     public static synchronized void removeHumanReadableEndpoint(Endpoint endpoint) {

@@ -55,6 +55,7 @@ public class PermissionsManager {
         for (int i = 0; i < numberOfKeys; i++) {
             AccessKey key = AccessKey.readAccessKey(ConfigurationManager.permissionConfiguration, "keys.key(" + i + ").");
             accessKeys.put(key.getKey(), key);
+            ShadowManager.log(Level.INFO, "Loaded Access Key for Permissions: " + key.permissions);
         }
         ShadowManager.log(Level.INFO, "Loaded all access keys...");
     }
@@ -67,6 +68,7 @@ public class PermissionsManager {
             while (iterator.hasNext()) {
                 AccessKey key = iterator.next();
                 AccessKey.writeAccessKey(ConfigurationManager.permissionConfiguration, key);
+                ShadowManager.log(Level.INFO, "Saved Access Key for Permissions: " + key.permissions);
             }
             ConfigurationManager.permissionConfiguration.save();
         } catch (ConfigurationException ex) {
