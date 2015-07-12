@@ -1,12 +1,8 @@
 package bridgempp.data;
 
 import java.util.Collection;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Version;
@@ -28,8 +24,17 @@ public class User
 	private Collection<Endpoint> endpoints;
 	
 	@Version
-	@Column(name = "LAST_UPDATED_TIME")
-	private Date lastUpdatedTime;
+	@Column(name = "VERSION", nullable = false)
+	private long version;
+	
+	
+	/**
+	 * JPA Constructor
+	 */
+	User()
+	{
+		
+	}
 	
 	User(String identifier)
 	{

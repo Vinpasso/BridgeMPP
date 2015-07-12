@@ -1,10 +1,7 @@
 package bridgempp.storage;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.accessibility.AccessibleKeyBinding;
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -15,6 +12,7 @@ import bridgempp.data.AccessKey;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
+import bridgempp.statistics.StatisticStore;
 
 public class PersistanceManager
 {
@@ -38,54 +36,50 @@ public class PersistanceManager
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public Collection<Group> loadGroups()
+	public <T> T getFromPrimaryKey(Class<T> className, Object primaryKey)
 	{
-		return entityManager.createQuery("SELECT e FROM Group e", Group.class).getResultList();
+		return entityManager.find(className, primaryKey);
 	}
-
-	public void saveGroups(Collection<Group> groups)
+	
+	public <T> Collection<T> getQuery(Class<T> className)
+	{
+		Entity annotation = className.getAnnotation(Entity.class);
+		if(annotation == null)
+		{
+			return null;
+		}
+		return entityManager.createQuery("SELECT s FROM " + annotation.name() + " s", className).getResultList();
+	}
+	
+	public void updateState(Object... objects)
 	{
 		EntityTransaction saveTransaction = entityManager.getTransaction();
 		saveTransaction.begin();
-		Iterator<Group> iterator = groups.iterator();
-		while (iterator.hasNext())
+		for(Object object : objects)
 		{
-			Group group = iterator.next();
-			if (entityManager.contains(group))
+			if (entityManager.contains(object))
 			{
-				entityManager.merge(group);
+				entityManager.merge(object);
 			} else
 			{
-				entityManager.persist(group);
+				entityManager.persist(object);
 			}
 		}
 		saveTransaction.commit();
-		entityManager.flush();
 	}
 	
-	public Collection<AccessKey> loadAccessKeys()
+	private void removeState(Object... objects)
 	{
-		return entityManager.createQuery("SELECT a FROM ACCESS_KEY a", AccessKey.class).getResultList();
-	}
-
-	public User getUserForIdentifier(String identifier)
-	{
-		return entityManager.find(User.class, identifier);
-	}
-
-	public Endpoint getEndpointForIdentifier(String identifier)
-	{
-		return entityManager.find(Endpoint.class, identifier);
-	}
-	
-	public AccessKey getAccessKeyForIdentifier(String key)
-	{
-		return entityManager.find(AccessKey.class, key);
-	}
-
-	public Collection<BridgeService> getServiceConfigurations()
-	{
-		return entityManager.createQuery("SELECT s FROM SERVICE s", BridgeService.class).getResultList();
+		EntityTransaction transaction = entityManager.getTransaction();
+		transaction.begin();
+		for (Object object : objects)
+		{
+			if (entityManager.contains(object))
+			{
+				entityManager.remove(object);
+			}
+		}
+		transaction.commit();
 	}
 	
 	public void shutdown()
@@ -93,33 +87,64 @@ public class PersistanceManager
 		entityManager.close();
 		entityManagerFactory.close();
 	}
-
-	public void removeAccessKey(AccessKey key)
+	
+	
+	//Many convenience Methods
+	
+	
+	
+	public Collection<StatisticStore> getStatisticsStore()
 	{
-		EntityTransaction transaction = entityManager.getTransaction();
-		transaction.begin();
-		entityManager.remove(key);
-		transaction.commit();
+		return getQuery(StatisticStore.class);
 	}
-
+	
+	public void saveStatisticsStore(StatisticStore statisticStore)
+	{
+		updateState(statisticStore);
+	}
+	
 	public void saveAccessKeys(Collection<AccessKey> accessKeys)
 	{
-		EntityTransaction saveTransaction = entityManager.getTransaction();
-		saveTransaction.begin();
-		Iterator<AccessKey> iterator = accessKeys.iterator();
-		while (iterator.hasNext())
-		{
-			AccessKey group = iterator.next();
-			if (entityManager.contains(group))
-			{
-				entityManager.merge(group);
-			} else
-			{
-				entityManager.persist(group);
-			}
-		}
-		saveTransaction.commit();
-		entityManager.flush();
+		updateState(accessKeys.toArray());
+	}
+	
+	public void removeAccessKey(AccessKey key)
+	{
+		removeState(key);
+	}
+	
+	public Collection<BridgeService> getServiceConfigurations()
+	{
+		return getQuery(BridgeService.class);
+	}
+	
+	public AccessKey getAccessKeyForIdentifier(String key)
+	{
+		return getFromPrimaryKey(AccessKey.class, key);
+	}
+	
+	public User getUserForIdentifier(String identifier)
+	{
+		return getFromPrimaryKey(User.class, identifier);
 	}
 
+	public Endpoint getEndpointForIdentifier(String identifier)
+	{
+		return getFromPrimaryKey(Endpoint.class, identifier);
+	}
+	
+	public Collection<Group> loadGroups()
+	{
+		return getQuery(Group.class);
+	}
+
+	public void saveGroups(Collection<Group> groups)
+	{
+		updateState(groups.toArray());
+	}
+
+	public Collection<AccessKey> loadAccessKeys()
+	{
+		return getQuery(AccessKey.class);
+	}
 }

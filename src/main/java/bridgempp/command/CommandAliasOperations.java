@@ -11,7 +11,6 @@ import bridgempp.Message;
 import bridgempp.ServiceManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.data.DataManager;
-import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.ShadowManager;
 
@@ -39,7 +38,7 @@ public class CommandAliasOperations {
             	message.getOrigin().sendOperatorMessage("Length of Commands not modulo 3! Last import will be dropped! Expected: user; service; alias");
             }
             for(int i = 0; i < commands.length - 1; i += 2) {
-                User user = DataManager.getUserForIdentifier(commands[i], ServiceManager.getServiceByServiceIdentifier(commands[i+1]));
+                User user = DataManager.getUserForIdentifier(commands[i], ServiceManager.getServiceByServiceIdentifier(Integer.parseInt(commands[i+1])));
                 if(user == null)
                 {
                 	message.getOrigin().sendOperatorMessage("User: " + commands[i] + " not found. Skipping...");

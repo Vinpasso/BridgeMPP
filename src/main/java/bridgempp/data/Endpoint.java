@@ -5,19 +5,18 @@
  */
 package bridgempp.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 import bridgempp.BridgeService;
 import bridgempp.Message;
@@ -34,11 +33,11 @@ public class Endpoint {
     private String identifier;
 	
 	@ManyToOne(optional=false)
-	@JoinColumn(name = "SERVICE_CONFIGURATION", referencedColumnName = "SERVICE_CONFIGURATION")
+	@JoinColumn(name = "BRIDGE_SERVICE_IDENTIFIER", referencedColumnName = "SERVICE_IDENTIFIER")
 	private BridgeService service;
     
     @ManyToMany
-    @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID"))
+    @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "SERVICE_IDENTIFIER", referencedColumnName = "IDENTIFIER"), inverseJoinColumns = @JoinColumn(name = "ENDPOINT_IDENTIFIER", referencedColumnName = "IDENTIFIER"))
     private Collection<User> users;
     
     @Column(name = "PERMISSIONS", nullable = false)
@@ -47,7 +46,13 @@ public class Endpoint {
     @ManyToMany(mappedBy = "endpoints")
     private Collection<Group> groups;
     
-    //For constructing by Persistence
+    @Version
+    @Column(name = "VERSION", nullable = false)
+    private long version;
+    
+    /**
+     * JPA Constructor
+     */
     Endpoint()
     {
     	
@@ -117,6 +122,10 @@ public class Endpoint {
 
 	public void putUser(User user)
 	{
+		if(users == null)
+		{
+			users = new ArrayList<User>();
+		}
 		if(!users.contains(user))
 		{
 			users.add(user);

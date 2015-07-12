@@ -5,9 +5,6 @@
  */
 package bridgempp;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-
 import bridgempp.data.AccessKey;
 import bridgempp.data.Endpoint;
 import bridgempp.storage.PersistanceManager;
@@ -15,14 +12,8 @@ import bridgempp.storage.PersistanceManager;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.logging.Level;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
  *
@@ -39,7 +30,8 @@ public class PermissionsManager
 		byte[] byteKey = new byte[32];
 		random.nextBytes(byteKey);
 		String key = Base64.getEncoder().encodeToString(byteKey);
-		// TODO: Persist access Key
+		keys.add(new AccessKey(key, permissions, useOnce));
+		saveAccessKeys();
 		return key;
 	}
 

@@ -6,7 +6,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry including="**/*.java" kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: org.igniterealtime.smack:smack-core:4.0.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: xpp3:xpp3:1.1.4c"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: org.igniterealtime.smack:smack-tcp:4.0.5"/>

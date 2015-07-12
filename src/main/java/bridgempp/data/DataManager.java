@@ -1,7 +1,5 @@
 package bridgempp.data;
 
-import java.util.List;
-
 import bridgempp.BridgeService;
 import bridgempp.storage.PersistanceManager;
 
@@ -11,14 +9,14 @@ public class DataManager
 	private static Endpoint registerEndpoint(BridgeService service, String identifier)
 	{
 		Endpoint endpoint = new Endpoint(service, identifier);
-		//TODO: Persist this
+		PersistanceManager.getPersistanceManager().updateState(endpoint);
 		return endpoint;
 	}
 	
 	private static User registerUser(String identifier)
 	{
 		User user = new User(identifier);
-		//TODO: Persist this
+		PersistanceManager.getPersistanceManager().updateState(user);
 		return user;
 	}
 	

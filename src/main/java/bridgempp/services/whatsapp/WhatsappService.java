@@ -6,20 +6,16 @@
 package bridgempp.services.whatsapp;
 
 import bridgempp.*;
-import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-
-import org.jivesoftware.smackx.pubsub.ConfigureForm;
 
 /**
  *
@@ -29,11 +25,11 @@ import org.jivesoftware.smackx.pubsub.ConfigureForm;
 @DiscriminatorValue("WHATSAPP_SERVICE")
 public class WhatsappService extends BridgeService {
 	
-	Process yowsup;
-	BufferedReader bufferedReader;
+	transient Process yowsup;
+	transient BufferedReader bufferedReader;
 	// private PrintStream printStream;
-	LinkedBlockingQueue<String> senderQueue;
-	Thread senderThread;
+	transient LinkedBlockingQueue<String> senderQueue;
+	transient Thread senderThread;
 	
 	@Column(name = "Phone_Number", nullable = false, length = 50)
 	String phone;
@@ -41,7 +37,7 @@ public class WhatsappService extends BridgeService {
 	@Column(name = "Password", nullable = false, length = 50) 
 	String password;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect() {

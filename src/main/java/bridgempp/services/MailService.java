@@ -37,9 +37,10 @@ import java.util.logging.Level;
 public class MailService extends BridgeService
 {
 
-	private Session session;
-	private Store store;
-	private IMAPFolder folder;
+	transient private Session session;
+	transient private Store store;
+	transient private IMAPFolder folder;
+	transient private IMAPFolder processedFolder;
 	@Column(name = "IMAP_HOST", nullable = false, length = 50)
 	private String imaphost;
 	@Column(name = "IMAP_PORT", nullable = false)
@@ -52,7 +53,6 @@ public class MailService extends BridgeService
 	private String smtphost;
 	@Column(name = "SMTP_PORT", nullable = false, length = 50)
 	private String smtpport;
-	private IMAPFolder processedFolder;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 

@@ -31,9 +31,9 @@ import bridgempp.messageformat.MessageFormat;
 public class FacebookService extends BridgeService
 {
 
-	private FacebookClient facebook;
-	private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
-	private FacebookPollService pollService;
+	transient private FacebookClient facebook;
+	transient private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
+	transient private FacebookPollService pollService;
 	@Column(name = "ACCESS_TOKEN", nullable = false, length = 50)
 	private String accessToken;
 	@Column(name = "APP_ID", nullable = false, length = 50)

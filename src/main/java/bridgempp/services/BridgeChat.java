@@ -27,10 +27,10 @@ public class BridgeChat extends BridgeService {
 	@Column(name = "PORT", nullable = false)
 	private int port;
 	
-	private Socket socket;
-	private Endpoint endpoint;
-	private User user;
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
+	transient private Socket socket;
+	transient private Endpoint endpoint;
+	transient private User user;
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
 			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override

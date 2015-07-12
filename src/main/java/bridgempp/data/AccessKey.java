@@ -5,16 +5,24 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 
-@Entity(name = "ACCESS_KEY")
+@Entity(name = "ACCESS_TOKEN")
 public class AccessKey {
     @Id
-    @Column(name = "KEY", nullable = false, length = 50)
+    @Column(name = "TOKEN", nullable = false, length = 50)
     private String key;
     @Column(name = "PERMISSIONS", nullable = false)
     private int permissions;
     @Column(name = "USE_ONCE", nullable = false)
     private boolean useOnce;
 
+    
+    /**
+     * JPA Constructor
+     */
+    AccessKey()
+    {
+    	
+    }
 
     public AccessKey(String key, int permissions, boolean useOnce) {
         this.key = key;

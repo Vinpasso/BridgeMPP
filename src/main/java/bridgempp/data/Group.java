@@ -7,7 +7,6 @@ package bridgempp.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -41,12 +40,12 @@ public class Group
 	private String name;
 
 	@ManyToMany
-	@JoinTable(name = "SUBSCRIPTIONS", joinColumns = @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"))
+	@JoinTable(name = "SUBSCRIPTIONS", joinColumns = @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "IDENTIFIER", referencedColumnName = "IDENTIFIER"))
 	private Collection<Endpoint> endpoints;
 
 	@Version
-	@Column(name = "LAST_UPDATED_TIME")
-	private Date updatedTime;
+	@Column(name = "VERSION", nullable = false)
+	private long version;
 
 	// Send message to all recipients in this group
 	public void sendMessage(Message message)

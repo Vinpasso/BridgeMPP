@@ -11,12 +11,12 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
-
-import com.sun.corba.se.spi.ior.Identifiable;
 
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
@@ -32,9 +32,10 @@ import bridgempp.messageformat.MessageFormat;
 public abstract class BridgeService {
 	@Id
 	@Column(name = "SERVICE_IDENTIFIER", nullable = false, length = 50)
-	private String serviceIdentifier;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int serviceIdentifier;
 	
-	@OneToMany(mappedBy="serviceConfiguration")
+	@OneToMany(mappedBy="service")
 	protected Collection<Endpoint> endpoints;
 	    
     //Initialize Service
@@ -58,7 +59,7 @@ public abstract class BridgeService {
     //Get the Supported Message Encodings by this Endpoint in order of descending priority
     public abstract MessageFormat[] getSupportedMessageFormats();
     
-    public String getIdentifier()
+    public int getIdentifier()
     {
     	return serviceIdentifier;
     }

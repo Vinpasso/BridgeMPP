@@ -30,11 +30,11 @@ import bridgempp.messageformat.MessageFormat;
 public class ConsoleService extends BridgeService
 {
 
-	Scanner scanner;
-	ConsoleReader reader;
-	Thread consoleThread;
+	transient Scanner scanner;
+	transient ConsoleReader reader;
+	transient Thread consoleThread;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect()

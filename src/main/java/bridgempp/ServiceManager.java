@@ -5,6 +5,7 @@
  */
 package bridgempp;
 
+import bridgempp.services.ConsoleService;
 import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
@@ -31,12 +32,32 @@ public class ServiceManager {
 		{
 			BridgeService service = iterator.next();
 			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
-			services.add(service);
-			service.connect();
+			loadService(service);
 			ShadowManager.log(Level.INFO, "Loaded Service: " + service.getName());
+		}
+		if(serviceConfigurations.isEmpty())
+		{
+			setupFirstRun();
 		}
 		ShadowManager.log(Level.INFO, "All Services loaded");
 
+	}
+
+	private static void setupFirstRun()
+	{
+		ShadowManager.log(Level.INFO, "No Services loaded. Automatically loading Console-Service");
+		loadService(new ConsoleService());
+		ShadowManager.log(Level.INFO, "Loaded Service: Console Service. Due to automatic loading.");
+		ShadowManager.log(Level.INFO, "Creating Server Key. Due to automatic loading");
+		String key = PermissionsManager.generateKey(Integer.MAX_VALUE, true);
+		ShadowManager.log(Level.INFO, "Created Server Key " + key + ". Due to automatic loading");
+	}
+
+	private static void loadService(BridgeService service)
+	{
+		services.add(service);
+		service.connect();
+		PersistanceManager.getPersistanceManager().updateState(service);
 	}
 
 	public static void unloadAllServices() {
@@ -53,13 +74,13 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Unloaded all Services...");
 	}
 
-	public static BridgeService getServiceByServiceIdentifier(String string)
+	public static BridgeService getServiceByServiceIdentifier(int serviceIdentifierId)
 	{
 		Iterator<BridgeService> iterator = services.iterator();
 		while(iterator.hasNext())
 		{
 			BridgeService service = iterator.next();
-			if(service.getIdentifier().equalsIgnoreCase(string))
+			if(service.getIdentifier() == serviceIdentifierId)
 			{
 				return service;
 			}

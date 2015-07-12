@@ -34,7 +34,7 @@ import com.skype.SkypeException;
 public class SkypeService extends BridgeService
 {
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect()

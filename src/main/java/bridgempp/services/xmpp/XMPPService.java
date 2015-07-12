@@ -44,10 +44,10 @@ import javax.persistence.Entity;
 @DiscriminatorValue(value = "XMPP_SERVICE")
 public class XMPPService extends BridgeService {
 
-	XMPPTCPConnection connection;
-	ChatManager chatmanager;
-	HashMap<String, XMPPMessageListener> activeChats;
-	HashMap<String, String> cachedObjects;
+	transient XMPPTCPConnection connection;
+	transient ChatManager chatmanager;
+	transient HashMap<String, XMPPMessageListener> activeChats;
+	transient HashMap<String, String> cachedObjects;
 	
 	@Column(name = "HOST", nullable = false, length = 50)
 	String host;

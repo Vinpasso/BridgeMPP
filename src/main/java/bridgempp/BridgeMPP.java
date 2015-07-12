@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import bridgempp.statistics.StatisticsManager;
+import bridgempp.storage.PersistanceManager;
 import bridgempp.util.LockdownLock;
 
 /**
@@ -112,6 +113,7 @@ public class BridgeMPP
 			GroupManager.saveAllGroups();
 			ServiceManager.unloadAllServices();
 			StatisticsManager.saveStatistics();
+			PersistanceManager.getPersistanceManager().shutdown();
 		} catch (Exception e)
 		{
 			ShadowManager.log(Level.WARNING, "Clean server shutdown has failed. Will forcefully continue shutdown", e);
