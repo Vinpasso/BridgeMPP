@@ -9,8 +9,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListener {
@@ -19,6 +20,7 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 	 * 
 	 */
 	private final XMPPService xmppService;
+	User user;
 	Endpoint endpoint;
 	Chat chat;
 
@@ -33,13 +35,14 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 	public XMPPSingleChatMessageListener(XMPPService xmppService, Chat chat) {
 		this.xmppService = xmppService;
 		this.chat = chat;
-		endpoint = new Endpoint(xmppService, chat.getParticipant());
+		endpoint = DataManager.getOrNewEndpointForIdentifier(chat.getParticipant(), xmppService);
+		user = DataManager.getOrNewUserForIdentifier(chat.getParticipant(), xmppService, endpoint);
 		xmppService.activeChats.put(endpoint.getIdentifier(), this);
 	}
 
 	@Override
 	public void processMessage(Chat chat, Message message) {
-		xmppService.interpretXMPPMessage(endpoint, message);;
+		xmppService.interpretXMPPMessage(user, endpoint, message);;
 	}
 
 	@Override

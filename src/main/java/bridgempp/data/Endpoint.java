@@ -35,7 +35,7 @@ public class Endpoint {
 	
 	@ManyToOne(optional=false)
 	@JoinColumn(name = "SERVICE_CONFIGURATION", referencedColumnName = "SERVICE_CONFIGURATION")
-	private ServiceConfiguration serviceConfiguration;
+	private BridgeService service;
     
     @ManyToMany
     @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID"))
@@ -55,7 +55,7 @@ public class Endpoint {
     
     //Create a new Endpoint
     Endpoint(BridgeService bridgeService, String identifier) {
-        this.serviceConfiguration = bridgeService.getServiceConfiguration();
+        this.service = bridgeService;
         this.identifier = identifier;
         permissions = 0;
     }
@@ -63,7 +63,7 @@ public class Endpoint {
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message) {
         message.setDestination(this);
-        serviceConfiguration.getService().sendMessage(message);
+        service.sendMessage(message);
     }
 
     public void sendOperatorMessage(String message) {
@@ -73,7 +73,7 @@ public class Endpoint {
 
     //Get this endpoints Carrier Service
     public BridgeService getService() {
-        return serviceConfiguration.getService();
+        return service;
     }
 
     //Get this endpoints Carrier Identifier

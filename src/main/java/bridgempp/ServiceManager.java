@@ -5,7 +5,6 @@
  */
 package bridgempp;
 
-import bridgempp.data.ServiceConfiguration;
 import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
@@ -26,12 +25,11 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Loading all Services...");
 
 		services = new ArrayList<>();
-		Collection<ServiceConfiguration> serviceConfigurations = PersistanceManager.getPersistanceManager().getServiceConfigurations();
-		Iterator<ServiceConfiguration> iterator = serviceConfigurations.iterator();
+		Collection<BridgeService> serviceConfigurations = PersistanceManager.getPersistanceManager().getServiceConfigurations();
+		Iterator<BridgeService> iterator = serviceConfigurations.iterator();
 		while(iterator.hasNext())
 		{
-			ServiceConfiguration serviceConfiguration = iterator.next();
-			BridgeService service = serviceConfiguration.createService();
+			BridgeService service = iterator.next();
 			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
 			services.add(service);
 			service.connect();
@@ -55,10 +53,15 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Unloaded all Services...");
 	}
 
-	public static BridgeService getService(String name) {
-		for (int i = 0; i < services.size(); i++) {
-			if (services.get(i).getName().equals(name)) {
-				return services.get(i);
+	public static BridgeService getServiceByServiceIdentifier(String string)
+	{
+		Iterator<BridgeService> iterator = services.iterator();
+		while(iterator.hasNext())
+		{
+			BridgeService service = iterator.next();
+			if(service.getIdentifier().equalsIgnoreCase(string))
+			{
+				return service;
 			}
 		}
 		return null;

@@ -15,12 +15,18 @@ import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
 
 /**
  *
  * @author Vinpasso
  */
+@Entity(name = "WHATSAPP_SERVICE_CONFIGURATION")
+@DiscriminatorValue("WHATSAPP_SERVICE")
 public class WhatsappService extends BridgeService {
 	
 	Process yowsup;
@@ -28,7 +34,11 @@ public class WhatsappService extends BridgeService {
 	// private PrintStream printStream;
 	LinkedBlockingQueue<String> senderQueue;
 	Thread senderThread;
+	
+	@Column(name = "Phone_Number", nullable = false, length = 50)
 	String phone;
+	
+	@Column(name = "Password", nullable = false, length = 50) 
 	String password;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
@@ -39,12 +49,6 @@ public class WhatsappService extends BridgeService {
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
-	}
-	
-	void configure(String phone, String password)
-	{
-		this.phone = phone;
-		this.password = password;
 	}
 
 	@Override

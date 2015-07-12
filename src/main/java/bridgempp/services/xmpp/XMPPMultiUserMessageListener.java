@@ -13,7 +13,9 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.ShadowManager;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListener {
@@ -49,7 +51,7 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 	public XMPPMultiUserMessageListener(XMPPService xmppService, MultiUserChat multiUserChat) {
 		this.xmppService = xmppService;
 		this.multiUserChat = multiUserChat;
-		endpoint = new Endpoint(this.xmppService, multiUserChat.getRoom());
+		endpoint = DataManager.getOrNewEndpointForIdentifier(multiUserChat.getRoom(), this.xmppService);
 		this.xmppService.activeChats.put(endpoint.getIdentifier(), this);
 	}
 
@@ -79,11 +81,12 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 			return;
 		}
 		String jid = multiUserChat.getOccupant(message.getFrom()).getJid();
+		User user;
 		if (jid != null) {
-			endpoint.setExtra(jid.substring(0, jid.indexOf("/")));
+			user = DataManager.getOrNewUserForIdentifier(jid.substring(0, jid.indexOf("/")), xmppService, endpoint);
 		} else {
-			endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/")));
+			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), xmppService, endpoint);
 		}
-		xmppService.interpretXMPPMessage(endpoint, message);
+		xmppService.interpretXMPPMessage(user, endpoint, message);
 	}
 }

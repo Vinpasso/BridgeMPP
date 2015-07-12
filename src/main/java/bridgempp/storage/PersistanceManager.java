@@ -12,7 +12,6 @@ import javax.persistence.Persistence;
 import bridgempp.BridgeService;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
-import bridgempp.data.ServiceConfiguration;
 import bridgempp.data.User;
 
 public class PersistanceManager
@@ -78,9 +77,9 @@ public class PersistanceManager
  		return entityManager.createQuery("SELECT e FROM Endpoint e WHERE e.service = " + service.getName(), Endpoint.class).getResultList();
 	}
 
-	public Collection<ServiceConfiguration> getServiceConfigurations()
+	public Collection<BridgeService> getServiceConfigurations()
 	{
-		return entityManager.createQuery("SELECT s FROM SERVICE_CONFIGURATION s", ServiceConfiguration.class).getResultList();
+		return entityManager.createQuery("SELECT s FROM SERVICE s", BridgeService.class).getResultList();
 	}
 	
 	public void shutdown()

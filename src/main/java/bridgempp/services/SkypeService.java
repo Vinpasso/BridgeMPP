@@ -5,16 +5,19 @@
  */
 package bridgempp.services;
 
-import bridgempp.*;
+import bridgempp.BridgeService;
+import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-
-import java.util.ArrayList;
 import java.util.logging.Level;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import com.skype.Chat;
 import com.skype.ChatMessage;
@@ -26,63 +29,81 @@ import com.skype.SkypeException;
  *
  * @author Vinpasso
  */
-public class SkypeService extends BridgeService {
+@Entity(name = "SKYPE_SERVICE")
+@DiscriminatorValue(value = "SKYPE_SERVICE")
+public class SkypeService extends BridgeService
+{
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String args) {
-		try {
+	public void connect()
+	{
+		try
+		{
 			ShadowManager.log(Level.INFO, "Starting Skype Service...");
 			Skype.setDaemon(false);
 			Skype.addChatMessageListener(new SkypeChatListener());
 			ShadowManager.log(Level.INFO, "Starting Skype Service...");
-		} catch (SkypeException ex) {
+		} catch (SkypeException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public void disconnect() {
+	public void disconnect()
+	{
 	}
 
 	@Override
-	public void sendMessage(Message message) {
-		try {
+	public void sendMessage(Message message)
+	{
+		try
+		{
 			Chat[] chats = Skype.getAllChats();
-			for (int i = 0; i < chats.length; i++) {
-				if (chats[i].getId().equals(message.getDestination().getIdentifier())) {
+			for (int i = 0; i < chats.length; i++)
+			{
+				if (chats[i].getId().equals(message.getDestination().getIdentifier()))
+				{
 					chats[i].send(message.toSimpleString(getSupportedMessageFormats()));
 					return;
 				}
 			}
-		} catch (SkypeException ex) {
+		} catch (SkypeException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return "Skype";
 	}
 
 	@Override
-	public boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return true;
 	}
 
 	@Override
-	public void interpretCommand(Message message) {
+	public void interpretCommand(Message message)
+	{
 		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
-	private class SkypeChatListener implements ChatMessageListener {
+	private class SkypeChatListener implements ChatMessageListener
+	{
 
-		public SkypeChatListener() {
+		public SkypeChatListener()
+		{
 		}
 
 		@Override
-		public void chatMessageReceived(ChatMessage receivedChatMessage) throws SkypeException {
+		public void chatMessageReceived(ChatMessage receivedChatMessage) throws SkypeException
+		{
 			String chatID = receivedChatMessage.getChat().getId();
 			String message = receivedChatMessage.getContent();
 			String sender = receivedChatMessage.getSenderDisplayName();
@@ -93,12 +114,14 @@ public class SkypeService extends BridgeService {
 		}
 
 		@Override
-		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException {
+		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException
+		{
 		}
 	}
 
 	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
+	public MessageFormat[] getSupportedMessageFormats()
+	{
 		return supportedMessageFormats;
 	}
 }

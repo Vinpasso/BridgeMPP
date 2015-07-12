@@ -4,30 +4,41 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
+@Entity(name = "BRIDGE_CHAT_SERVICE")
+@DiscriminatorValue(value = "BRIDGE_CHAT_SERVICE")
 public class BridgeChat extends BridgeService {
 
+	@Column(name = "HOST", nullable = false, length = 50)
+	private String host;
+	
+	@Column(name = "PORT", nullable = false)
+	private int port;
+	
 	private Socket socket;
 	private Endpoint endpoint;
+	private User user;
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
 			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argList) {
-		String[] args = argList.split("; ");
-		if (args.length != 2) {
-			throw new UnsupportedOperationException(
-					"Incorrect number of Options for BridgeChat");
-		}
-		endpoint = new Endpoint(this, "BridgeChat");
+	public void connect() {
+		endpoint = DataManager.getOrNewEndpointForIdentifier("BridgeChat", this);
+		user = DataManager.getOrNewUserForIdentifier("BridgeChatUser", this, endpoint);
 		try {
-			socket = new Socket(args[0], Integer.parseInt(args[1]));
+			socket = new Socket(host, port);
 			socket.getOutputStream().write(
 					BridgeChatProtoBuf.BindingRequest.newBuilder()
 							.setBindInfo("BridgeMPP").build().toByteArray());
@@ -37,7 +48,7 @@ public class BridgeChat extends BridgeService {
 				public void run() {
 					try {
 						while (true) {
-							CommandInterpreter.processMessage(new Message(
+							CommandInterpreter.processMessage(new Message(user, 
 									endpoint, BridgeChatProtoBuf.UserEvent
 											.parseFrom(socket.getInputStream())
 											.getChatMessage(),
@@ -87,11 +98,6 @@ public class BridgeChat extends BridgeService {
 	@Override
 	public boolean isPersistent() {
 		return false;
-	}
-
-	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		this.endpoint = endpoint;
 	}
 
 	@Override

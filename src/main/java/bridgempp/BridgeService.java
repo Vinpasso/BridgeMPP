@@ -5,7 +5,20 @@
  */
 package bridgempp;
 
-import bridgempp.data.ServiceConfiguration;
+import java.util.Collection;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+
+import com.sun.corba.se.spi.ior.Identifiable;
+
+import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 
@@ -13,9 +26,17 @@ import bridgempp.messageformat.MessageFormat;
  *
  * @author Vinpasso
  */
+@Entity(name="SERVICE")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "SERVICE_TYPE", discriminatorType=DiscriminatorType.STRING, length = 50)
 public abstract class BridgeService {
-	private ServiceConfiguration serviceConfiguration;
-    
+	@Id
+	@Column(name = "SERVICE_IDENTIFIER", nullable = false, length = 50)
+	private String serviceIdentifier;
+	
+	@OneToMany(mappedBy="serviceConfiguration")
+	protected Collection<Endpoint> endpoints;
+	    
     //Initialize Service
     public abstract void connect();
     //Deinitialize Service
@@ -37,8 +58,8 @@ public abstract class BridgeService {
     //Get the Supported Message Encodings by this Endpoint in order of descending priority
     public abstract MessageFormat[] getSupportedMessageFormats();
     
-	public ServiceConfiguration getServiceConfiguration()
-	{
-		return serviceConfiguration;
-	}
+    public String getIdentifier()
+    {
+    	return serviceIdentifier;
+    }
 }

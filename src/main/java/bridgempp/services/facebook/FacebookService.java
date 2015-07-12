@@ -2,7 +2,12 @@ package bridgempp.services.facebook;
 
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.logging.Level;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.NotImplementedException;
@@ -20,36 +25,38 @@ import bridgempp.ConfigurationManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
+@Entity(name = "FACEBOOK_SERVICE")
+@DiscriminatorValue(value = "FACEBOOK_SERVICE")
 public class FacebookService extends BridgeService {
 
 	private FacebookClient facebook;
 	private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
-	private Hashtable<String, Endpoint> endpoints;
 	private FacebookPollService pollService;
-	private String appSecret;
-	private String appID;
+	@Column(name = "ACCESS_TOKEN", nullable = false, length = 50)
 	private String accessToken;
+	@Column(name = "APP_ID", nullable = false, length = 50)
+	private String appID;
+	@Column(name = "APP_SECRET", nullable = false, length = 50)
+	private String appSecret;
 	
 	@Override
-	public void connect(String args) {
-		String[] parameters = args.split("; ");
-		if(parameters.length != 3)
-		{
-			throw new InvalidParameterException("Unexpected args (Should be Access Token; App ID; App Secret): " + parameters.toString());
-		}
-		accessToken = parameters[0];
-		appID = parameters[1];
-		appSecret = parameters[2];
+	public void connect() {
 		ShadowManager.log(Level.INFO, "Facebook Client starting up");
-		endpoints = new Hashtable<>();
 		facebook = new DefaultFacebookClient(accessToken, appSecret, Version.VERSION_2_3);
 		pollService = new FacebookPollService(this);
 		Thread thread = new Thread(pollService);
 		thread.setName("Facebook Poll Service");
 		thread.start();
+		Iterator<Endpoint> iterator = endpoints.iterator();
+		while(iterator.hasNext())
+		{
+			addEndpoint(iterator.next());
+		}
 		ShadowManager.log(Level.INFO, "Facebook Client ready");
 	}
 
@@ -86,10 +93,9 @@ public class FacebookService extends BridgeService {
 		
 	}
 
-	@Override
 	public void addEndpoint(Endpoint endpoint) {
-		endpoints.put(endpoint.getIdentifier(), endpoint);
-		pollService.addConnection(endpoint.getIdentifier(), endpoint.getExtra());
+		//TODO: UGH
+		pollService.addConnection(endpoint.getIdentifier(), endpoint.getUsers().iterator().next().getIdentifier());
 	}
 
 	@Override
@@ -102,13 +108,11 @@ public class FacebookService extends BridgeService {
 	}
 
 	public void processPost(String place, Post post) {
-		if(!endpoints.containsKey(place))
-		{
-			endpoints.put(place, new Endpoint(this, place));
-		}
-		endpoints.get(place).setExtra(post.getId());
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(place, this);
+		//TODO: POST: GET ID AS TRACKER?
+		User user = DataManager.getOrNewUserForIdentifier(post.getId(), this, endpoint);
 		String postString = convertMessageToString(post);
-		Message message = new Message(endpoints.get(place), postString, MessageFormat.PLAIN_TEXT);
+		Message message = new Message(user, endpoint, postString, MessageFormat.PLAIN_TEXT);
 		CommandInterpreter.processMessage(message);
 	}
 

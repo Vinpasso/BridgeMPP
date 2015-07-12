@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
@@ -22,6 +25,8 @@ import bridgempp.messageformat.MessageFormat;
  *
  * @author Vinpasso
  */
+@Entity(name = "CONSOLE_SERVICE")
+@DiscriminatorValue(value = "CONSOLE_SERVICE")
 public class ConsoleService extends BridgeService
 {
 
@@ -32,7 +37,7 @@ public class ConsoleService extends BridgeService
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String args)
+	public void connect()
 	{
 		ShadowManager.log(Level.INFO, "Console Service is being loaded...");
 		scanner = new Scanner(System.in);

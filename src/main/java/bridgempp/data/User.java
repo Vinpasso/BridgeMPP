@@ -79,4 +79,9 @@ public class User
 	{
 		return name.length() > 0;
 	}
+
+	public String getIdentifier()
+	{
+		return identifier;
+	}
 }

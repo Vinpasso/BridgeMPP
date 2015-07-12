@@ -8,6 +8,7 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.Message;
+import bridgempp.ServiceManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
@@ -33,18 +34,18 @@ public class CommandAliasOperations {
     static void cmdImportAliasList(Message message) {
         if (CommandInterpreter.checkPermission(message.getOrigin(), Permission.IMPORT_ALIAS)) {
             String[] commands = CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()).split("; ");
-            if(commands.length % 2 != 0)
+            if(commands.length % 3 != 0)
             {
-            	message.getOrigin().sendOperatorMessage("Length of Commands not even! Last import will be dropped");
+            	message.getOrigin().sendOperatorMessage("Length of Commands not modulo 3! Last import will be dropped! Expected: user; service; alias");
             }
             for(int i = 0; i < commands.length - 1; i += 2) {
-                User user = DataManager.getUserForIdentifier(commands[i]);
+                User user = DataManager.getUserForIdentifier(commands[i], ServiceManager.getServiceByServiceIdentifier(commands[i+1]));
                 if(user == null)
                 {
                 	message.getOrigin().sendOperatorMessage("User: " + commands[i] + " not found. Skipping...");
                 	continue;
                 }
-				user.setName(rearrangeNameFormat(commands[i+1]));
+				user.setName(rearrangeNameFormat(commands[i+2]));
             }
             message.getOrigin().sendOperatorMessage("Alias List successfully imported");
         }

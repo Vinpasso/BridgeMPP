@@ -21,47 +21,46 @@ import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
  *
  * @author Vinpasso
  */
+@Entity(name = "MAIL_SERVICE")
+@DiscriminatorValue(value = "MAIL_SERVICE")
 public class MailService extends BridgeService
 {
 
 	private Session session;
 	private Store store;
 	private IMAPFolder folder;
+	@Column(name = "IMAP_HOST", nullable = false, length = 50)
 	private String imaphost;
+	@Column(name = "IMAP_PORT", nullable = false)
 	private int imapport;
+	@Column(name = "USERNAME", nullable = false, length = 50)
 	private String username;
+	@Column(name = "PASSWORD", nullable = false, length = 50)
 	private String password;
+	@Column(name = "SMTP_HOST", nullable = false, length = 50)
 	private String smtphost;
+	@Column(name = "SMTP_PORT", nullable = false, length = 50)
 	private String smtpport;
 	private IMAPFolder processedFolder;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argumentString)
+	public void connect()
 	{
 		ShadowManager.log(Level.INFO, "Loading Mail Service...");
 
-		String[] args = argumentString.split("; ");
-		if (args.length != 6)
-		{
-			throw new UnsupportedOperationException("Incorrect Arguments for mailer service");
-		}
-		imaphost = args[0];
-		imapport = Integer.parseInt(args[1]);
-		smtphost = args[2];
-		smtpport = args[3];
-		username = args[4];
-		password = args[5];
 		try
 		{
 

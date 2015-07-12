@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
@@ -23,11 +27,18 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
  *
  * @author Vinpasso
  */
+@Entity(name = "SOCKET_SERVICE")
+@DiscriminatorValue(value = "SOCKET_SERVIE")
 public class SocketService extends BridgeService {
 
 	ServerSocket serverSocket;
-	int listenPort;
+	
+	@Column(name = "Listen_Address", nullable = false, length = 50) 
 	String listenAddress;
+	
+	@Column(name = "List_Port", nullable = false)
+	int listenPort;
+
 	HashMap<String, SocketClient> connectedSockets;
 	LinkedList<String> pendingDeletion;
 	private ServerListener serverListener;
@@ -45,12 +56,6 @@ public class SocketService extends BridgeService {
 		serverListener = new ServerListener(this);
 		new Thread(serverListener, "Socket Server Listener").start();
 		ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
-	}
-	
-	void configure(String listenAddress, int listenPort)
-	{
-		this.listenAddress = listenAddress;
-		this.listenPort = listenPort;
 	}
 
 	@Override
