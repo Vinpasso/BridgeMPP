@@ -26,7 +26,7 @@ import com.skype.SkypeException;
  *
  * @author Vinpasso
  */
-public class SkypeService implements BridgeService {
+public class SkypeService extends BridgeService {
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 

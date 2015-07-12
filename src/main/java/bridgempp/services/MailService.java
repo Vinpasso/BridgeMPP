@@ -30,7 +30,7 @@ import java.util.logging.Level;
  *
  * @author Vinpasso
  */
-public class MailService implements BridgeService
+public class MailService extends BridgeService
 {
 
 	private Session session;

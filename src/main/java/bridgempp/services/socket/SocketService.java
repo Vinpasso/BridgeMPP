@@ -23,7 +23,7 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
  *
  * @author Vinpasso
  */
-public class SocketService implements BridgeService {
+public class SocketService extends BridgeService {
 
 	ServerSocket serverSocket;
 	int listenPort;
@@ -37,20 +37,20 @@ public class SocketService implements BridgeService {
 			MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argString) {
-		String[] args = argString.split("; ");
-		if (args.length != 2) {
-			throw new UnsupportedOperationException("Incorrect options for Socket Service: " + argString);
-		}
+	public void connect() {
 		ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
 
-		listenPort = Integer.parseInt(args[1]);
-		listenAddress = args[0];
 		connectedSockets = new HashMap<>();
 		pendingDeletion = new LinkedList<String>();
 		serverListener = new ServerListener(this);
 		new Thread(serverListener, "Socket Server Listener").start();
 		ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
+	}
+	
+	void configure(String listenAddress, int listenPort)
+	{
+		this.listenAddress = listenAddress;
+		this.listenPort = listenPort;
 	}
 
 	@Override

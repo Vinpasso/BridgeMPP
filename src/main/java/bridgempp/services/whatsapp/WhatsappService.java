@@ -15,11 +15,13 @@ import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
+import org.jivesoftware.smackx.pubsub.ConfigureForm;
+
 /**
  *
  * @author Vinpasso
  */
-public class WhatsappService implements BridgeService {
+public class WhatsappService extends BridgeService {
 	
 	Process yowsup;
 	BufferedReader bufferedReader;
@@ -32,17 +34,17 @@ public class WhatsappService implements BridgeService {
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argString) {
+	public void connect() {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
-		String[] args = argString.split("; ");
-		if (args.length != 2) {
-			throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
-		}
-		phone = args[0];
-		password = args[1];
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
+	}
+	
+	void configure(String phone, String password)
+	{
+		this.phone = phone;
+		this.password = password;
 	}
 
 	@Override

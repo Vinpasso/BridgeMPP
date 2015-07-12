@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  *
  * @author Vinpasso
  */
-public class XMPPService implements BridgeService {
+public class XMPPService extends BridgeService {
 
 	XMPPTCPConnection connection;
 	ChatManager chatmanager;
@@ -52,7 +52,7 @@ public class XMPPService implements BridgeService {
 	@Override
 	// Arguments <server>; <port>; <domain>; <username>; <password>; <status>;
 	// <oldStyleSSL>
-	public void connect(String parameters) {
+	public void connect() {
 		try {
 			ShadowManager.log(Level.INFO, "Starting XMPP Service...");
 			String[] args = parameters.split("; ");

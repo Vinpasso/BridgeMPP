@@ -22,7 +22,7 @@ import bridgempp.messageformat.MessageFormat;
  *
  * @author Vinpasso
  */
-public class ConsoleService implements BridgeService
+public class ConsoleService extends BridgeService
 {
 
 	Scanner scanner;

@@ -23,7 +23,7 @@ import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
-public class FacebookService implements BridgeService {
+public class FacebookService extends BridgeService {
 
 	private FacebookClient facebook;
 	private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;

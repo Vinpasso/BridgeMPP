@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 import bridgempp.BridgeService;
 import bridgempp.Message;
@@ -32,10 +33,9 @@ public class Endpoint {
     @Column(name = "IDENTIFIER", nullable = false, length = 50)
     private String identifier;
 	
-	@Column(name = "SERVICE", nullable = false, length = 50)
-	private String serviceName;
-	//What to do with this?
-    private BridgeService bridgeService;
+	@ManyToOne(optional=false)
+	@JoinColumn(name = "SERVICE_CONFIGURATION", referencedColumnName = "SERVICE_CONFIGURATION")
+	private ServiceConfiguration serviceConfiguration;
     
     @ManyToMany
     @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID"))
@@ -55,7 +55,7 @@ public class Endpoint {
     
     //Create a new Endpoint
     Endpoint(BridgeService bridgeService, String identifier) {
-        this.bridgeService = bridgeService;
+        this.serviceConfiguration = bridgeService.getServiceConfiguration();
         this.identifier = identifier;
         permissions = 0;
     }
@@ -63,7 +63,7 @@ public class Endpoint {
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message) {
         message.setDestination(this);
-        bridgeService.sendMessage(message);
+        serviceConfiguration.getService().sendMessage(message);
     }
 
     public void sendOperatorMessage(String message) {
@@ -73,7 +73,7 @@ public class Endpoint {
 
     //Get this endpoints Carrier Service
     public BridgeService getService() {
-        return bridgeService;
+        return serviceConfiguration.getService();
     }
 
     //Get this endpoints Carrier Identifier

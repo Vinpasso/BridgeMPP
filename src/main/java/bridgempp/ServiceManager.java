@@ -5,15 +5,12 @@
  */
 package bridgempp;
 
-import bridgempp.services.ConsoleService;
-import bridgempp.services.MailService;
-import bridgempp.services.SkypeService;
-import bridgempp.services.facebook.FacebookService;
-import bridgempp.services.socket.SocketService;
-import bridgempp.services.whatsapp.WhatsappService;
-import bridgempp.services.xmpp.XMPPService;
+import bridgempp.data.ServiceConfiguration;
+import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 /**
@@ -29,39 +26,15 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Loading all Services...");
 
 		services = new ArrayList<>();
-		int serviceDefinitionCount = ConfigurationManager.getServiceCount();
-		for (int i = 0; i < serviceDefinitionCount; i++) {
-			String type = ConfigurationManager.serviceConfiguration.getString("services.service(" + i + ").type");
-			String options = ConfigurationManager.serviceConfiguration.getString("services.service(" + i + ").options");
-			BridgeService service;
-			switch (type.toLowerCase()) {
-			case "consoleservice":
-				service = new ConsoleService();
-				break;
-			case "socketservice":
-				service = new SocketService();
-				break;
-			case "mailservice":
-				service = new MailService();
-				break;
-			case "xmppservice":
-				service = new XMPPService();
-				break;
-			case "skypeservice":
-				service = new SkypeService();
-				break;
-			case "whatsappservice":
-				service = new WhatsappService();
-				break;
-			case "facebookservice":
-				service = new FacebookService();
-				break;
-			default:
-				throw new UnsupportedOperationException("Incorrect Servicetype in Service Declaration: " + type);
-			}
-			services.add(service);
+		Collection<ServiceConfiguration> serviceConfigurations = PersistanceManager.getPersistanceManager().getServiceConfigurations();
+		Iterator<ServiceConfiguration> iterator = serviceConfigurations.iterator();
+		while(iterator.hasNext())
+		{
+			ServiceConfiguration serviceConfiguration = iterator.next();
+			BridgeService service = serviceConfiguration.createService();
 			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
-			service.connect(options);
+			services.add(service);
+			service.connect();
 			ShadowManager.log(Level.INFO, "Loaded Service: " + service.getName());
 		}
 		ShadowManager.log(Level.INFO, "All Services loaded");

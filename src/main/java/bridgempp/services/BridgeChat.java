@@ -11,7 +11,7 @@ import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
-public class BridgeChat implements BridgeService {
+public class BridgeChat extends BridgeService {
 
 	private Socket socket;
 	private Endpoint endpoint;
