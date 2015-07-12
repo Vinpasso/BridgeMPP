@@ -1,7 +1,5 @@
 package bridgempp.services.facebook;
 
-import java.security.InvalidParameterException;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -9,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.NotImplementedException;
 
 import com.restfb.DefaultFacebookClient;
@@ -21,7 +18,6 @@ import com.restfb.types.FacebookType;
 import com.restfb.types.Post;
 
 import bridgempp.BridgeService;
-import bridgempp.ConfigurationManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
@@ -32,7 +28,8 @@ import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "FACEBOOK_SERVICE")
 @DiscriminatorValue(value = "FACEBOOK_SERVICE")
-public class FacebookService extends BridgeService {
+public class FacebookService extends BridgeService
+{
 
 	private FacebookClient facebook;
 	private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
@@ -43,9 +40,10 @@ public class FacebookService extends BridgeService {
 	private String appID;
 	@Column(name = "APP_SECRET", nullable = false, length = 50)
 	private String appSecret;
-	
+
 	@Override
-	public void connect() {
+	public void connect()
+	{
 		ShadowManager.log(Level.INFO, "Facebook Client starting up");
 		facebook = new DefaultFacebookClient(accessToken, appSecret, Version.VERSION_2_3);
 		pollService = new FacebookPollService(this);
@@ -53,7 +51,7 @@ public class FacebookService extends BridgeService {
 		thread.setName("Facebook Poll Service");
 		thread.start();
 		Iterator<Endpoint> iterator = endpoints.iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
 			addEndpoint(iterator.next());
 		}
@@ -61,93 +59,99 @@ public class FacebookService extends BridgeService {
 	}
 
 	@Override
-	public void disconnect() {
+	public void disconnect()
+	{
 		updateToken();
 		facebook = null;
 	}
 
 	@Override
-	public void sendMessage(Message message) {
-		if(message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
+	public void sendMessage(Message message)
+	{
+		if (message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
 		{
 			facebook.publish(message.getDestination().getIdentifier(), FacebookType.class, Parameter.with("message", message.getPlainTextMessage()));
-		}
-		else
+		} else
 		{
 			throw new NotImplementedException("Can not currently Post non Plain Text-able Messages");
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return "Facebook";
 	}
 
 	@Override
-	public boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return true;
 	}
 
 	@Override
-	public void interpretCommand(Message message) {
-		
+	public void interpretCommand(Message message)
+	{
+
 	}
 
-	public void addEndpoint(Endpoint endpoint) {
-		//TODO: UGH
+	public void addEndpoint(Endpoint endpoint)
+	{
+		// TODO: UGH
 		pollService.addConnection(endpoint.getIdentifier(), endpoint.getUsers().iterator().next().getIdentifier());
 	}
 
 	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
+	public MessageFormat[] getSupportedMessageFormats()
+	{
 		return supportedMessageFormats;
 	}
 
-	public FacebookClient getFacebook() {
+	public FacebookClient getFacebook()
+	{
 		return facebook;
 	}
 
-	public void processPost(String place, Post post) {
+	public void processPost(String place, Post post)
+	{
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(place, this);
-		//TODO: POST: GET ID AS TRACKER?
+		// TODO: POST: GET ID AS TRACKER?
 		User user = DataManager.getOrNewUserForIdentifier(post.getId(), this, endpoint);
 		String postString = convertMessageToString(post);
 		Message message = new Message(user, endpoint, postString, MessageFormat.PLAIN_TEXT);
 		CommandInterpreter.processMessage(message);
 	}
 
-	private String convertMessageToString(Post post) {
+	private String convertMessageToString(Post post)
+	{
 		return post.toString();
 	}
 
-	public String getAccessToken() {
+	public String getAccessToken()
+	{
 		return accessToken;
 	}
-	
+
 	protected String getAppID()
 	{
 		return appID;
 	}
-	
+
 	protected String getAppSecret()
 	{
 		return appSecret;
 	}
-	
+
 	private void updateToken()
 	{
 		ShadowManager.log(Level.INFO, "Obtaining new Access Token for old Access Token: " + getAccessToken());
-		String newToken = exchangeToken();
-		ConfigurationManager.serviceConfiguration.setProperty(ConfigurationManager.getServiceConfigurationIdentifier("facebookservice") + ".options", newToken + "; " + getAppID() + "; " + getAppSecret());
-		try {
-			ConfigurationManager.serviceConfiguration.save();
-		} catch (ConfigurationException e) {
-			ShadowManager.log(Level.SEVERE, "Failed to save new Configuration with updated Facebook Token", e);
-		}
-		ShadowManager.log(Level.INFO, "Got new Access Token: " + newToken);
+		accessToken = exchangeToken();
+
+		ShadowManager.log(Level.INFO, "Got new Access Token: " + getAccessToken());
 	}
 
-	private String exchangeToken() {
+	private String exchangeToken()
+	{
 		AccessToken newToken = facebook.obtainExtendedAccessToken(getAppID(), getAppSecret(), getAccessToken());
 		return newToken.getAccessToken();
 	}

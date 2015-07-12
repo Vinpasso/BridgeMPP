@@ -4,12 +4,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.accessibility.AccessibleKeyBinding;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import bridgempp.BridgeService;
+import bridgempp.data.AccessKey;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
@@ -60,6 +62,11 @@ public class PersistanceManager
 		saveTransaction.commit();
 		entityManager.flush();
 	}
+	
+	public Collection<AccessKey> loadAccessKeys()
+	{
+		return entityManager.createQuery("SELECT a FROM ACCESS_KEY a", AccessKey.class).getResultList();
+	}
 
 	public User getUserForIdentifier(String identifier)
 	{
@@ -70,11 +77,10 @@ public class PersistanceManager
 	{
 		return entityManager.find(Endpoint.class, identifier);
 	}
-
-	public List<Endpoint> getEndpointsForService(BridgeService service)
+	
+	public AccessKey getAccessKeyForIdentifier(String key)
 	{
-		//TODO e.service no longer exists
- 		return entityManager.createQuery("SELECT e FROM Endpoint e WHERE e.service = " + service.getName(), Endpoint.class).getResultList();
+		return entityManager.find(AccessKey.class, key);
 	}
 
 	public Collection<BridgeService> getServiceConfigurations()
@@ -86,6 +92,34 @@ public class PersistanceManager
 	{
 		entityManager.close();
 		entityManagerFactory.close();
+	}
+
+	public void removeAccessKey(AccessKey key)
+	{
+		EntityTransaction transaction = entityManager.getTransaction();
+		transaction.begin();
+		entityManager.remove(key);
+		transaction.commit();
+	}
+
+	public void saveAccessKeys(Collection<AccessKey> accessKeys)
+	{
+		EntityTransaction saveTransaction = entityManager.getTransaction();
+		saveTransaction.begin();
+		Iterator<AccessKey> iterator = accessKeys.iterator();
+		while (iterator.hasNext())
+		{
+			AccessKey group = iterator.next();
+			if (entityManager.contains(group))
+			{
+				entityManager.merge(group);
+			} else
+			{
+				entityManager.persist(group);
+			}
+		}
+		saveTransaction.commit();
+		entityManager.flush();
 	}
 
 }

@@ -63,13 +63,9 @@ public class CommandPermissionOperations {
 
     static void cmdRemoveKey(Message message) {
         if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.REMOVE_KEYS)) {
-            boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-            if (success) {
+            PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
                 ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has removed key");
                 message.getOrigin().sendOperatorMessage("Successfully removed key");
-            } else {
-                message.getOrigin().sendOperatorMessage("Error: Key not found");
-            }
         } else {
             message.getOrigin().sendOperatorMessage("Access denied");
         }

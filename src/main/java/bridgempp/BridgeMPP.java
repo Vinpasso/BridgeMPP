@@ -49,7 +49,6 @@ public class BridgeMPP
 		}
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
 		addShutdownHook();
-		ConfigurationManager.initializeConfiguration();
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
 		GroupManager.loadAllGroups();

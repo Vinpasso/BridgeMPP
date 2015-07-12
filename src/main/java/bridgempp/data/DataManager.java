@@ -76,11 +76,6 @@ public class DataManager
 		return endpoint;
 	}
 	
-	public static List<Endpoint> getRegisteredEndpointsForService(BridgeService service)
-	{
-		return PersistanceManager.getPersistanceManager().getEndpointsForService(service);
-	}
-	
 	private static String getEndpointIdentifier(String identifier, BridgeService service)
 	{
 		return identifier + "@" + service.getName();
