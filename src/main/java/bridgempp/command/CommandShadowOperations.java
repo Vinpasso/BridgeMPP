@@ -18,34 +18,34 @@ import bridgempp.ShadowManager;
 public class CommandShadowOperations {
 
     static void cmdAddShadow(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
-            ShadowManager.log(Level.WARNING, "Shadow has been subscribed by " + message.getSender().toString());
-            ShadowManager.shadowEndpoints.add(message.getSender());
-            message.getSender().sendOperatorMessage("Your endpoint has been added to the list of Shadows");
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
+            ShadowManager.log(Level.WARNING, "Shadow has been subscribed by " + message.getOrigin().toString());
+            ShadowManager.shadowEndpoints.add(message.getOrigin());
+            message.getOrigin().sendOperatorMessage("Your endpoint has been added to the list of Shadows");
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdListShadows(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_SHADOW)) {
-            message.getSender().sendOperatorMessage("Listing shadows");
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.LIST_SHADOW)) {
+            message.getOrigin().sendOperatorMessage("Listing shadows");
             for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
-                message.getSender().sendOperatorMessage("Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
+                message.getOrigin().sendOperatorMessage("Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
             }
-            message.getSender().sendOperatorMessage("Done listing shadows");
+            message.getOrigin().sendOperatorMessage("Done listing shadows");
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdRemoveShadow(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
-            ShadowManager.log(Level.WARNING, "Shadow has been removed by " + message.getSender().toString());
-            ShadowManager.shadowEndpoints.remove(message.getSender());
-            message.getSender().sendOperatorMessage("Your endpoint has been removed from the list of Shadows");
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
+            ShadowManager.log(Level.WARNING, "Shadow has been removed by " + message.getOrigin().toString());
+            ShadowManager.shadowEndpoints.remove(message.getOrigin());
+            message.getOrigin().sendOperatorMessage("Your endpoint has been removed from the list of Shadows");
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 

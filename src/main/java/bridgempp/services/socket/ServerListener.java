@@ -10,7 +10,9 @@ import java.util.logging.Level;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 class ServerListener implements Runnable {
@@ -38,14 +40,15 @@ class ServerListener implements Runnable {
 			socketService.serverSocket.setSoTimeout(5000);
 			while (!socketService.pendingShutdown && !socketService.serverSocket.isClosed()) {
 				try {
-					int randomIdentifier;
+					String randomIdentifier;
 					do {
-						randomIdentifier = new Random().nextInt(Integer.MAX_VALUE);
+						randomIdentifier = new Random().nextInt(Integer.MAX_VALUE) + "";
 					} while (socketService.connectedSockets.containsKey(randomIdentifier));
 
 					Socket socket = socketService.serverSocket.accept();
-					SocketClient socketClient = new SocketClient(socketService, socket, new Endpoint(
-							socketService, randomIdentifier + ""));
+					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(randomIdentifier, socketService);
+					User user = DataManager.getOrNewUserForIdentifier(randomIdentifier, socketService, endpoint);
+					SocketClient socketClient = new SocketClient(socketService, socket, user, endpoint);
 					socketClient.randomIdentifier = randomIdentifier;
 					socketService.connectedSockets.put(randomIdentifier, socketClient);
 					new Thread(socketClient, "Socket TCP Connection").start();
@@ -63,7 +66,7 @@ class ServerListener implements Runnable {
 
 	private void sendKeepAliveMessages() {
 		for (SocketClient client : socketService.connectedSockets.values()) {
-			socketService.sendMessage(new Message(client.endpoint, client.endpoint, null, "",
+			socketService.sendMessage(new Message(client.user, client.endpoint, client.endpoint, null, "",
 					MessageFormat.PLAIN_TEXT));
 		}
 		lastKeepAlive = System.currentTimeMillis();
@@ -71,7 +74,7 @@ class ServerListener implements Runnable {
 
 	private void removePendingDeletions() {
 		while (!socketService.pendingDeletion.isEmpty()) {
-			Integer index = socketService.pendingDeletion.removeFirst();
+			String index = socketService.pendingDeletion.removeFirst();
 			socketService.connectedSockets.remove(index);
 		}
 	}

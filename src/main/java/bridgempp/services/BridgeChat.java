@@ -69,7 +69,7 @@ public class BridgeChat implements BridgeService {
 		try {
 			BridgeChatProtoBuf.UserEvent
 					.newBuilder()
-					.setUsername(message.getSender().toString())
+					.setUsername(message.getOrigin().toString())
 					.setChatMessage(
 							message.toComplexString(getSupportedMessageFormats()))
 					.build().writeTo(socket.getOutputStream());
@@ -101,7 +101,7 @@ public class BridgeChat implements BridgeService {
 	
 	@Override
 	public void interpretCommand(Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 	
 

@@ -5,7 +5,6 @@
  */
 package bridgempp;
 
-import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
 
@@ -30,8 +29,8 @@ public interface BridgeService {
     
     public void interpretCommand(Message message);
     
-    //Add Endpoint from Save to list of Endpoints
-    public void addEndpoint(Endpoint endpoint);
+//    //Add Endpoint from Save to list of Endpoints
+//    public void addEndpoint(Endpoint endpoint);
     
     //Get the Supported Message Encodings by this Endpoint in order of descending priority
     public MessageFormat[] getSupportedMessageFormats();

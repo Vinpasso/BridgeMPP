@@ -19,12 +19,12 @@ import bridgempp.ShadowManager;
 public class CommandServerOperations {
 
     static void cmdExit(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.EXIT)) {
-            ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + message.getSender().toString());
-            message.getSender().sendOperatorMessage("Shutting down");
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.EXIT)) {
+            ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString());
+            message.getOrigin().sendOperatorMessage("Shutting down");
             BridgeMPP.exit();
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
     

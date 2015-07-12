@@ -63,7 +63,7 @@ public class FacebookService implements BridgeService {
 	public void sendMessage(Message message) {
 		if(message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
 		{
-			facebook.publish(message.getTarget().getTarget(), FacebookType.class, Parameter.with("message", message.getPlainTextMessage()));
+			facebook.publish(message.getDestination().getIdentifier(), FacebookType.class, Parameter.with("message", message.getPlainTextMessage()));
 		}
 		else
 		{
@@ -88,8 +88,8 @@ public class FacebookService implements BridgeService {
 
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
-		endpoints.put(endpoint.getTarget(), endpoint);
-		pollService.addConnection(endpoint.getTarget(), endpoint.getExtra());
+		endpoints.put(endpoint.getIdentifier(), endpoint);
+		pollService.addConnection(endpoint.getIdentifier(), endpoint.getExtra());
 	}
 
 	@Override

@@ -7,6 +7,7 @@ package bridgempp.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -18,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Version;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
@@ -42,6 +44,10 @@ public class Group
 	@JoinTable(name = "SUBSCRIPTIONS", joinColumns = @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"))
 	private Collection<Endpoint> endpoints;
 
+	@Version
+	@Column(name = "LAST_UPDATED_TIME")
+	private Date updatedTime;
+
 	// Send message to all recipients in this group
 	public void sendMessage(Message message)
 	{
@@ -55,10 +61,8 @@ public class Group
 				endpoint.sendMessage(message);
 			} catch (Exception e)
 			{
-				ShadowManager.log(Level.WARNING,
-						"Delivery failed! Message could not be delivered to " + endpoint.toString(true), e);
-				message.getSender().sendOperatorMessage(
-						"Delivery failed! Message could not be delivered to " + endpoint.toString(true));
+				ShadowManager.log(Level.WARNING, "Delivery failed! Message could not be delivered to " + endpoint.toString(), e);
+				message.getOrigin().sendOperatorMessage("Delivery failed! Message could not be delivered to " + endpoint.toString());
 			}
 		}
 	}
@@ -77,17 +81,15 @@ public class Group
 		{
 			Endpoint endpoint = iterator.next();
 			// Check that Sender does not get the Message sent back to him
-			if (!endpoint.equals(message.getSender()))
+			if (!endpoint.equals(message.getOrigin()))
 			{
 				try
 				{
 					endpoint.sendMessage(message);
 				} catch (Exception e)
 				{
-					ShadowManager.log(Level.WARNING,
-							"Delivery failed! Message could not be delivered to " + endpoint.toString(true), e);
-					message.getSender().sendOperatorMessage(
-							"Delivery failed! Message could not be delivered to " + endpoint.toString(true));
+					ShadowManager.log(Level.WARNING, "Delivery failed! Message could not be delivered to " + endpoint.toString(), e);
+					message.getOrigin().sendOperatorMessage("Delivery failed! Message could not be delivered to " + endpoint.toString());
 				}
 			}
 		}
@@ -109,10 +111,10 @@ public class Group
 	public void removeAllEndpoints()
 	{
 		Iterator<Endpoint> iterator = endpoints.iterator();
-		// TODO: This will cause a concurrent modification exception
 		while (iterator.hasNext())
 		{
-			removeEndpoint(iterator.next());
+			iterator.next();
+			iterator.remove();
 		}
 	}
 
@@ -133,7 +135,7 @@ public class Group
 		name = "NewGroup";
 	}
 
-	boolean hasEndpoint(Endpoint endpoint)
+	public boolean hasEndpoint(Endpoint endpoint)
 	{
 		return getEndpoints().contains(endpoint);
 	}
@@ -147,7 +149,13 @@ public class Group
 		while (iterator.hasNext())
 		{
 			Endpoint endpoint = iterator.next();
-			members += "Member: " + endpoint.toString(false) + "Alias: " + endpoint.toString(true) + "\n";
+			members += "Endpoint: " + endpoint.toString() + "\n";
+			Iterator<User> userIterator = endpoint.getUsers().iterator();
+			while (userIterator.hasNext())
+			{
+				User user = userIterator.next();
+				members += "Member: " + user.toString() + "\n";
+			}
 		}
 		return members;
 	}

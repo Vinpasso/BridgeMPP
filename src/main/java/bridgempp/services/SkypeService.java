@@ -7,13 +7,20 @@ package bridgempp.services;
 
 import bridgempp.*;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-import com.skype.*;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
+
+import com.skype.Chat;
+import com.skype.ChatMessage;
+import com.skype.ChatMessageListener;
+import com.skype.Skype;
+import com.skype.SkypeException;
 
 /**
  *
@@ -21,7 +28,6 @@ import java.util.logging.Level;
  */
 public class SkypeService implements BridgeService {
 
-	private ArrayList<Endpoint> endpoints;
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
@@ -45,7 +51,7 @@ public class SkypeService implements BridgeService {
 		try {
 			Chat[] chats = Skype.getAllChats();
 			for (int i = 0; i < chats.length; i++) {
-				if (chats[i].getId().equals(message.getTarget().getTarget())) {
+				if (chats[i].getId().equals(message.getDestination().getIdentifier())) {
 					chats[i].send(message.toSimpleString(getSupportedMessageFormats()));
 					return;
 				}
@@ -66,19 +72,13 @@ public class SkypeService implements BridgeService {
 	}
 
 	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		endpoints.add(endpoint);
-	}
-
-	@Override
 	public void interpretCommand(Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	private class SkypeChatListener implements ChatMessageListener {
 
 		public SkypeChatListener() {
-			endpoints = new ArrayList<>();
 		}
 
 		@Override
@@ -86,18 +86,9 @@ public class SkypeService implements BridgeService {
 			String chatID = receivedChatMessage.getChat().getId();
 			String message = receivedChatMessage.getContent();
 			String sender = receivedChatMessage.getSenderDisplayName();
-			for (int i = 0; i < endpoints.size(); i++) {
-				if (endpoints.get(i).getTarget().equals(chatID)) {
-					endpoints.get(i).setExtra(sender);
-					Message bMessage = new Message(endpoints.get(i), message, getSupportedMessageFormats()[0]);
-					CommandInterpreter.processMessage(bMessage);
-					return;
-				}
-			}
-			Endpoint endpoint = new Endpoint(SkypeService.this, chatID);
-			endpoint.setExtra(sender);
-			endpoints.add(endpoint);
-			Message bMessage = new Message(endpoint, message, getSupportedMessageFormats()[0]);
+			Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(chatID, SkypeService.this);
+			User user = DataManager.getOrNewUserForIdentifier(sender, SkypeService.this, endpoint);
+			Message bMessage = new Message(user, endpoint, message, getSupportedMessageFormats()[0]);
 			CommandInterpreter.processMessage(bMessage);
 		}
 

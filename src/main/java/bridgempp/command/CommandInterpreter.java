@@ -26,7 +26,7 @@ public class CommandInterpreter {
 	// Interpret a Message message with leading !
 	public static void interpretCommand(Message message) {
 		if (message.getPlainTextMessage().charAt(0) != '!') {
-			message.getSender().sendOperatorMessage(
+			message.getOrigin().sendOperatorMessage(
 					"Internal Server Error! Command " + message.getPlainTextMessage()
 							+ " not a message.getMessage() but recieved interpret request");
 			throw new UnsupportedOperationException("Interpret Command: " + message.getPlainTextMessage()
@@ -74,9 +74,9 @@ public class CommandInterpreter {
 		} else if (operator.startsWith("!statistics")) {
 			CommandStatisticsOperations.cmdShowStatistics(message);
 		} else if (operator.startsWith("!proto")) {
-			message.getSender().getService().interpretCommand(message);
+			message.getOrigin().getService().interpretCommand(message);
 		} else {
-			message.getSender().sendOperatorMessage("Error: Command not found");
+			message.getOrigin().sendOperatorMessage("Error: Command not found");
 		}
 	}
 

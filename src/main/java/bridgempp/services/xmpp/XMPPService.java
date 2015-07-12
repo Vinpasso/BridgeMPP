@@ -119,7 +119,7 @@ public class XMPPService implements BridgeService {
 
 	@Override
 	public void sendMessage(bridgempp.Message message) {
-		activeChats.get(message.getTarget().getTarget()).sendMessage(message);
+		activeChats.get(message.getDestination().getIdentifier()).sendMessage(message);
 	}
 
 	@Override
@@ -134,6 +134,7 @@ public class XMPPService implements BridgeService {
 
 	@Override
 	public void addEndpoint(Endpoint endpoint) {
+		//TODO: Continue here
 		if (endpoint.getExtra().isEmpty()) {
 			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(this, endpoint);
 			listener.chat.addMessageListener(listener);
@@ -145,7 +146,7 @@ public class XMPPService implements BridgeService {
 
 	@Override
 	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	@Override

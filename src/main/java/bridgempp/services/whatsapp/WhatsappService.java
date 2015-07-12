@@ -20,9 +20,7 @@ import java.util.logging.Level;
  * @author Vinpasso
  */
 public class WhatsappService implements BridgeService {
-
-	HashMap<String, Endpoint> endpoints;
-
+	
 	Process yowsup;
 	BufferedReader bufferedReader;
 	// private PrintStream printStream;
@@ -42,7 +40,6 @@ public class WhatsappService implements BridgeService {
 		}
 		phone = args[0];
 		password = args[1];
-		endpoints = new HashMap<>();
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
@@ -58,10 +55,10 @@ public class WhatsappService implements BridgeService {
 	public void sendMessage(Message message) {
 		try {
 			senderQueue.add("/message send "
-					+ message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@"))
+					+ message.getDestination().getIdentifier().substring(0, message.getDestination().getIdentifier().indexOf("@"))
 					+ " \""
 					+ Base64.getEncoder().encodeToString(
-							(message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats))
+							(message.getSender().toString() + ": " + message.getMessage(supportedMessageFormats))
 									.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
 			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
@@ -79,13 +76,8 @@ public class WhatsappService implements BridgeService {
 	}
 
 	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		endpoints.put(endpoint.getTarget(), endpoint);
-	}
-
-	@Override
 	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 
 	@Override

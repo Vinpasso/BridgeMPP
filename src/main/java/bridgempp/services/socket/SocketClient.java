@@ -13,6 +13,7 @@ import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.socket.SocketService.ProtoCarry;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
@@ -24,14 +25,16 @@ class SocketClient implements Runnable {
 	 */
 	private final SocketService socketService;
 	Socket socket;
+	User user;
 	Endpoint endpoint;
-	int randomIdentifier;
+	String randomIdentifier;
 	ProtoCarry protoCarry = ProtoCarry.Plain_Text;
 	boolean running = true;
 
-	public SocketClient(SocketService socketService, Socket socket, Endpoint endpoint) {
+	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint) {
 		this.socketService = socketService;
 		this.socket = socket;
+		this.user = user;
 		this.endpoint = endpoint;
 	}
 
@@ -54,7 +57,7 @@ class SocketClient implements Runnable {
 				switch (protoCarry) {
 				case ProtoBuf:
 					ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
-					Message bridgeMessage = new Message(endpoint, protoMessage.getMessage(),
+					Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(),
 							MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
 					if (protoMessage.hasGroup()) {
 						bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
@@ -81,7 +84,7 @@ class SocketClient implements Runnable {
 							buffer);
 					while (matcher.find()) {
 						Message message = Message.parseMessage(matcher.group());
-						message.setSender(endpoint);
+						message.setOrigin(endpoint);
 						CommandInterpreter.processMessage(message);
 					}
 					break;
@@ -92,7 +95,7 @@ class SocketClient implements Runnable {
 						disconnect();
 						break;
 					}
-					CommandInterpreter.processMessage(new Message(endpoint, messageLine,
+					CommandInterpreter.processMessage(new Message(user, endpoint, messageLine,
 							MessageFormat.PLAIN_TEXT));
 					break;
 				}

@@ -18,72 +18,72 @@ import bridgempp.ShadowManager;
 public class CommandPermissionOperations {
 
     static void cmdUseKey(Message message) {
-        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getSender());
+        boolean success = PermissionsManager.useKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getOrigin());
         if (success) {
-            ShadowManager.log(Level.INFO, message.getSender().toString() + " has used key and now has " + message.getSender().getPermissions());
-            message.getSender().sendOperatorMessage("Rights granted successfully. Your new rights are: " + message.getSender().getPermissions());
+            ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has used key and now has " + message.getOrigin().getPermissions());
+            message.getOrigin().sendOperatorMessage("Rights granted successfully. Your new rights are: " + message.getOrigin().getPermissions());
         } else {
-            message.getSender().sendOperatorMessage("Key Failure. Incorrect Key");
+            message.getOrigin().sendOperatorMessage("Key Failure. Incorrect Key");
         }
     }
 
     static void cmdPrintPermissions(Message message) {
-        message.getSender().sendOperatorMessage("Your rights are " + message.getSender().getPermissions());
+        message.getOrigin().sendOperatorMessage("Your rights are " + message.getOrigin().getPermissions());
     }
 
     static void cmdGeneratePermanentKey(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_PERMANENT_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getSender().getPermissions();
-            ShadowManager.log(Level.INFO, message.getSender().toString() + " has created permanent key with permissions " + permissions);
-            message.getSender().sendOperatorMessage("Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.GENERATE_PERMANENT_KEYS)) {
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getOrigin().getPermissions();
+            ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has created permanent key with permissions " + permissions);
+            message.getOrigin().sendOperatorMessage("Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdRemovePermissions(Message message) {
         int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage());
         if (permissions < 0) {
-            message.getSender().sendOperatorMessage("Invalid Argument: Required Integer: New Permissions");
+            message.getOrigin().sendOperatorMessage("Invalid Argument: Required Integer: New Permissions");
             return;
         }
-        message.getSender().removePermissions(permissions);
-        message.getSender().sendOperatorMessage("Rights removed successfully. Your new rights are: " + message.getSender().getPermissions());
+        message.getOrigin().removePermissions(permissions);
+        message.getOrigin().sendOperatorMessage("Rights removed successfully. Your new rights are: " + message.getOrigin().getPermissions());
     }
 
     static void cmdGenerateOneTimeKey(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.GENERATE_ONETIME_KEYS)) {
-            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getSender().getPermissions();
-            ShadowManager.log(Level.INFO, message.getSender().toString() + " has created temporary key with permissions " + permissions);
-            message.getSender().sendOperatorMessage("Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.GENERATE_ONETIME_KEYS)) {
+            int permissions = CommandInterpreter.getIntegerFromArgument(message.getPlainTextMessage()) & message.getOrigin().getPermissions();
+            ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has created temporary key with permissions " + permissions);
+            message.getOrigin().sendOperatorMessage("Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdRemoveKey(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.REMOVE_KEYS)) {
+        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.REMOVE_KEYS)) {
             boolean success = PermissionsManager.removeKey(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
             if (success) {
-                ShadowManager.log(Level.INFO, message.getSender().toString() + " has removed key");
-                message.getSender().sendOperatorMessage("Successfully removed key");
+                ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has removed key");
+                message.getOrigin().sendOperatorMessage("Successfully removed key");
             } else {
-                message.getSender().sendOperatorMessage("Error: Key not found");
+                message.getOrigin().sendOperatorMessage("Error: Key not found");
             }
         } else {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 
     static void cmdListKeys(Message message)
     {
-        if(CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_KEYS))
+        if(CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.LIST_KEYS))
         {
-            message.getSender().sendOperatorMessage("Key List: " + PermissionsManager.listKeys());
+            message.getOrigin().sendOperatorMessage("Key List: " + PermissionsManager.listKeys());
         }
         else
         {
-            message.getSender().sendOperatorMessage("Access denied");
+            message.getOrigin().sendOperatorMessage("Access denied");
         }
     }
 }

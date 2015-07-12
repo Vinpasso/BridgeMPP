@@ -7,6 +7,7 @@ package bridgempp;
 
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 /**
@@ -17,31 +18,24 @@ public class Message {
 
     private String message;
     private MessageFormat messageFormat;
-    private Endpoint sender;
-    private Endpoint target;
+    private User sender;
+    private Endpoint origin;
+    private Endpoint destination;
     private Group group;
 
     public Message() {
-        this(null, null, null, "", MessageFormat.PLAIN_TEXT);
-    }
-
-    public Message(String message) {
-        this(null, null, null, message, MessageFormat.PLAIN_TEXT);
-    }
-
-    @Deprecated
-    public Message(Endpoint sender, String message) {
-        this(sender, null, null, message, MessageFormat.PLAIN_TEXT);
+        this(null, null, null, null, "", MessageFormat.PLAIN_TEXT);
     }
     
-    public Message(Endpoint sender, String message, MessageFormat messageFormat)
+    public Message(User sender, Endpoint origin, String message, MessageFormat messageFormat)
     {
-    	this(sender, null, null, message, messageFormat);
+    	this(sender, origin, null, null, message, messageFormat);
     }
 
-    public Message(Endpoint sender, Endpoint target, Group group, String message, MessageFormat messageFormat) {
-        this.sender = sender;
-        this.target = target;
+    public Message(User sender, Endpoint origin, Endpoint target, Group group, String message, MessageFormat messageFormat) {
+    	this.sender = sender;
+        this.origin = origin;
+        this.destination = target;
         this.group = group;
         this.message = message;
         this.messageFormat = messageFormat;
@@ -87,31 +81,47 @@ public class Message {
     }
 
     /**
-     * @return the sender
+	 * @return the sender
+	 */
+	public User getSender()
+	{
+		return sender;
+	}
+
+	/**
+	 * @param sender the sender to set
+	 */
+	public void setSender(User sender)
+	{
+		this.sender = sender;
+	}
+
+	/**
+     * @return the Origin
      */
-    public Endpoint getSender() {
-        return sender;
+    public Endpoint getOrigin() {
+        return origin;
     }
 
     /**
-     * @param sender the sender to set
+     * @param sender the Origin to set
      */
-    public void setSender(Endpoint sender) {
-        this.sender = sender;
+    public void setOrigin(Endpoint sender) {
+        this.origin = sender;
     }
 
     /**
      * @return the target
      */
-    public Endpoint getTarget() {
-        return target;
+    public Endpoint getDestination() {
+        return destination;
     }
 
     /**
-     * @param target the target to set
+     * @param destination the Destination to set
      */
-    public void setTarget(Endpoint target) {
-        this.target = target;
+    public void setDestination(Endpoint destination) {
+        this.destination = destination;
     }
 
     /**
@@ -129,14 +139,14 @@ public class Message {
     }
 
     public String toSimpleString(MessageFormat... messageFormats) {
-        return ((getSender() != null)?getSender().toString():"Unknown") + ": " + getMessage(messageFormats);
+        return ((getOrigin() != null)?getOrigin().toString():"Unknown") + ": " + getMessage(messageFormats);
     }
 
     public String toComplexString(MessageFormat... messageFormats) {
     	String messageFormat = chooseMessageFormat(messageFormats).getName() + ": ";
         String group = (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: ";
-        String sender = (getSender() != null)?getSender().toString():"Unknown";
-        String target = (getTarget() != null)?(getTarget().toString() + ": "):("Unknown: ");
+        String sender = (getOrigin() != null)?getOrigin().toString():"Unknown";
+        String target = (getDestination() != null)?(getDestination().toString() + ": "):("Unknown: ");
         return messageFormat + group + sender + " --> " + target + getMessage(messageFormats);
     }
     

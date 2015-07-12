@@ -28,8 +28,8 @@ public class SocketService implements BridgeService {
 	ServerSocket serverSocket;
 	int listenPort;
 	String listenAddress;
-	HashMap<Integer, SocketClient> connectedSockets;
-	LinkedList<Integer> pendingDeletion;
+	HashMap<String, SocketClient> connectedSockets;
+	LinkedList<String> pendingDeletion;
 	private ServerListener serverListener;
 	protected boolean pendingShutdown = false;
 
@@ -47,7 +47,7 @@ public class SocketService implements BridgeService {
 		listenPort = Integer.parseInt(args[1]);
 		listenAddress = args[0];
 		connectedSockets = new HashMap<>();
-		pendingDeletion = new LinkedList<Integer>();
+		pendingDeletion = new LinkedList<String>();
 		serverListener = new ServerListener(this);
 		new Thread(serverListener, "Socket Server Listener").start();
 		ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
@@ -71,9 +71,9 @@ public class SocketService implements BridgeService {
 	@Override
 	public void sendMessage(Message message) {
 		try {
-			OutputStream out = connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).socket
+			OutputStream out = connectedSockets.get(Integer.parseInt(message.getDestination().getIdentifier())).socket
 					.getOutputStream();
-			ProtoCarry protoCarry = connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).protoCarry;
+			ProtoCarry protoCarry = connectedSockets.get(Integer.parseInt(message.getDestination().getIdentifier())).protoCarry;
 			switch (protoCarry) {
 			case Plain_Text:
 				out.write((message.toComplexString(getSupportedMessageFormats()) + "\n").getBytes("UTF-8"));
@@ -89,11 +89,11 @@ public class SocketService implements BridgeService {
 				if (message.getGroup() != null) {
 					protoMessageBuilder.setGroup(message.getGroup().getName());
 				}
-				if (message.getSender() != null) {
-					protoMessageBuilder.setSender(message.getSender().toString());
+				if (message.getOrigin() != null) {
+					protoMessageBuilder.setSender(message.getOrigin().toString());
 				}
-				if (message.getTarget() != null) {
-					protoMessageBuilder.setTarget(message.getTarget().toString());
+				if (message.getDestination() != null) {
+					protoMessageBuilder.setTarget(message.getDestination().toString());
 				}
 				ProtoBuf.Message protoMessage = protoMessageBuilder.build();
 				protoMessage.writeDelimitedTo(out);
@@ -101,7 +101,7 @@ public class SocketService implements BridgeService {
 			}
 		} catch (IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
-			connectedSockets.get(Integer.parseInt(message.getTarget().getTarget())).disconnect();
+			connectedSockets.get(Integer.parseInt(message.getDestination().getIdentifier())).disconnect();
 		}
 	}
 
@@ -115,11 +115,6 @@ public class SocketService implements BridgeService {
 		return false;
 	}
 
-	// Non Persistent Service. Adding an endpoint from save does nothing
-	@Override
-	public void addEndpoint(Endpoint endpoint) {
-	}
-
 	@Override
 	public void interpretCommand(Message message) {
 		String command = message.getPlainTextMessage().toLowerCase();
@@ -129,23 +124,23 @@ public class SocketService implements BridgeService {
 		switch (command) {
 		case "!protocarry":
 			try {
-				connectedSockets.get(Integer.parseInt(message.getSender().getTarget())).protoCarry = ProtoCarry
+				connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry
 						.valueOf(message.getPlainTextMessage().substring(command.length() + 1));
 			} catch (Exception e) {
-				message.getSender().sendOperatorMessage("Please specifiy a valid Protocol Carry");
+				message.getOrigin().sendOperatorMessage("Please specifiy a valid Protocol Carry");
 			}
 			break;
 		case "!protoplaintextcarry":
-			connectedSockets.get(Integer.parseInt(message.getSender().getTarget())).protoCarry = ProtoCarry.Plain_Text;
+			connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.Plain_Text;
 			break;
 		case "!protoxmlcarry":
-			connectedSockets.get(Integer.parseInt(message.getSender().getTarget())).protoCarry = ProtoCarry.XML_Embedded;
+			connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.XML_Embedded;
 			break;
 		case "!protoprotobufcarry":
-			connectedSockets.get(Integer.parseInt(message.getSender().getTarget())).protoCarry = ProtoCarry.ProtoBuf;
+			connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.ProtoBuf;
 			break;
 		default:
-			message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+			message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 			break;
 		}
 	}

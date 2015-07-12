@@ -34,12 +34,12 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 	public XMPPMultiUserMessageListener(XMPPService xmppService, Endpoint endpoint) {
 		this.xmppService = xmppService;
 		try {
-			multiUserChat = new MultiUserChat(this.xmppService.connection, endpoint.getTarget());
+			multiUserChat = new MultiUserChat(this.xmppService.connection, endpoint.getIdentifier());
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", "", discussionHistory, this.xmppService.connection.getPacketReplyTimeout());
 			this.endpoint = endpoint;
-			this.xmppService.activeChats.put(endpoint.getTarget(), this);
+			this.xmppService.activeChats.put(endpoint.getIdentifier(), this);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
@@ -50,7 +50,7 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 		this.xmppService = xmppService;
 		this.multiUserChat = multiUserChat;
 		endpoint = new Endpoint(this.xmppService, multiUserChat.getRoom());
-		this.xmppService.activeChats.put(endpoint.getTarget(), this);
+		this.xmppService.activeChats.put(endpoint.getIdentifier(), this);
 	}
 
 	@Override

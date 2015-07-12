@@ -6,6 +6,8 @@
 package bridgempp.data;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,19 +28,14 @@ import bridgempp.messageformat.MessageFormat;
  */
 @Entity(name = "ENDPOINT")
 public class Endpoint {
-
-	@Id
-	@Column(name = "ENDPOINT_ID", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long endpointID;
+    @Id
+    @Column(name = "IDENTIFIER", nullable = false, length = 50)
+    private String identifier;
 	
 	@Column(name = "SERVICE", nullable = false, length = 50)
 	private String serviceName;
 	//What to do with this?
     private BridgeService bridgeService;
-
-    @Column(name = "TARGET", nullable = false, length = 50)
-    private String target;
     
     @ManyToMany
     @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "ENDPOINT_ID", referencedColumnName = "ENDPOINT_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID"))
@@ -51,26 +48,27 @@ public class Endpoint {
     private Collection<Group> groups;
     
     //For constructing by Persistence
-    public Endpoint()
+    Endpoint()
     {
     	
     }
     
     //Create a new Endpoint
-    public Endpoint(BridgeService bridgeService, String target) {
+    Endpoint(BridgeService bridgeService, String identifier) {
         this.bridgeService = bridgeService;
-        this.target = target;
+        this.identifier = identifier;
         permissions = 0;
     }
 
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message) {
-        message.setTarget(this);
+        message.setDestination(this);
         bridgeService.sendMessage(message);
     }
 
     public void sendOperatorMessage(String message) {
-        sendMessage(new Message(this, this, null, "BridgeMPP: " + message, MessageFormat.PLAIN_TEXT));
+    	//TODO: This message needs a Sender
+        sendMessage(new Message(null, this, this, null, "BridgeMPP: " + message, MessageFormat.PLAIN_TEXT));
     }
 
     //Get this endpoints Carrier Service
@@ -79,8 +77,8 @@ public class Endpoint {
     }
 
     //Get this endpoints Carrier Identifier
-    public String getTarget() {
-        return target;
+    public String getIdentifier() {
+        return identifier;
     }
 
     /**
@@ -106,5 +104,23 @@ public class Endpoint {
     public void removePermissions(int removePermissions) {
         permissions = permissions & ~removePermissions;
     }
+    
+    public String toString()
+    {
+    	return getIdentifier() + " " + getService().getName();
+    }
+
+	public Collection<User> getUsers()
+	{
+		return Collections.unmodifiableCollection(users);
+	}
+
+	public void putUser(User user)
+	{
+		if(!users.contains(user))
+		{
+			users.add(user);
+		}
+	}
 
 }
