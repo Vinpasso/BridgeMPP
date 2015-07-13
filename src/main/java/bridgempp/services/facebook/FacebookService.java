@@ -89,12 +89,6 @@ public class FacebookService extends BridgeService
 		return true;
 	}
 
-	@Override
-	public void interpretCommand(Message message)
-	{
-
-	}
-
 	public void addEndpoint(Endpoint endpoint)
 	{
 		// TODO: UGH

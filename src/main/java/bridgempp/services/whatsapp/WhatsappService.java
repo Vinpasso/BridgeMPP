@@ -78,11 +78,6 @@ public class WhatsappService extends BridgeService {
 	}
 
 	@Override
-	public void interpretCommand(bridgempp.Message message) {
-		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-
-	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
 	}

@@ -259,10 +259,4 @@ public class MailService extends BridgeService
 		return supportedMessageFormats;
 	}
 
-	@Override
-	public void interpretCommand(bridgempp.Message message)
-	{
-		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-
 }

@@ -88,12 +88,6 @@ public class SkypeService extends BridgeService
 		return true;
 	}
 
-	@Override
-	public void interpretCommand(Message message)
-	{
-		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-
 	private class SkypeChatListener implements ChatMessageListener
 	{
 

@@ -57,6 +57,7 @@ public class PermissionsManager
 
 	private static void removeAccessKey(AccessKey key)
 	{
+		keys.remove(key);
 		PersistanceManager.getPersistanceManager().removeAccessKey(key);
 	}
 

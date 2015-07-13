@@ -11,21 +11,27 @@ import bridgempp.BridgeMPP;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
+import bridgempp.PermissionsManager.Permission;
+import bridgempp.command.wrapper.CommandName;
+import bridgempp.command.wrapper.CommandTrigger;
+import bridgempp.command.wrapper.HelpTopic;
+import bridgempp.command.wrapper.RequiredPermission;
 
 /**
  *
  * @author Vinpasso
  */
-public class CommandServerOperations {
+public class CommandServerOperations
+{
 
-    static void cmdExit(Message message) {
-        if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.EXIT)) {
-            ShadowManager.log(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString());
-            message.getOrigin().sendOperatorMessage("Shutting down");
-            BridgeMPP.exit();
-        } else {
-            message.getOrigin().sendOperatorMessage("Access denied");
-        }
-    }
-    
+	@CommandName("!exit: Shutdown BridgeMPP")
+	@CommandTrigger("!exit")
+	@HelpTopic("Executes the BridgeMPP shutdown routine, disconnecting all clients and services")
+	@RequiredPermission(Permission.EXIT)
+	public static void cmdExit(Message message)
+	{
+		ShadowManager.logAndReply(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString(), message);
+		BridgeMPP.exit();
+	}
+
 }

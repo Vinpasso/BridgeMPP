@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 
+import bridgempp.command.CommandInterpreter;
 import bridgempp.statistics.StatisticsManager;
 import bridgempp.storage.PersistanceManager;
 import bridgempp.util.LockdownLock;
@@ -50,6 +51,7 @@ public class BridgeMPP
 		}
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
 		addShutdownHook();
+		CommandInterpreter.loadCommands();
 		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
 		GroupManager.loadAllGroups();

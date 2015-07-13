@@ -105,11 +105,6 @@ public class BridgeChat extends BridgeService {
 		return supportedMessageFormats;
 	}
 	
-	@Override
-	public void interpretCommand(Message message) {
-		message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-	
 
 	public static final class BridgeChatProtoBuf {
 		private BridgeChatProtoBuf() {

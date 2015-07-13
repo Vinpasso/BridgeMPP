@@ -51,7 +51,6 @@ public abstract class BridgeService {
     //Check whether this Service is persistent across restarts
     public abstract boolean isPersistent();
     
-    public abstract void interpretCommand(Message message);
     
 //    //Add Endpoint from Save to list of Endpoints
 //    public void addEndpoint(Endpoint endpoint);

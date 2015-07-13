@@ -132,40 +132,6 @@ public class SocketService extends BridgeService
 	}
 
 	@Override
-	public void interpretCommand(Message message)
-	{
-		String command = message.getPlainTextMessage().toLowerCase();
-		if (command.contains(" "))
-		{
-			command = command.substring(0, command.indexOf(" "));
-		}
-		switch (command)
-		{
-			case "!protocarry":
-				try
-				{
-					connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.valueOf(message.getPlainTextMessage().substring(command.length() + 1));
-				} catch (Exception e)
-				{
-					message.getOrigin().sendOperatorMessage("Please specifiy a valid Protocol Carry");
-				}
-				break;
-			case "!protoplaintextcarry":
-				connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.Plain_Text;
-				break;
-			case "!protoxmlcarry":
-				connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.XML_Embedded;
-				break;
-			case "!protoprotobufcarry":
-				connectedSockets.get(Integer.parseInt(message.getOrigin().getIdentifier())).protoCarry = ProtoCarry.ProtoBuf;
-				break;
-			default:
-				message.getOrigin().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-				break;
-		}
-	}
-
-	@Override
 	public MessageFormat[] getSupportedMessageFormats()
 	{
 		return supportedMessageFormats;
