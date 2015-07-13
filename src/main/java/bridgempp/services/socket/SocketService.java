@@ -141,4 +141,10 @@ public class SocketService extends BridgeService
 	{
 		Plain_Text, XML_Embedded, ProtoBuf
 	}
+
+	public void configure(String listenAddress, int listenPort)
+	{
+		this.listenAddress = listenAddress;
+		this.listenPort = listenPort;
+	}
 }

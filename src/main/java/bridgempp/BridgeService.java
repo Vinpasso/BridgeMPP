@@ -62,4 +62,9 @@ public abstract class BridgeService {
     {
     	return serviceIdentifier;
     }
+    
+    public String toString()
+    {
+    	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent)":" (Non-Persistent)");
+    }
 }

@@ -94,7 +94,7 @@ public class PermissionsManager
 	{
 		String list = "";
 		Iterator<AccessKey> iterator = keys.iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
 			AccessKey key = iterator.next();
 			list += key.toString() + "\n";
@@ -105,7 +105,7 @@ public class PermissionsManager
 	public static enum Permission
 	{
 
-		DIRECT_MESSAGE, SUBSCRIBE_UNSUBSCRIBE_GROUP, CREATE_REMOVE_GROUP, LIST_MEMBERS, LIST_GROUPS, IMPORT_ALIAS, ADD_REMOVE_SHADOW, LIST_SHADOW, EXIT, GENERATE_ONETIME_KEYS, GENERATE_PERMANENT_KEYS, REMOVE_KEYS, LIST_KEYS
+		DIRECT_MESSAGE, SUBSCRIBE_UNSUBSCRIBE_GROUP, CREATE_REMOVE_GROUP, LIST_MEMBERS, LIST_GROUPS, IMPORT_ALIAS, ADD_REMOVE_SHADOW, LIST_SHADOW, EXIT, GENERATE_ONETIME_KEYS, GENERATE_PERMANENT_KEYS, REMOVE_KEYS, LIST_KEYS, LIST_SERVICES, ADD_REMOVE_SERVICE
 	}
 
 	public static class Permissions

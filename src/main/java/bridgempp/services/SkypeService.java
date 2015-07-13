@@ -118,4 +118,8 @@ public class SkypeService extends BridgeService
 	{
 		return supportedMessageFormats;
 	}
+
+	public void configure()
+	{		
+	}
 }

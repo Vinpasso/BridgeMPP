@@ -36,7 +36,7 @@ public class CommandWrapper
 				Object[] parameters = fetchParameters(method, message);
 				if (parameters == null)
 				{
-					ShadowManager.logAndReply(Level.INFO, "Invalid Arguments. Type \"!helpcommand <command>\" to access the command's help topic", message);
+					ShadowManager.logAndReply(Level.INFO, "Invalid Arguments. Type \"!command <command>\" to access the command's help topic", message);
 					continue;
 				}
 				callCommand(method, parameters, message);

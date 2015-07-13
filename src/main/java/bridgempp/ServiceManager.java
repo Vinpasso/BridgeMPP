@@ -10,32 +10,36 @@ import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
  *
  * @author Vinpasso
  */
-public class ServiceManager {
+public class ServiceManager
+{
 
 	private static ArrayList<BridgeService> services;
 
 	// Load Services from Config
-	public static void loadAllServices() {
+	public static void loadAllServices()
+	{
 		ShadowManager.log(Level.INFO, "Loading all Services...");
 
 		services = new ArrayList<>();
 		Collection<BridgeService> serviceConfigurations = PersistanceManager.getPersistanceManager().getServiceConfigurations();
 		Iterator<BridgeService> iterator = serviceConfigurations.iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
 			BridgeService service = iterator.next();
 			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
 			loadService(service);
 			ShadowManager.log(Level.INFO, "Loaded Service: " + service.getName());
 		}
-		if(serviceConfigurations.isEmpty())
+		if (serviceConfigurations.isEmpty())
 		{
 			setupFirstRun();
 		}
@@ -53,21 +57,37 @@ public class ServiceManager {
 		ShadowManager.log(Level.INFO, "Created Server Key " + key + ". Due to automatic loading");
 	}
 
-	private static void loadService(BridgeService service)
+	public static void loadService(BridgeService service)
 	{
 		services.add(service);
-		service.connect();
+		connectService(service);
 		PersistanceManager.getPersistanceManager().updateState(service);
 	}
 
-	public static void unloadAllServices() {
+	private static void connectService(BridgeService service)
+	{
+		try
+		{
+			service.connect();
+		} catch (Exception e)
+		{
+			ShadowManager.log(Level.SEVERE, "Could not load Service: " + service.toString());
+			ShadowManager.fatal(e);
+		}
+	}
+
+	public static void unloadAllServices()
+	{
 		ShadowManager.log(Level.INFO, "Unloading all Services...");
-		for (int i = 0; i < services.size(); i++) {
-			try {
+		for (int i = 0; i < services.size(); i++)
+		{
+			try
+			{
 				ShadowManager.log(Level.INFO, "Unloading Service: " + services.get(i).getName());
 				services.get(i).disconnect();
 				ShadowManager.log(Level.INFO, "Unloaded Service: " + services.get(i).getName());
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				ShadowManager.log(Level.INFO, "Unloading of Service " + services.get(i).getName() + " has failed", e);
 			}
 		}
@@ -77,14 +97,41 @@ public class ServiceManager {
 	public static BridgeService getServiceByServiceIdentifier(int serviceIdentifierId)
 	{
 		Iterator<BridgeService> iterator = services.iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
 			BridgeService service = iterator.next();
-			if(service.getIdentifier() == serviceIdentifierId)
+			if (service.getIdentifier() == serviceIdentifierId)
 			{
 				return service;
 			}
 		}
 		return null;
+	}
+
+	public static List<BridgeService> listServices()
+	{
+		return Collections.unmodifiableList(services);
+	}
+
+	public static void unloadService(int serviceID)
+	{
+		BridgeService service = getServiceByServiceIdentifier(serviceID);
+		ShadowManager.log(Level.WARNING, "Unloading Service: " + service.toString());
+		services.remove(service);
+		PersistanceManager.getPersistanceManager().removeState(service);
+		disconnectService(service);
+	}
+
+	private static void disconnectService(BridgeService service)
+	{
+		try
+		{
+			service.disconnect();
+		} catch (Exception e)
+		{
+			ShadowManager.log(Level.SEVERE, "Could not unload Service: " + service.toString());
+			ShadowManager.fatal(e);
+
+		}
 	}
 }

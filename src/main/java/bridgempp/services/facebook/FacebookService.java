@@ -150,4 +150,11 @@ public class FacebookService extends BridgeService
 		return newToken.getAccessToken();
 	}
 
+	public void configure(String appID, String appSecret, String accessToken)
+	{
+		this.appID = appID;
+		this.appSecret = appSecret;
+		this.accessToken = accessToken;
+	}
+
 }

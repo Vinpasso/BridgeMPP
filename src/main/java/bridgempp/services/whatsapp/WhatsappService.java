@@ -81,4 +81,10 @@ public class WhatsappService extends BridgeService {
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
 	}
+
+	public void configure(String phone, String password)
+	{
+		this.phone = phone;
+		this.password = password;
+	}
 }

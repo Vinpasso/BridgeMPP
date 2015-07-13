@@ -68,7 +68,7 @@ public class PersistanceManager
 		saveTransaction.commit();
 	}
 	
-	private void removeState(Object... objects)
+	public void removeState(Object... objects)
 	{
 		EntityTransaction transaction = entityManager.getTransaction();
 		transaction.begin();

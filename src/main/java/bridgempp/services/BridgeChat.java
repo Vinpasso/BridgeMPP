@@ -27,6 +27,13 @@ public class BridgeChat extends BridgeService {
 	@Column(name = "PORT", nullable = false)
 	private int port;
 	
+
+	public void configure(String host, int port)
+	{
+		this.host = host;
+		this.port = port;
+	}
+	
 	transient private Socket socket;
 	transient private Endpoint endpoint;
 	transient private User user;

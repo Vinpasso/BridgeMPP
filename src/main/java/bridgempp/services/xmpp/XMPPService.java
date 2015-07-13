@@ -207,4 +207,15 @@ public class XMPPService extends BridgeService {
 		}
 	}
 
+	public void configure(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String statusMessage)
+	{
+		this.host = host;
+		this.port = port;
+		this.domain = domain;
+		this.oldStyleSSL = oldStyleSSL;
+		this.username = username;
+		this.password = password;
+		this.statusMessage = statusMessage;
+	}
+
 }

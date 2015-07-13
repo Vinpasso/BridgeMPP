@@ -52,7 +52,7 @@ public class MailService extends BridgeService
 	@Column(name = "SMTP_HOST", nullable = false, length = 50)
 	private String smtphost;
 	@Column(name = "SMTP_PORT", nullable = false, length = 50)
-	private String smtpport;
+	private int smtpport;
 
 	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
@@ -68,7 +68,7 @@ public class MailService extends BridgeService
 			System.getProperties().setProperty("mail.smtp.submitter", "username");
 			System.getProperties().setProperty("mail.smtp.auth", "true");
 			System.getProperties().setProperty("mail.smtp.host", smtphost);
-			System.getProperties().setProperty("mail.smtp.port", smtpport);
+			System.getProperties().setProperty("mail.smtp.port", smtpport + "");
 
 			Authenticator authenticator = new Authenticator() {
 				@Override
@@ -257,6 +257,16 @@ public class MailService extends BridgeService
 	public MessageFormat[] getSupportedMessageFormats()
 	{
 		return supportedMessageFormats;
+	}
+
+	public void configure(String imaphost, int imapport, String username, String password, String smtphost, int smtpport)
+	{
+		this.imaphost = imaphost;
+		this.imapport = imapport;
+		this.username = username;
+		this.password = password;
+		this.smtphost = smtphost;
+		this.smtpport = smtpport;
 	}
 
 }

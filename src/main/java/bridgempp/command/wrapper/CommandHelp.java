@@ -6,15 +6,15 @@ import java.lang.reflect.Parameter;
 public class CommandHelp
 {
 	@CommandName("!help: This help topic")
-	@CommandTrigger("!help ")
+	@CommandTrigger("!help")
 	@HelpTopic("Shows a list of BridgeMPP Commands")
 	public static String help()
 	{
-		return "This is the BridgeMPP Help Topic\nThis is a list of available Commands:\n" + getListOfCommands() + "\nType !helpcommand <command> for the help topic of a command";
+		return "This is the BridgeMPP Help Topic\nThis is a list of available Commands:\n" + getListOfCommands() + "\nType \"!command <command>\" for the help topic of a command";
 	}
 	
-	@CommandName("!helpcommand: Detailed help for a Command")
-	@CommandTrigger("!helpcommand")
+	@CommandName("!command: Detailed help for a Command")
+	@CommandTrigger("!command")
 	@HelpTopic("Show the help topic for a given BridgeMPP Command, along with the required Syntax")
 	public static String help(String command)
 	{
