@@ -5,108 +5,121 @@
  */
 package bridgempp.services;
 
-import bridgempp.*;
+import bridgempp.BridgeService;
+import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-import com.skype.*;
-
-import java.util.ArrayList;
 import java.util.logging.Level;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+import com.skype.Chat;
+import com.skype.ChatMessage;
+import com.skype.ChatMessageListener;
+import com.skype.Skype;
+import com.skype.SkypeException;
 
 /**
  *
  * @author Vinpasso
  */
-public class SkypeService implements BridgeService {
+@Entity(name = "SKYPE_SERVICE")
+@DiscriminatorValue(value = "SKYPE_SERVICE")
+public class SkypeService extends BridgeService
+{
 
-	private ArrayList<Endpoint> endpoints;
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String args) {
-		try {
+	public void connect()
+	{
+		try
+		{
 			ShadowManager.log(Level.INFO, "Starting Skype Service...");
 			Skype.setDaemon(false);
 			Skype.addChatMessageListener(new SkypeChatListener());
 			ShadowManager.log(Level.INFO, "Starting Skype Service...");
-		} catch (SkypeException ex) {
+		} catch (SkypeException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public void disconnect() {
+	public void disconnect()
+	{
 	}
 
 	@Override
-	public void sendMessage(Message message) {
-		try {
+	public void sendMessage(Message message)
+	{
+		try
+		{
 			Chat[] chats = Skype.getAllChats();
-			for (int i = 0; i < chats.length; i++) {
-				if (chats[i].getId().equals(message.getTarget().getTarget())) {
+			for (int i = 0; i < chats.length; i++)
+			{
+				if (chats[i].getId().equals(message.getDestination().getIdentifier()))
+				{
 					chats[i].send(message.toSimpleString(getSupportedMessageFormats()));
 					return;
 				}
 			}
-		} catch (SkypeException ex) {
+		} catch (SkypeException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return "Skype";
 	}
 
 	@Override
-	public boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return true;
 	}
 
-	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		endpoints.add(endpoint);
-	}
+	private class SkypeChatListener implements ChatMessageListener
+	{
 
-	@Override
-	public void interpretCommand(Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-
-	private class SkypeChatListener implements ChatMessageListener {
-
-		public SkypeChatListener() {
-			endpoints = new ArrayList<>();
+		public SkypeChatListener()
+		{
 		}
 
 		@Override
-		public void chatMessageReceived(ChatMessage receivedChatMessage) throws SkypeException {
+		public void chatMessageReceived(ChatMessage receivedChatMessage) throws SkypeException
+		{
 			String chatID = receivedChatMessage.getChat().getId();
 			String message = receivedChatMessage.getContent();
 			String sender = receivedChatMessage.getSenderDisplayName();
-			for (int i = 0; i < endpoints.size(); i++) {
-				if (endpoints.get(i).getTarget().equals(chatID)) {
-					endpoints.get(i).setExtra(sender);
-					Message bMessage = new Message(endpoints.get(i), message, getSupportedMessageFormats()[0]);
-					CommandInterpreter.processMessage(bMessage);
-					return;
-				}
-			}
-			Endpoint endpoint = new Endpoint(SkypeService.this, chatID);
-			endpoint.setExtra(sender);
-			endpoints.add(endpoint);
-			Message bMessage = new Message(endpoint, message, getSupportedMessageFormats()[0]);
+			Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(chatID, SkypeService.this);
+			User user = DataManager.getOrNewUserForIdentifier(sender, SkypeService.this, endpoint);
+			Message bMessage = new Message(user, endpoint, message, getSupportedMessageFormats()[0]);
 			CommandInterpreter.processMessage(bMessage);
 		}
 
 		@Override
-		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException {
+		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException
+		{
 		}
 	}
 
 	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
+	public MessageFormat[] getSupportedMessageFormats()
+	{
 		return supportedMessageFormats;
+	}
+
+	public void configure()
+	{		
 	}
 }

@@ -6,9 +6,11 @@
 package bridgempp.services;
 
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 import com.sun.mail.iap.ProtocolException;
@@ -19,58 +21,59 @@ import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
  *
  * @author Vinpasso
  */
-public class MailService implements BridgeService {
+@Entity(name = "MAIL_SERVICE")
+@DiscriminatorValue(value = "MAIL_SERVICE")
+public class MailService extends BridgeService
+{
 
-	private ArrayList<Endpoint> endpoints;
-	private Session session;
-	private Store store;
-	private IMAPFolder folder;
+	transient private Session session;
+	transient private Store store;
+	transient private IMAPFolder folder;
+	transient private IMAPFolder processedFolder;
+	@Column(name = "IMAP_HOST", nullable = false, length = 50)
 	private String imaphost;
+	@Column(name = "IMAP_PORT", nullable = false)
 	private int imapport;
+	@Column(name = "USERNAME", nullable = false, length = 50)
 	private String username;
+	@Column(name = "PASSWORD", nullable = false, length = 50)
 	private String password;
+	@Column(name = "SMTP_HOST", nullable = false, length = 50)
 	private String smtphost;
-	private String smtpport;
-	private IMAPFolder processedFolder;
+	@Column(name = "SMTP_PORT", nullable = false, length = 50)
+	private int smtpport;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML,
-			MessageFormat.PLAIN_TEXT };
+	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argumentString) {
+	public void connect()
+	{
 		ShadowManager.log(Level.INFO, "Loading Mail Service...");
 
-		endpoints = new ArrayList<>();
-		String[] args = argumentString.split("; ");
-		if (args.length != 6) {
-			throw new UnsupportedOperationException("Incorrect Arguments for mailer service");
-		}
-		imaphost = args[0];
-		imapport = Integer.parseInt(args[1]);
-		smtphost = args[2];
-		smtpport = args[3];
-		username = args[4];
-		password = args[5];
-		try {
+		try
+		{
 
 			System.getProperties().setProperty("mail.store.protocol", "imaps");
 			System.getProperties().setProperty("mail.smtp.submitter", "username");
 			System.getProperties().setProperty("mail.smtp.auth", "true");
 			System.getProperties().setProperty("mail.smtp.host", smtphost);
-			System.getProperties().setProperty("mail.smtp.port", smtpport);
+			System.getProperties().setProperty("mail.smtp.port", smtpport + "");
 
 			Authenticator authenticator = new Authenticator() {
 				@Override
-				protected PasswordAuthentication getPasswordAuthentication() {
+				protected PasswordAuthentication getPasswordAuthentication()
+				{
 					return new PasswordAuthentication(username, password);
 				}
 
@@ -82,93 +85,106 @@ public class MailService implements BridgeService {
 			folder = (IMAPFolder) store.getFolder("Inbox");
 			folder.open(Folder.READ_WRITE);
 			processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
-			if (!processedFolder.exists()) {
+			if (!processedFolder.exists())
+			{
 				processedFolder.create(Folder.HOLDS_MESSAGES);
 			}
 			processedFolder.open(Folder.READ_WRITE);
 			new Thread(new MailMessageListener(), "Mail Message Listener").start();
-		} catch (NoSuchProviderException ex) {
+		} catch (NoSuchProviderException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
-		} catch (MessagingException ex) {
+		} catch (MessagingException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 		ShadowManager.log(Level.INFO, "Mail service loaded");
 	}
 
 	@Override
-	public void disconnect() {
-		try {
+	public void disconnect()
+	{
+		try
+		{
 			folder.close(true);
 			processedFolder.close(true);
 			store.close();
-		} catch (MessagingException ex) {
+		} catch (MessagingException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public void sendMessage(bridgempp.Message message) {
-		try {
+	public void sendMessage(bridgempp.Message message)
+	{
+		try
+		{
 			MimeMessage mimeMessage = new MimeMessage(session);
 			mimeMessage.setFrom(username);
-			mimeMessage.setRecipients(Message.RecipientType.TO, message.getTarget().getTarget());
+			mimeMessage.setRecipients(Message.RecipientType.TO, message.getDestination().getIdentifier());
 			mimeMessage.setSubject(message.toSimpleString(getSupportedMessageFormats()));
 			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()));
 			Transport.send(mimeMessage, username, password);
-		} catch (MessagingException ex) {
+		} catch (MessagingException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return "Mail";
 	}
 
 	@Override
-	public boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return true;
 	}
 
-	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		endpoints.add(endpoint);
-	}
-
-	private class MailMessageListener implements Runnable, MessageCountListener {
+	private class MailMessageListener implements Runnable, MessageCountListener
+	{
 
 		Thread autoRenewThread;
 
-		public MailMessageListener() {
-			endpoints = new ArrayList<>();
+		public MailMessageListener()
+		{
 			folder.addMessageCountListener(this);
 			autoRenewThread = new Thread(new Runnable() {
 				private static final long KEEP_ALIVE_FREQUENCY = 1740000l;
 
 				@Override
-				public void run() {
-					try {
-						while (folder.isOpen()) {
-							try {
+				public void run()
+				{
+					try
+					{
+						while (folder.isOpen())
+						{
+							try
+							{
 								ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
 
 								folder.doCommand(new IMAPFolder.ProtocolCommand() {
 
 									@Override
-									public Object doCommand(IMAPProtocol protocol) throws ProtocolException {
+									public Object doCommand(IMAPProtocol protocol) throws ProtocolException
+									{
 										protocol.simpleCommand("NOOP", null);
 										return null;
 									}
 								});
 								ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP");
 								Thread.sleep(KEEP_ALIVE_FREQUENCY);
-							} catch (MessagingException ex) {
+							} catch (MessagingException ex)
+							{
 								ShadowManager.log(Level.SEVERE, null, ex);
 							}
 						}
-					} catch (InterruptedException e) {
-						ShadowManager.log(Level.WARNING,
-								"Mail Message Listener interrupted. Shutting down Mail Message Listener");
+					} catch (InterruptedException e)
+					{
+						ShadowManager.log(Level.WARNING, "Mail Message Listener interrupted. Shutting down Mail Message Listener");
 					}
 				}
 			}, "Mail Connection Renew Thread");
@@ -176,14 +192,19 @@ public class MailService implements BridgeService {
 		}
 
 		@Override
-		public void run() {
-			while (folder.isOpen()) {
-				try {
-					for (Message message : folder.getMessages()) {
+		public void run()
+		{
+			while (folder.isOpen())
+			{
+				try
+				{
+					for (Message message : folder.getMessages())
+					{
 						processMessage(message);
 					}
 					folder.idle();
-				} catch (MessagingException ex) {
+				} catch (MessagingException ex)
+				{
 					ShadowManager.log(Level.SEVERE, null, ex);
 				}
 			}
@@ -191,55 +212,61 @@ public class MailService implements BridgeService {
 		}
 
 		@Override
-		public void messagesAdded(MessageCountEvent e) {
-			try {
-				for (Message message : folder.getMessages()) {
+		public void messagesAdded(MessageCountEvent e)
+		{
+			try
+			{
+				for (Message message : folder.getMessages())
+				{
 					processMessage(message);
 				}
-			} catch (MessagingException e1) {
+			} catch (MessagingException e1)
+			{
 				ShadowManager.log(Level.SEVERE, "Mailbox error", e1);
 			}
 		}
 
 		@Override
-		public void messagesRemoved(MessageCountEvent e) {
+		public void messagesRemoved(MessageCountEvent e)
+		{
 		}
 
-		public void processMessage(Message message) {
-			try {
+		public void processMessage(Message message)
+		{
+			try
+			{
 				String sender = message.getFrom()[0].toString();
-				for (int i = 0; i < endpoints.size(); i++) {
-					if (endpoints.get(i).getTarget().equals(sender)) {
-						bridgempp.Message bMessage = new bridgempp.Message(endpoints.get(i), message.getContent()
-								.toString(), getSupportedMessageFormats()[0]);
-						CommandInterpreter.processMessage(bMessage);
-						folder.copyMessages(new Message[] { message }, processedFolder);
-						folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
-						folder.expunge();
-						return;
-					}
-				}
-				Endpoint endpoint = new Endpoint(MailService.this, message.getFrom()[0].toString());
-				endpoints.add(endpoint);
-				bridgempp.Message bMessage = new bridgempp.Message(endpoint, message.getContent().toString(),
-						getSupportedMessageFormats()[0]);
+				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(sender, MailService.this);
+				User user = DataManager.getOrNewUserForIdentifier(sender, MailService.this, endpoint);
+
+				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, message.getContent().toString(), getSupportedMessageFormats()[0]);
 				CommandInterpreter.processMessage(bMessage);
+				folder.copyMessages(new Message[] { message }, processedFolder);
 				folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
 				folder.expunge();
-			} catch (MessagingException | IOException ex) {
+				return;
+
+			} catch (MessagingException | IOException ex)
+			{
 				ShadowManager.log(Level.SEVERE, null, ex);
 			}
 		}
 	}
 
 	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
+	public MessageFormat[] getSupportedMessageFormats()
+	{
 		return supportedMessageFormats;
 	}
 
-	@Override
-	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
+	public void configure(String imaphost, int imapport, String username, String password, String smtphost, int smtpport)
+	{
+		this.imaphost = imaphost;
+		this.imapport = imapport;
+		this.username = username;
+		this.password = password;
+		this.smtphost = smtphost;
+		this.smtpport = smtpport;
 	}
 
 }

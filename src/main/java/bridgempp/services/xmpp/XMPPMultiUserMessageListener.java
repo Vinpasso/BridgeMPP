@@ -12,8 +12,10 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
-import bridgempp.Endpoint;
 import bridgempp.ShadowManager;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListener {
@@ -34,12 +36,12 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 	public XMPPMultiUserMessageListener(XMPPService xmppService, Endpoint endpoint) {
 		this.xmppService = xmppService;
 		try {
-			multiUserChat = new MultiUserChat(this.xmppService.connection, endpoint.getTarget());
+			multiUserChat = new MultiUserChat(this.xmppService.connection, endpoint.getIdentifier());
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", "", discussionHistory, this.xmppService.connection.getPacketReplyTimeout());
 			this.endpoint = endpoint;
-			this.xmppService.activeChats.put(endpoint.getTarget(), this);
+			this.xmppService.activeChats.put(endpoint.getIdentifier(), this);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
@@ -49,8 +51,8 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 	public XMPPMultiUserMessageListener(XMPPService xmppService, MultiUserChat multiUserChat) {
 		this.xmppService = xmppService;
 		this.multiUserChat = multiUserChat;
-		endpoint = new Endpoint(this.xmppService, multiUserChat.getRoom());
-		this.xmppService.activeChats.put(endpoint.getTarget(), this);
+		endpoint = DataManager.getOrNewEndpointForIdentifier(multiUserChat.getRoom(), this.xmppService);
+		this.xmppService.activeChats.put(endpoint.getIdentifier(), this);
 	}
 
 	@Override
@@ -79,11 +81,12 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 			return;
 		}
 		String jid = multiUserChat.getOccupant(message.getFrom()).getJid();
+		User user;
 		if (jid != null) {
-			endpoint.setExtra(jid.substring(0, jid.indexOf("/")));
+			user = DataManager.getOrNewUserForIdentifier(jid.substring(0, jid.indexOf("/")), xmppService, endpoint);
 		} else {
-			endpoint.setExtra(message.getFrom().substring(message.getFrom().indexOf("/")));
+			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), xmppService, endpoint);
 		}
-		xmppService.interpretXMPPMessage(endpoint, message);
+		xmppService.interpretXMPPMessage(user, endpoint, message);
 	}
 }

@@ -5,12 +5,13 @@
  */
 package bridgempp;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
+import bridgempp.data.AccessKey;
+import bridgempp.data.Endpoint;
+import bridgempp.storage.PersistanceManager;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -18,151 +19,101 @@ import java.util.logging.Level;
  *
  * @author Vinpasso
  */
-public class PermissionsManager {
+public class PermissionsManager
+{
 
-    private static HashMap<String, AccessKey> accessKeys;
+	private static Collection<AccessKey> keys;
 
-    public static String generateKey(int permissions, boolean useOnce) {
-        SecureRandom random = new SecureRandom();
-        byte[] byteKey = new byte[32];
-        random.nextBytes(byteKey);
-        String key = Base64.getEncoder().encodeToString(byteKey);
-        accessKeys.put(key, new AccessKey(key, permissions, useOnce));
-        return key;
-    }
+	public static String generateKey(int permissions, boolean useOnce)
+	{
+		SecureRandom random = new SecureRandom();
+		byte[] byteKey = new byte[32];
+		random.nextBytes(byteKey);
+		String key = Base64.getEncoder().encodeToString(byteKey);
+		keys.add(new AccessKey(key, permissions, useOnce));
+		saveAccessKeys();
+		return key;
+	}
 
-    public static boolean useKey(String key, Endpoint endpoint) {
-        AccessKey accessKey = accessKeys.get(key);
-        if (accessKey == null) {
-            return false;
-        }
-        if (accessKey.isUseOnce() == true) {
-            accessKeys.remove(key);
-        }
-        endpoint.addPermissions(accessKey.getPermissions());
-        return true;
-    }
+	public static boolean useKey(String key, Endpoint endpoint)
+	{
+		AccessKey accessKey = getAccessKey(key);
+		if (accessKey == null)
+		{
+			return false;
+		}
+		if (accessKey.isUseOnce() == true)
+		{
+			removeAccessKey(accessKey);
+		}
+		endpoint.addPermissions(accessKey.getPermissions());
+		return true;
+	}
 
-    public static boolean hasPermissions(Endpoint endpoint, int permissions) {
-        return (endpoint.getPermissions() & permissions) == permissions;
-    }
+	private static AccessKey getAccessKey(String key)
+	{
+		return PersistanceManager.getPersistanceManager().getAccessKeyForIdentifier(key);
+	}
 
-    public static void loadAccessKeys() {
-        ShadowManager.log(Level.INFO, "Loading all access keys...");
+	private static void removeAccessKey(AccessKey key)
+	{
+		keys.remove(key);
+		PersistanceManager.getPersistanceManager().removeAccessKey(key);
+	}
 
-        accessKeys = new HashMap<>();
-        int numberOfKeys = ConfigurationManager.permissionConfiguration.getRoot().getChild(0).getChildrenCount();
-        for (int i = 0; i < numberOfKeys; i++) {
-            AccessKey key = AccessKey.readAccessKey(ConfigurationManager.permissionConfiguration, "keys.key(" + i + ").");
-            accessKeys.put(key.getKey(), key);
-            ShadowManager.log(Level.INFO, "Loaded Access Key for Permissions: " + key.permissions);
-        }
-        ShadowManager.log(Level.INFO, "Loaded all access keys...");
-    }
+	public static boolean hasPermissions(Endpoint endpoint, int permissions)
+	{
+		return (endpoint.getPermissions() & permissions) == permissions;
+	}
 
-    public static void saveAccessKeys() {
-        ShadowManager.log(Level.INFO, "Saving all access keys...");
-        try {
-            ConfigurationManager.permissionConfiguration.clear();
-            Iterator<AccessKey> iterator = accessKeys.values().iterator();
-            while (iterator.hasNext()) {
-                AccessKey key = iterator.next();
-                AccessKey.writeAccessKey(ConfigurationManager.permissionConfiguration, key);
-                ShadowManager.log(Level.INFO, "Saved Access Key for Permissions: " + key.permissions);
-            }
-            ConfigurationManager.permissionConfiguration.save();
-        } catch (ConfigurationException ex) {
-            ShadowManager.log(Level.SEVERE, "Error while saving Access Keys to XML Configuration", ex);
-        }
-        ShadowManager.log(Level.INFO, "Saved all access keys...");
-    }
+	public static void loadAccessKeys()
+	{
+		ShadowManager.log(Level.INFO, "Loading all access keys...");
+		keys = PersistanceManager.getPersistanceManager().loadAccessKeys();
+		Iterator<AccessKey> iterator = keys.iterator();
+		while (iterator.hasNext())
+		{
+			ShadowManager.log(Level.INFO, "Loaded Access Key for Permissions: " + iterator.next().getPermissions());
+		}
+		ShadowManager.log(Level.INFO, "Loaded all access keys...");
+	}
 
-    public static boolean removeKey(String keyName) {
-        return accessKeys.remove(keyName) != null;
-    }
+	public static void saveAccessKeys()
+	{
+		ShadowManager.log(Level.INFO, "Saving all access keys...");
+		PersistanceManager.getPersistanceManager().saveAccessKeys(keys);
+		ShadowManager.log(Level.INFO, "Saved all access keys...");
+	}
 
-    public static String listKeys() {
-        String list = "";
-        for (AccessKey key : accessKeys.values()) {
-            list += key.toString() + "\n";
-        }
-        return list.substring(0, list.length() - 1);
-    }
+	public static void removeKey(String keyName)
+	{
+		removeAccessKey(getAccessKey(keyName));
+	}
 
-    static class AccessKey {
+	public static String listKeys()
+	{
+		String list = "";
+		Iterator<AccessKey> iterator = keys.iterator();
+		while (iterator.hasNext())
+		{
+			AccessKey key = iterator.next();
+			list += key.toString() + "\n";
+		}
+		return list.substring(0, list.length() - 1);
+	}
 
-        private int permissions;
-        private boolean useOnce;
-        private String key;
+	public static enum Permission
+	{
 
-        public AccessKey(String key, int permissions, boolean useOnce) {
-            this.key = key;
-            this.permissions = permissions;
-            this.useOnce = useOnce;
-        }
+		DIRECT_MESSAGE, SUBSCRIBE_UNSUBSCRIBE_GROUP, CREATE_REMOVE_GROUP, LIST_MEMBERS, LIST_GROUPS, IMPORT_ALIAS, ADD_REMOVE_SHADOW, LIST_SHADOW, EXIT, GENERATE_ONETIME_KEYS, GENERATE_PERMANENT_KEYS, REMOVE_KEYS, LIST_KEYS, LIST_SERVICES, ADD_REMOVE_SERVICE
+	}
 
-        @Override
-        public String toString() {
-            return "AccessKey: Permissions " + permissions + " useOnce " + useOnce + " Key " + key;
-        }
+	public static class Permissions
+	{
 
-        /**
-         * @return the permissions
-         */
-        public int getPermissions() {
-            return permissions;
-        }
-
-        /**
-         * @return the useOnce
-         */
-        public boolean isUseOnce() {
-            return useOnce;
-        }
-
-        /**
-         * @return the Key
-         */
-        public String getKey() {
-            return key;
-        }
-
-        public static void writeAccessKey(XMLConfiguration configuration, AccessKey key) {
-            configuration.addProperty("keys.key(-1).key", key.getKey());
-            configuration.addProperty("keys.key.permissions", key.getPermissions());
-            configuration.addProperty("keys.key.useOnce", key.isUseOnce());
-        }
-
-        public static AccessKey readAccessKey(XMLConfiguration configuration, String prefix) {
-            String key = configuration.getString(prefix + "key");
-            int permissions = configuration.getInt(prefix + "permissions");
-            boolean useOnce = configuration.getBoolean(prefix + "useOnce");
-            return new AccessKey(key, permissions, useOnce);
-        }
-
-    }
-
-    public static enum Permission {
-
-        DIRECT_MESSAGE,
-        SUBSCRIBE_UNSUBSCRIBE_GROUP,
-        CREATE_REMOVE_GROUP,
-        LIST_MEMBERS,
-        LIST_GROUPS,
-        IMPORT_ALIAS,
-        ADD_REMOVE_SHADOW,
-        LIST_SHADOW,
-        EXIT,
-        GENERATE_ONETIME_KEYS,
-        GENERATE_PERMANENT_KEYS,
-        REMOVE_KEYS,
-        LIST_KEYS
-    }
-
-    public static class Permissions {
-
-        public static int getPermission(Permission permission) {
-            return (int) Math.pow(2, permission.ordinal());
-        }
-    }
+		public static int getPermission(Permission permission)
+		{
+			return (int) Math.pow(2, permission.ordinal());
+		}
+	}
 }

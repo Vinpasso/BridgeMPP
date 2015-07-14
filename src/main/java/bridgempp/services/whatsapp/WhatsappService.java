@@ -10,38 +10,38 @@ import bridgempp.messageformat.MessageFormat;
 
 import java.io.*;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  *
  * @author Vinpasso
  */
-public class WhatsappService implements BridgeService {
-
-	HashMap<String, Endpoint> endpoints;
-
-	Process yowsup;
-	BufferedReader bufferedReader;
+@Entity(name = "WHATSAPP_SERVICE_CONFIGURATION")
+@DiscriminatorValue("WHATSAPP_SERVICE")
+public class WhatsappService extends BridgeService {
+	
+	transient Process yowsup;
+	transient BufferedReader bufferedReader;
 	// private PrintStream printStream;
-	LinkedBlockingQueue<String> senderQueue;
-	Thread senderThread;
+	transient LinkedBlockingQueue<String> senderQueue;
+	transient Thread senderThread;
+	
+	@Column(name = "Phone_Number", nullable = false, length = 50)
 	String phone;
+	
+	@Column(name = "Password", nullable = false, length = 50) 
 	String password;
 
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argString) {
+	public void connect() {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
-		String[] args = argString.split("; ");
-		if (args.length != 2) {
-			throw new UnsupportedOperationException("Incorrect Parameters for Whatsapp Service: " + argString);
-		}
-		phone = args[0];
-		password = args[1];
-		endpoints = new HashMap<>();
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
 		ShadowManager.log(Level.INFO, "Service Whatsapp started");
@@ -57,10 +57,10 @@ public class WhatsappService implements BridgeService {
 	public void sendMessage(Message message) {
 		try {
 			senderQueue.add("/message send "
-					+ message.getTarget().getTarget().substring(0, message.getTarget().getTarget().indexOf("@"))
+					+ message.getDestination().getIdentifier().substring(0, message.getDestination().getIdentifier().indexOf("@"))
 					+ " \""
 					+ Base64.getEncoder().encodeToString(
-							(message.getSender().toString(true) + ": " + message.getMessage(supportedMessageFormats))
+							(message.getSender().toString() + ": " + message.getMessage(supportedMessageFormats))
 									.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
 			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
@@ -78,17 +78,13 @@ public class WhatsappService implements BridgeService {
 	}
 
 	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		endpoints.put(endpoint.getTarget(), endpoint);
-	}
-
-	@Override
-	public void interpretCommand(bridgempp.Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
-	}
-
-	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
+	}
+
+	public void configure(String phone, String password)
+	{
+		this.phone = phone;
+		this.password = password;
 	}
 }

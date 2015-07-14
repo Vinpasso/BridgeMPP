@@ -10,10 +10,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import bridgempp.BridgeMPP;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
 class WhatsappMessageListener implements Runnable {
@@ -78,16 +80,9 @@ class WhatsappMessageListener implements Runnable {
 					String author = matcher.group(1) + "@s.whatsapp.net";
 					String group = matcher.group(2);
 					String message = new String(Base64.getDecoder().decode(matcher.group(5)), "UTF-8");
-					Endpoint endpoint;
-					if (this.whatsappService.endpoints.containsKey(group)) {
-						endpoint = this.whatsappService.endpoints.get(group);
-						endpoint.setExtra(author);
-					} else {
-						endpoint = new Endpoint(this.whatsappService, group);
-						endpoint.setExtra(author);
-						this.whatsappService.endpoints.put(group, endpoint);
-					}
-					Message parsedMessage = new Message(endpoint, message, MessageFormat.PLAIN_TEXT);
+					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(group, whatsappService);
+					User user = DataManager.getOrNewUserForIdentifier(author, whatsappService, endpoint);
+					Message parsedMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
 					CommandInterpreter.processMessage(parsedMessage);
 				}
 			}

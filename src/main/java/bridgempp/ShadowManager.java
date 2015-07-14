@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import bridgempp.data.Endpoint;
+
 /**
  *
  * @author Vinpasso
@@ -26,11 +28,29 @@ public class ShadowManager {
     
     public static void log(Level level, String message)
     {
-        LogRecord record = new LogRecord(level, message);
-        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+        logWithStackTraceDepth(level, message, 3);
+    }
+
+	private static void logWithStackTraceDepth(Level level, String message, int depth)
+	{
+		LogRecord record = new LogRecord(level, message);
+        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[depth];
         record.setSourceClassName(stackTraceElement.getClassName());
         record.setSourceMethodName(stackTraceElement.getMethodName());
         Logger.getGlobal().log(record);
+	}
+    
+    public static void logAndReply(Level level, String message, Message bridgeMessage)
+    {
+    	logWithStackTraceDepth(level, message, 3);
+    	bridgeMessage.getOrigin().sendOperatorMessage(message);
+    }
+    
+    public static void logAndReply(Level level, String message, Message bridgeMessage, Exception e)
+    {
+    	logWithStackTraceDepth(level, message, 3);
+    	e.printStackTrace();
+    	bridgeMessage.getOrigin().sendOperatorMessage(message);
     }
 
     private static class LogHandler extends Handler {
@@ -58,7 +78,7 @@ public class ShadowManager {
     }
 
 	public static void log(Level level, String message, Exception e) {
-		log(level, message);
+		logWithStackTraceDepth(level, message, 3);
 		e.printStackTrace();
 	}
 

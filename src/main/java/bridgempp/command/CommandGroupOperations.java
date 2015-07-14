@@ -7,137 +7,165 @@ package bridgempp.command;
 
 import java.util.logging.Level;
 
-import bridgempp.Endpoint;
-import bridgempp.Group;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
+import bridgempp.PermissionsManager.Permission;
+import bridgempp.command.wrapper.CommandName;
+import bridgempp.command.wrapper.CommandTrigger;
+import bridgempp.command.wrapper.HelpTopic;
+import bridgempp.command.wrapper.RequiredPermission;
+import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
 import bridgempp.messageformat.MessageFormat;
 
 /**
  *
  * @author Vinpasso
  */
-public class CommandGroupOperations {
+public class CommandGroupOperations
+{
 
-    //Unsubscribe the Message's Sender to the specified Group with name
-    private static Group unsubscribeGroup(String name, Endpoint endpoint) {
-        Group group = GroupManager.findGroup(name);
-        if (group == null) {
-            return null;
-        }
-        group.removeEndpoint(endpoint);
-        return group;
-    }
+	@CommandName("!removegroup: Close the group")
+	@CommandTrigger("!removegroup")
+	@HelpTopic("Closes the Group and disconnects all currently participating Users")
+	@RequiredPermission(Permission.CREATE_REMOVE_GROUP)
+	public static void cmdRemoveGroup(String name, Message message)
+	{
+		boolean success = removeGroup(name);
+		if (success)
+		{
+			ShadowManager.logAndReply(Level.FINE, "Group has been removed: " + name, message);
+		} else
+		{
+			message.getOrigin().sendOperatorMessage("Error: Group not found");
+		}
+	}
 
-    static void cmdRemoveGroup(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.CREATE_REMOVE_GROUP)) {
-            boolean success = removeGroup(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-            if (success) {
-                ShadowManager.log(Level.FINE, "Group has been removed: " + CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-                message.getSender().sendOperatorMessage("Group has been removed");
-            } else {
-                message.getSender().sendOperatorMessage("Error: Group not found");
-            }
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!subscribegroup: Join a group")
+	@CommandTrigger("!subscribegroup")
+	@HelpTopic("Subscribe the Message's Sender to the specified Group with name")
+	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
+	public static void cmdSubscribeGroup(String name, Message message)
+	{
+		Group group = subscribeGroup(name, message.getOrigin());
+		if (group != null)
+		{
+			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
+			group.sendMessage(new Message(message.getSender(), message.getOrigin(), null, group, "BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been added to Group: "
+					+ group.getName(), MessageFormat.PLAIN_TEXT));
+			message.getOrigin().sendOperatorMessage("Group has been subscribed");
+		} else
+		{
+			message.getOrigin().sendOperatorMessage("Error: Group not found");
+		}
+	}
 
-    //Create a Group with name
-    private static Group createGroup(String name) {
-        if (GroupManager.findGroup(name) != null) {
-            return null;
-        }
-        Group group = GroupManager.newGroup();
-        group.setName(name);
-        return group;
-    }
+	@CommandName("!listgroups: List all groups")
+	@CommandTrigger("!listgroups")
+	@HelpTopic("Lists all the groups currently registered on BridgeMPP")
+	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
+	public static void cmdListGroups(Message message)
+	{
+		message.getOrigin().sendOperatorMessage("Listing Groups:\nBridgeMPP: " + GroupManager.listGroups().replaceAll("\n", "\nBridgeMPP: ") + "BridgeMPP: Finished listing Groups");
+	}
 
-    static void cmdSubscribeGroup(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)) {
-            Group group = subscribeGroup(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getSender());
-            if (group != null) {
-                ShadowManager.log(Level.FINE, message.getSender().toString() + " has been subscribed: " + group.getName());
-                group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been added to Group: " + group.getName(), MessageFormat.PLAIN_TEXT));
-                message.getSender().sendOperatorMessage("Group has been subscribed");
-            } else {
-                message.getSender().sendOperatorMessage("Error: Group not found");
-            }
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!unsubscribegroup: Leave the group")
+	@CommandTrigger("!unsubscribegroup")
+	@HelpTopic("Unsubscribe the Message's Sender from the specified Group with name")
+	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
+	public static void cmdUnsubscribeGroup(String name, Message message)
+	{
+		Group group = unsubscribeGroup(name, message.getOrigin());
+		if (group != null)
+		{
+			ShadowManager.logAndReply(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName(), message);
+			group.sendMessage(new Message(message.getSender(), message.getOrigin(), null, group, "BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been removed from Group: "
+					+ group.getName(), MessageFormat.PLAIN_TEXT));
+		} else
+		{
+			message.getOrigin().sendOperatorMessage("Error: Group not found");
+		}
+	}
 
-    static void cmdListGroups(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_GROUPS)) {
-            message.getSender().sendOperatorMessage("Listing Groups:\nBridgeMPP: " + GroupManager.listGroups().replaceAll("\n", "\nBridgeMPP: ") + "BridgeMPP: Finished listing Groups");
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!listmembers: List all the Members of a Group")
+	@CommandTrigger("!listmembers")
+	@HelpTopic("Prints all the Member names of the specified Group")
+	@RequiredPermission(Permission.LIST_MEMBERS)
+	public static void cmdListMembers(String name, Message message)
+	{
+		Group group = GroupManager.findGroup(name);
+		if (group == null)
+		{
+			message.getOrigin().sendOperatorMessage("Error: No such group");
+			return;
+		}
+		message.getOrigin().sendOperatorMessage("Listing Members:\nBridgeMPP: " + group.toString().replaceAll("\n", "\nBridgeMPP: ") + "Finished listing Members");
+	}
 
-    static void cmdUnsubscribeGroup(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)) {
-            Group group = unsubscribeGroup(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()), message.getSender());
-            if (group != null) {
-                ShadowManager.log(Level.FINE, message.getSender().toString() + " has been unsubscribed: " + group.getName());
-                group.sendMessage(new Message(message.getSender(), null, group, "BridgeMPP: Endpoint: " + message.getSender().toString() + " has been removed from Group: " + group.getName(), MessageFormat.PLAIN_TEXT));
-                message.getSender().sendOperatorMessage("Group has been unsubscribed");
-            } else {
-                message.getSender().sendOperatorMessage("Error: Group not found");
-            }
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!creategroup: Create a new group")
+	@CommandTrigger("!creategroup")
+	@HelpTopic("Opens a new empty Group with the target name")
+	@RequiredPermission(Permission.CREATE_REMOVE_GROUP)
+	public static void cmdCreateGroup(String name, Message message)
+	{
+		Group group = createGroup(name);
+		if (group == null)
+		{
+			message.getOrigin().sendOperatorMessage("Error: Group already exists");
+		} else
+		{
+			ShadowManager.log(Level.FINE, "Group has been created: " + group.getName());
+			message.getOrigin().sendOperatorMessage("Group has been created: " + group.getName());
+		}
+	}
 
-    //Subscribe the Message's Sender to the specified Group with name
-    private static Group subscribeGroup(String message, Endpoint sender) {
-        Group group = GroupManager.findGroup(message);
-        if (group == null) {
-            return null;
-        }
-        group.addEndpoint(sender);
-        return group;
-    }
+	// Remove everyone from Group and destroy Group
+	private static boolean removeGroup(String name)
+	{
+		Group group = GroupManager.findGroup(name);
+		if (group == null)
+		{
+			return false;
+		}
+		GroupManager.removeGroup(group);
+		return true;
+	}
 
-    static void cmdListMembers(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_MEMBERS)) {
-            Group group = GroupManager.findGroup(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-            if (group == null) {
-                message.getSender().sendOperatorMessage("Error: No such group");
-                return;
-            }
-            message.getSender().sendOperatorMessage("Listing Members:\nBridgeMPP: " + group.toString().replaceAll("\n", "\nBridgeMPP: ") + "Finished listing Members");
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	// Create a Group with name
+	private static Group createGroup(String name)
+	{
+		if (GroupManager.findGroup(name) != null)
+		{
+			return null;
+		}
+		Group group = GroupManager.newGroup();
+		group.setName(name);
+		return group;
+	}
 
-    static void cmdCreateGroup(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.CREATE_REMOVE_GROUP)) {
-            Group group = createGroup(CommandInterpreter.getStringFromArgument(message.getPlainTextMessage()));
-            if (group == null) {
-                message.getSender().sendOperatorMessage("Error: Group already exists");
-            } else {
-                ShadowManager.log(Level.FINE, "Group has been created: " + group.getName());
-                message.getSender().sendOperatorMessage("Group has been created: " + group.getName());
-            }
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	// Subscribe the Message's Sender to the specified Group with name
+	private static Group subscribeGroup(String message, Endpoint sender)
+	{
+		Group group = GroupManager.findGroup(message);
+		if (group == null)
+		{
+			return null;
+		}
+		group.addEndpoint(sender);
+		return group;
+	}
 
-    //Remove everyone from Group and destroy Group
-    private static boolean removeGroup(String name) {
-        Group group = GroupManager.findGroup(name);
-        if (group == null) {
-            return false;
-        }
-        GroupManager.removeGroup(group);
-        return true;
-    }
-    
+	private static Group unsubscribeGroup(String name, Endpoint endpoint)
+	{
+		Group group = GroupManager.findGroup(name);
+		if (group == null)
+		{
+			return null;
+		}
+		group.removeEndpoint(endpoint);
+		return group;
+	}
+
 }

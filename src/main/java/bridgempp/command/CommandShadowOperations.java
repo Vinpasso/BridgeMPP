@@ -10,43 +10,51 @@ import java.util.logging.Level;
 import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
+import bridgempp.PermissionsManager.Permission;
+import bridgempp.command.wrapper.CommandName;
+import bridgempp.command.wrapper.CommandTrigger;
+import bridgempp.command.wrapper.HelpTopic;
+import bridgempp.command.wrapper.RequiredPermission;
 
 /**
  *
  * @author Vinpasso
  */
-public class CommandShadowOperations {
+public class CommandShadowOperations
+{
 
-    static void cmdAddShadow(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
-            ShadowManager.log(Level.WARNING, "Shadow has been subscribed by " + message.getSender().toString());
-            ShadowManager.shadowEndpoints.add(message.getSender());
-            message.getSender().sendOperatorMessage("Your endpoint has been added to the list of Shadows");
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!addshadow: Receive log messages")
+	@CommandTrigger("!addshadow")
+	@HelpTopic("Add the message's sender to the list of Shadows, which receive all BridgeMPP log messages")
+	@RequiredPermission(Permission.ADD_REMOVE_SHADOW)
+	public static void cmdAddShadow(Message message)
+	{
+		ShadowManager.shadowEndpoints.add(message.getOrigin());
+		ShadowManager.logAndReply(Level.WARNING, "Shadow has been subscribed by " + message.getOrigin().toString(), message);
+	}
 
-    static void cmdListShadows(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.LIST_SHADOW)) {
-            message.getSender().sendOperatorMessage("Listing shadows");
-            for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++) {
-                message.getSender().sendOperatorMessage("Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
-            }
-            message.getSender().sendOperatorMessage("Done listing shadows");
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!listshadows: List log receivers")
+	@CommandTrigger("!listshadows")
+	@HelpTopic("List all the Endpoints currently receiving BridgeMPP log messages")
+	@RequiredPermission(Permission.LIST_SHADOW)
+	public static void cmdListShadows(Message message)
+	{
+		message.getOrigin().sendOperatorMessage("Listing shadows");
+		for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++)
+		{
+			message.getOrigin().sendOperatorMessage("Shadow: " + ShadowManager.shadowEndpoints.get(i).toString());
+		}
+		message.getOrigin().sendOperatorMessage("Done listing shadows");
+	}
 
-    static void cmdRemoveShadow(Message message) {
-        if (CommandInterpreter.checkPermission(message.getSender(), PermissionsManager.Permission.ADD_REMOVE_SHADOW)) {
-            ShadowManager.log(Level.WARNING, "Shadow has been removed by " + message.getSender().toString());
-            ShadowManager.shadowEndpoints.remove(message.getSender());
-            message.getSender().sendOperatorMessage("Your endpoint has been removed from the list of Shadows");
-        } else {
-            message.getSender().sendOperatorMessage("Access denied");
-        }
-    }
+	@CommandName("!removeshadow: No log messages")
+	@CommandTrigger("!removeshadow")
+	@HelpTopic("Remove the message's sender from the list of Shadows, which receive all BridgeMPP log messages")
+	@RequiredPermission(Permission.ADD_REMOVE_SHADOW)
+	public static void cmdRemoveShadow(Message message)
+	{
+		ShadowManager.logAndReply(Level.WARNING, "Shadow has been removed by " + message.getOrigin().toString(), message);
+		ShadowManager.shadowEndpoints.remove(message.getOrigin());
+	}
 
 }

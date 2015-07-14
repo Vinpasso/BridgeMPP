@@ -3,30 +3,49 @@ package bridgempp.services;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import bridgempp.BridgeService;
-import bridgempp.Endpoint;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-public class BridgeChat implements BridgeService {
+@Entity(name = "BRIDGE_CHAT_SERVICE")
+@DiscriminatorValue(value = "BRIDGE_CHAT_SERVICE")
+public class BridgeChat extends BridgeService {
 
-	private Socket socket;
-	private Endpoint endpoint;
-	private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
+	@Column(name = "HOST", nullable = false, length = 50)
+	private String host;
+	
+	@Column(name = "PORT", nullable = false)
+	private int port;
+	
+
+	public void configure(String host, int port)
+	{
+		this.host = host;
+		this.port = port;
+	}
+	
+	transient private Socket socket;
+	transient private Endpoint endpoint;
+	transient private User user;
+	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
 			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect(String argList) {
-		String[] args = argList.split("; ");
-		if (args.length != 2) {
-			throw new UnsupportedOperationException(
-					"Incorrect number of Options for BridgeChat");
-		}
-		endpoint = new Endpoint(this, "BridgeChat");
+	public void connect() {
+		endpoint = DataManager.getOrNewEndpointForIdentifier("BridgeChat", this);
+		user = DataManager.getOrNewUserForIdentifier("BridgeChatUser", this, endpoint);
 		try {
-			socket = new Socket(args[0], Integer.parseInt(args[1]));
+			socket = new Socket(host, port);
 			socket.getOutputStream().write(
 					BridgeChatProtoBuf.BindingRequest.newBuilder()
 							.setBindInfo("BridgeMPP").build().toByteArray());
@@ -36,7 +55,7 @@ public class BridgeChat implements BridgeService {
 				public void run() {
 					try {
 						while (true) {
-							CommandInterpreter.processMessage(new Message(
+							CommandInterpreter.processMessage(new Message(user, 
 									endpoint, BridgeChatProtoBuf.UserEvent
 											.parseFrom(socket.getInputStream())
 											.getChatMessage(),
@@ -68,7 +87,7 @@ public class BridgeChat implements BridgeService {
 		try {
 			BridgeChatProtoBuf.UserEvent
 					.newBuilder()
-					.setUsername(message.getSender().toString())
+					.setUsername(message.getOrigin().toString())
 					.setChatMessage(
 							message.toComplexString(getSupportedMessageFormats()))
 					.build().writeTo(socket.getOutputStream());
@@ -89,18 +108,8 @@ public class BridgeChat implements BridgeService {
 	}
 
 	@Override
-	public void addEndpoint(Endpoint endpoint) {
-		this.endpoint = endpoint;
-	}
-
-	@Override
 	public MessageFormat[] getSupportedMessageFormats() {
 		return supportedMessageFormats;
-	}
-	
-	@Override
-	public void interpretCommand(Message message) {
-		message.getSender().sendOperatorMessage(getClass().getSimpleName() + ": No supported Protocol options");
 	}
 	
 

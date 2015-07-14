@@ -5,10 +5,13 @@
  */
 package bridgempp;
 
-import org.apache.commons.configuration.ConfigurationException;
+import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
+import bridgempp.storage.PersistanceManager;
 
-import java.util.ArrayList;
-import java.util.logging.Level;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  *
@@ -16,7 +19,7 @@ import java.util.logging.Level;
  */
 public class GroupManager {
 
-    private static ArrayList<Group> groups = new ArrayList<>();
+    private static Collection<Group> groups;
 
     //Create an empty new group and add it to the list of Groups
     public static Group newGroup() {
@@ -33,82 +36,69 @@ public class GroupManager {
 
     //Find Group, finds the First Group with name IGNORES CASE!
     public static Group findGroup(String name) {
-        for (int i = 0; i < groups.size(); i++) {
-            String groupname = groups.get(i).getName();
-            if (groupname != null && groupname.equalsIgnoreCase(name)) {
-                return groups.get(i);
+    	Iterator<Group> iterator = groups.iterator();
+        while(iterator.hasNext())
+        {
+        	Group group = iterator.next();
+            if (group.getName().equalsIgnoreCase(name)) {
+                return group;
             }
         }
         return null;
     }
 
-    public static void sendMessageToAllSubscribedGroups(Message message) {
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).hasEndpoint(message.getSender())) {
-                groups.get(i).sendMessage(message);
-            }
-        }
+    public static void sendMessageToAllSubscribedGroups(final Message message) {
+        groups.forEach(new Consumer<Group>() {
+
+			@Override
+			public void accept(Group group)
+			{
+	            if (group.hasEndpoint(message.getOrigin())) {
+	                group.sendMessage(message);
+	            }
+			}
+		});
     }
 
-    public static void sendMessageToAllSubscribedGroupsWithoutLoopback(Message message) {
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).hasEndpoint(message.getSender())) {
-                groups.get(i).sendMessageWithoutLoopback(message);
-            }
-        }
-    }
+    public static void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
+        groups.forEach(new Consumer<Group>() {
 
-    //Load all groups from File
-    public static void loadAllGroups() {
-        ShadowManager.log(Level.INFO, "Loading all groups...");
-
-        int numGroups = ConfigurationManager.groupConfiguration.getRoot().getChild(0).getChildrenCount();
-        for (int g = 0; g < numGroups; g++) {
-            Group group = new Group();
-            group.setName(ConfigurationManager.groupConfiguration.getString("groups.group(" + g + ").name"));
-            int numEndpoints = ConfigurationManager.groupConfiguration.getRoot().getChild(0).getChild(g).getChildrenCount() - 1;
-            for (int e = 0; e < numEndpoints; e++) {
-                Endpoint endpoint = Endpoint.readEndpoint(ConfigurationManager.groupConfiguration, "groups.group(" + g + ").endpoint(" + e + ").");
-                endpoint.getService().addEndpoint(endpoint);
-                group.addEndpoint(endpoint);
-            }
-            groups.add(group);
-            ShadowManager.log(Level.INFO, "Loaded Group: " + group.getName());
-        }
-        ShadowManager.log(Level.INFO, "Loaded all groups");
-    }
-
-    //Save all groups to File
-    public static void saveAllGroups() {
-        ShadowManager.log(Level.INFO, "Saving all groups...");
-        try {
-            ConfigurationManager.groupConfiguration.clear();
-            for (int g = 0; g < groups.size(); g++) {
-                Group group = groups.get(g);
-                ConfigurationManager.groupConfiguration.addProperty("groups.group(-1).name", group.getName());
-                for (int e = 0; e < group.getEndpoints().size(); e++) {
-                    Endpoint.writeEndpoint(group.getEndpoints().get(e), ConfigurationManager.groupConfiguration, "groups.group.");
-                }
-                ShadowManager.log(Level.INFO, "Saved Group: " + group);
-            }
-            ConfigurationManager.groupConfiguration.save();
-        } catch (ConfigurationException ex) {
-            ShadowManager.log(Level.SEVERE, "Error while saving all XML Configurations to File", ex);
-        }
-        ShadowManager.log(Level.INFO, "Saved all groups");
+			@Override
+			public void accept(Group group)
+			{
+	            if (group.hasEndpoint(message.getOrigin())) {
+	                group.sendMessageWithoutLoopback(message);
+	            }
+			}
+		});
     }
 
     public static String listGroups() {
         String listGroups = "";
-        for (int i = 0; i < groups.size(); i++) {
-            listGroups += "Group: " + groups.get(i).getName() + "\n" + groups.get(i).toString();
+        Iterator<Group> iterator = groups.iterator();
+        while(iterator.hasNext())
+        {
+        	Group group = iterator.next();
+            listGroups += "Group: " + group.getName() + "\n" + group.toString();
         }
         return listGroups;
     }
 
     public static void removeEndpointFromAllGroups(Endpoint endpoint) {
-        for (int i = 0; i < groups.size(); i++) {
-            groups.get(i).removeEndpoint(endpoint);
+        Iterator<Group> iterator = groups.iterator();
+        while(iterator.hasNext())
+        {
+        	iterator.next().removeEndpoint(endpoint);
         }
     }
+
+	public static void loadAllGroups()
+	{
+		groups = PersistanceManager.getPersistanceManager().loadGroups();
+	}
+
+	public static void saveAllGroups()
+	{
+		PersistanceManager.getPersistanceManager().saveGroups(groups);
+	}
 }
