@@ -76,11 +76,11 @@ public class DataManager
 	
 	private static String getEndpointIdentifier(String identifier, BridgeService service)
 	{
-		return identifier + "@" + service.getName();
+		return identifier /*+ "@" + service.getName()*/;
 	}
 
 	private static String getUserIdentifier(String identifier, BridgeService service)
 	{
-		return identifier + "@" + service.getName();
+		return identifier /*+ "@" + service.getName()*/;
 	}
 }
