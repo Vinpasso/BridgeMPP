@@ -139,7 +139,9 @@ public class Message {
     }
 
     public String toSimpleString(MessageFormat... messageFormats) {
-        return ((getOrigin() != null)?getOrigin().toString():"Unknown") + ": " + getMessage(messageFormats);
+        String messageSender = (getSender() != null)?getSender().toString():null;
+        String messageOrigin = (getOrigin() != null)?getOrigin().toString():null;
+		return (messageSender!=null)?messageSender:messageOrigin + ": " + getMessage(messageFormats);
     }
 
     public String toComplexString(MessageFormat... messageFormats) {

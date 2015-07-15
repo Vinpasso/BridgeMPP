@@ -21,7 +21,7 @@ import bridgempp.messageformat.MessageFormat;
 class WhatsappMessageListener implements Runnable {
 
 	private static final Pattern REGEX_MESSAGE = Pattern
-			.compile("\\[([^\\/]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)");
+			.compile("\\[([\\d]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)");
 	/**
 	 * 
 	 */

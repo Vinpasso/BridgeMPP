@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,6 +125,10 @@ public class XMPPService extends BridgeService {
 			});
 		} catch (XMPPException | SmackException | IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
+		}
+		if(endpoints == null)
+		{
+			endpoints = new LinkedList<Endpoint>();
 		}
 		Iterator<Endpoint> iterator = endpoints.iterator();
 		while(iterator.hasNext())
