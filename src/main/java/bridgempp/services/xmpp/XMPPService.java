@@ -167,6 +167,7 @@ public class XMPPService extends BridgeService {
 	}
 
 	public void addEndpoint(Endpoint endpoint) {
+		ShadowManager.log(Level.INFO, "Loading Endpoint: " + endpoint.toString());
 		if (endpoint.getUsers().size() <= 1) {
 			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(this, endpoint);
 			listener.chat.addMessageListener(listener);
@@ -174,6 +175,7 @@ public class XMPPService extends BridgeService {
 			XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(this, endpoint);
 			listener.multiUserChat.addMessageListener(listener);
 		}
+		ShadowManager.log(Level.INFO, "Loaded Endpoint: " + endpoint.toString());
 	}
 
 	@Override

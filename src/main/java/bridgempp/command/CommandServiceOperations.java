@@ -1,14 +1,21 @@
 package bridgempp.command;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import bridgempp.BridgeService;
+import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.ServiceManager;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
+import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
+import bridgempp.data.User;
+import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.BridgeChat;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
@@ -138,5 +145,56 @@ public class CommandServiceOperations
 		service.configure(appid, apikey, accesstoken);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
+	}
+	
+	@CommandName("!injectendpoint: Load a endpoint for given Service")
+	@CommandTrigger("!injectendpoint")
+	@HelpTopic("Load a new endpoint for a given Service. Requires SERVICE_ID and ENDPOINT_ID.")
+	@RequiredPermission(Permission.INJECT_ENDPOINT)
+	public static String injectEndpoint(int serviceID, String endpointID)
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		ShadowManager.log(Level.WARNING, "Injecting Endpoint: " + service.toString() + " new Endpoint: " + endpointID);
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpointID, service);
+		return "Injected endpoint: " + endpoint.toString(); 
+	}
+	
+	@CommandName("!remotesendmessage: Send a message from a specified endpoint")
+	@CommandTrigger("!remotesendmessage")
+	@HelpTopic("Remotely send a message as if it were comming from the specified endpoint. Requires SERVICE_ID and ENDPOINT_ID and USER_ID and Message.")
+	@RequiredPermission(Permission.REMOTE_SEND_MESSAGE)
+	public static String remoteSendMessage(int serviceID, String endpointID, String userID, String message)
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		ShadowManager.log(Level.WARNING, "Remote sending Message from: " + service.toString() + " endpoint: " + endpointID + " message: " + message);
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpointID, service);
+		User user = DataManager.getOrNewUserForIdentifier(userID, service, endpoint);
+		CommandInterpreter.processMessage(new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT));
+		return "Remotely sent message: " + message; 
+	}
+	
+	@CommandName("!reloadservice: Reload a Service")
+	@CommandTrigger("!reloadservice")
+	@HelpTopic("Reload a Service by disconnecting and reconnecting it. Requires SERVICE_ID.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String reloadService(int serviceID)
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		ShadowManager.log(Level.WARNING, "Reloading Service: " + service.toString());
+		service.disconnect();
+		service.connect();
+		return "Reloaded Service: " + service.toString(); 
 	}
 }

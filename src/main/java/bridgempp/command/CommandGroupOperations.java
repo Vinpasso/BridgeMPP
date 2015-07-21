@@ -7,15 +7,17 @@ package bridgempp.command;
 
 import java.util.logging.Level;
 
+import bridgempp.BridgeService;
 import bridgempp.GroupManager;
 import bridgempp.Message;
-import bridgempp.PermissionsManager;
+import bridgempp.ServiceManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.messageformat.MessageFormat;
@@ -59,6 +61,30 @@ public class CommandGroupOperations
 		} else
 		{
 			message.getOrigin().sendOperatorMessage("Error: Group not found");
+		}
+	}
+	
+	@CommandName("!remotesubscribegroup: Remote join a group")
+	@CommandTrigger("!remotesubscribegroup")
+	@HelpTopic("Subscribe the specified Endpoint to the specified Group with name. Requires SERVICE_ID, ENDPOINT_ID, USER_ID, Group_Names")
+	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
+	public static String cmdRemoteSubscribeGroup(int serviceID, String endpoint_id, String user_id, String name, Message message)
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpoint_id, service);
+		DataManager.getOrNewUserForIdentifier(user_id, service, endpoint);
+		Group group = subscribeGroup(name, endpoint);
+		if (group != null)
+		{
+			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
+			return "Group has been subscribed";
+		} else
+		{
+			return "Error: Group not found";
 		}
 	}
 
