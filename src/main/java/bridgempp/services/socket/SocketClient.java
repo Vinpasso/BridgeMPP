@@ -46,6 +46,10 @@ class SocketClient implements Runnable {
 			if (initialProtocol >= 0x30) {
 				initialProtocol -= 0x30;
 			}
+			if(initialProtocol >= ProtoCarry.values().length)
+			{
+				throw new IOException("Unknown Protocol");
+			}
 			protoCarry = ProtoCarry.values()[initialProtocol];
 			BufferedReader bufferedReader = null;
 			if (protoCarry == ProtoCarry.ProtoBuf) {

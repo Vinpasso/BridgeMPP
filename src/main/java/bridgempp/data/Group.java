@@ -12,8 +12,6 @@ import java.util.logging.Level;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -32,10 +30,6 @@ public class Group
 {
 
 	@Id
-	@Column(name = "GROUP_ID", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long groupID;
-
 	@Column(name = "GROUP_NAME", nullable = false, length = 50)
 	private String name;
 
@@ -117,21 +111,21 @@ public class Group
 		}
 	}
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
 	public String getName()
 	{
 		return name;
 	}
 
 	// Initialize the group endpoints
-	public Group()
+	public Group(String name)
 	{
 		endpoints = new ArrayList<>();
-		name = "NewGroup";
+		this.name = name;
+	}
+	
+	//JPA Constructor
+	protected Group()
+	{
 	}
 
 	public boolean hasEndpoint(Endpoint endpoint)

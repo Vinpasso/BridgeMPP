@@ -6,14 +6,11 @@
 package bridgempp;
 
 import bridgempp.data.AccessKey;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
-import bridgempp.storage.PersistanceManager;
-
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 /**
  *
@@ -22,16 +19,13 @@ import java.util.logging.Level;
 public class PermissionsManager
 {
 
-	private static Collection<AccessKey> keys;
-
 	public static String generateKey(int permissions, boolean useOnce)
 	{
 		SecureRandom random = new SecureRandom();
-		byte[] byteKey = new byte[32];
+		byte[] byteKey = new byte[42];
 		random.nextBytes(byteKey);
 		String key = Base64.getEncoder().encodeToString(byteKey);
-		keys.add(new AccessKey(key, permissions, useOnce));
-		saveAccessKeys();
+		DataManager.createAccessKey(new AccessKey(key, permissions, useOnce));
 		return key;
 	}
 
@@ -52,37 +46,17 @@ public class PermissionsManager
 
 	private static AccessKey getAccessKey(String key)
 	{
-		return PersistanceManager.getPersistanceManager().getAccessKeyForIdentifier(key);
+		return DataManager.getAccessKey(key);
 	}
 
 	private static void removeAccessKey(AccessKey key)
 	{
-		keys.remove(key);
-		PersistanceManager.getPersistanceManager().removeAccessKey(key);
+		DataManager.removeAccessKey(key);
 	}
 
 	public static boolean hasPermissions(Endpoint endpoint, int permissions)
 	{
 		return (endpoint.getPermissions() & permissions) == permissions;
-	}
-
-	public static void loadAccessKeys()
-	{
-		ShadowManager.log(Level.INFO, "Loading all access keys...");
-		keys = PersistanceManager.getPersistanceManager().loadAccessKeys();
-		Iterator<AccessKey> iterator = keys.iterator();
-		while (iterator.hasNext())
-		{
-			ShadowManager.log(Level.INFO, "Loaded Access Key for Permissions: " + iterator.next().getPermissions());
-		}
-		ShadowManager.log(Level.INFO, "Loaded all access keys...");
-	}
-
-	public static void saveAccessKeys()
-	{
-		ShadowManager.log(Level.INFO, "Saving all access keys...");
-		PersistanceManager.getPersistanceManager().saveAccessKeys(keys);
-		ShadowManager.log(Level.INFO, "Saved all access keys...");
 	}
 
 	public static void removeKey(String keyName)
@@ -93,7 +67,7 @@ public class PermissionsManager
 	public static String listKeys()
 	{
 		String list = "";
-		Iterator<AccessKey> iterator = keys.iterator();
+		Iterator<AccessKey> iterator = DataManager.getAllAccessKeys().iterator();
 		while (iterator.hasNext())
 		{
 			AccessKey key = iterator.next();
@@ -105,7 +79,7 @@ public class PermissionsManager
 	public static enum Permission
 	{
 
-		DIRECT_MESSAGE, SUBSCRIBE_UNSUBSCRIBE_GROUP, CREATE_REMOVE_GROUP, LIST_MEMBERS, LIST_GROUPS, IMPORT_ALIAS, ADD_REMOVE_SHADOW, LIST_SHADOW, EXIT, GENERATE_ONETIME_KEYS, GENERATE_PERMANENT_KEYS, REMOVE_KEYS, LIST_KEYS, LIST_SERVICES, ADD_REMOVE_SERVICE, INJECT_ENDPOINT, REMOTE_SEND_MESSAGE
+		DIRECT_MESSAGE, SUBSCRIBE_UNSUBSCRIBE_GROUP, CREATE_REMOVE_GROUP, LIST_MEMBERS, LIST_GROUPS, IMPORT_ALIAS, ADD_REMOVE_SHADOW, LIST_SHADOW, EXIT, GENERATE_ONETIME_KEYS, GENERATE_PERMANENT_KEYS, REMOVE_KEYS, LIST_KEYS, LIST_SERVICES, ADD_REMOVE_SERVICE, INJECT_ENDPOINT, REMOTE_SEND_MESSAGE, LIST_ENDPOINTS
 	}
 
 	public static class Permissions

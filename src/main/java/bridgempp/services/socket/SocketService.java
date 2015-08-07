@@ -82,8 +82,9 @@ public class SocketService extends BridgeService
 	{
 		try
 		{
-			OutputStream out = connectedSockets.get(Integer.parseInt(message.getDestination().getIdentifier())).socket.getOutputStream();
-			ProtoCarry protoCarry = connectedSockets.get(Integer.parseInt(message.getDestination().getIdentifier())).protoCarry;
+			SocketClient socketClient = connectedSockets.get(message.getDestination().getIdentifier());
+			OutputStream out = socketClient.socket.getOutputStream();
+			ProtoCarry protoCarry = socketClient.protoCarry;
 			switch (protoCarry)
 			{
 				case Plain_Text:

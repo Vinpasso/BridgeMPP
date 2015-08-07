@@ -46,7 +46,7 @@ public class Endpoint {
     @ManyToMany(mappedBy = "endpoints")
     private Collection<Group> groups;
     
-    @Version
+	@Version
     @Column(name = "VERSION", nullable = false)
     private long version;
     
@@ -130,6 +130,10 @@ public class Endpoint {
 		{
 			users.add(user);
 		}
+	}
+	
+    public Collection<Group> getGroups() {
+		return groups;
 	}
 
 }

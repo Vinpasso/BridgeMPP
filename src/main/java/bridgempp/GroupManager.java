@@ -5,13 +5,10 @@
  */
 package bridgempp;
 
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
-import bridgempp.storage.PersistanceManager;
-
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 /**
  *
@@ -19,63 +16,43 @@ import java.util.function.Consumer;
  */
 public class GroupManager {
 
-    private static Collection<Group> groups;
+    //private static Collection<Group> groups;
 
     //Create an empty new group and add it to the list of Groups
-    public static Group newGroup() {
-        Group group = new Group();
-        groups.add(group);
-        return group;
+    public static Group newGroup(String name) {
+        return DataManager.createGroup(name);
     }
 
     //Remove Group and all its Users
     public static void removeGroup(Group group) {
         group.removeAllEndpoints();
-        groups.remove(group);
+        DataManager.removeGroup(group);
     }
 
     //Find Group, finds the First Group with name IGNORES CASE!
     public static Group findGroup(String name) {
-    	Iterator<Group> iterator = groups.iterator();
-        while(iterator.hasNext())
-        {
-        	Group group = iterator.next();
-            if (group.getName().equalsIgnoreCase(name)) {
-                return group;
-            }
-        }
-        return null;
+        return DataManager.getGroup(name);
     }
 
     public static void sendMessageToAllSubscribedGroups(final Message message) {
-        groups.forEach(new Consumer<Group>() {
-
-			@Override
-			public void accept(Group group)
-			{
-	            if (group.hasEndpoint(message.getOrigin())) {
-	                group.sendMessage(message);
-	            }
-			}
-		});
+        Endpoint endpoint = message.getOrigin();
+        for(Group group : endpoint.getGroups())
+        {
+        	group.sendMessage(message);
+        }
     }
 
     public static void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
-        groups.forEach(new Consumer<Group>() {
-
-			@Override
-			public void accept(Group group)
-			{
-	            if (group.hasEndpoint(message.getOrigin())) {
-	                group.sendMessageWithoutLoopback(message);
-	            }
-			}
-		});
+        Endpoint endpoint = message.getOrigin();
+        for(Group group : endpoint.getGroups())
+        {
+        	group.sendMessageWithoutLoopback(message);
+        }
     }
 
     public static String listGroups() {
         String listGroups = "";
-        Iterator<Group> iterator = groups.iterator();
+        Iterator<Group> iterator = DataManager.getAllGroups().iterator();
         while(iterator.hasNext())
         {
         	Group group = iterator.next();
@@ -85,20 +62,9 @@ public class GroupManager {
     }
 
     public static void removeEndpointFromAllGroups(Endpoint endpoint) {
-        Iterator<Group> iterator = groups.iterator();
-        while(iterator.hasNext())
+        for(Group group : endpoint.getGroups())
         {
-        	iterator.next().removeEndpoint(endpoint);
+        	group.removeEndpoint(endpoint);
         }
     }
-
-	public static void loadAllGroups()
-	{
-		groups = PersistanceManager.getPersistanceManager().loadGroups();
-	}
-
-	public static void saveAllGroups()
-	{
-		PersistanceManager.getPersistanceManager().saveGroups(groups);
-	}
 }

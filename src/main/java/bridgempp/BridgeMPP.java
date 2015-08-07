@@ -52,9 +52,7 @@ public class BridgeMPP
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
 		addShutdownHook();
 		CommandInterpreter.loadCommands();
-		PermissionsManager.loadAccessKeys();
 		ServiceManager.loadAllServices();
-		GroupManager.loadAllGroups();
 		StatisticsManager.loadStatistics();
 		allClear();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
@@ -111,8 +109,6 @@ public class BridgeMPP
 		lockdown();
 		try
 		{
-			PermissionsManager.saveAccessKeys();
-			GroupManager.saveAllGroups();
 			ServiceManager.unloadAllServices();
 			StatisticsManager.saveStatistics();
 			PersistanceManager.getPersistanceManager().shutdown();

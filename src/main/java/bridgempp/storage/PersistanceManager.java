@@ -8,7 +8,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import bridgempp.BridgeService;
-import bridgempp.data.AccessKey;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
@@ -103,24 +102,9 @@ public class PersistanceManager
 		updateState(statisticStore);
 	}
 	
-	public void saveAccessKeys(Collection<AccessKey> accessKeys)
-	{
-		updateState(accessKeys.toArray());
-	}
-	
-	public void removeAccessKey(AccessKey key)
-	{
-		removeState(key);
-	}
-	
 	public Collection<BridgeService> getServiceConfigurations()
 	{
 		return getQuery(BridgeService.class);
-	}
-	
-	public AccessKey getAccessKeyForIdentifier(String key)
-	{
-		return getFromPrimaryKey(AccessKey.class, key);
 	}
 	
 	public User getUserForIdentifier(String identifier)
@@ -133,18 +117,15 @@ public class PersistanceManager
 		return getFromPrimaryKey(Endpoint.class, identifier);
 	}
 	
-	public Collection<Group> loadGroups()
-	{
+	public Collection<Endpoint> getEndpoints() {
+		return getQuery(Endpoint.class);
+	}
+
+	public Group getGroup(String name) {
+		return getFromPrimaryKey(Group.class, name);
+	}
+
+	public Collection<Group> getGroups() {
 		return getQuery(Group.class);
-	}
-
-	public void saveGroups(Collection<Group> groups)
-	{
-		updateState(groups.toArray());
-	}
-
-	public Collection<AccessKey> loadAccessKeys()
-	{
-		return getQuery(AccessKey.class);
 	}
 }

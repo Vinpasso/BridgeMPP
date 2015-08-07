@@ -1,5 +1,7 @@
 package bridgempp.data;
 
+import java.util.Collection;
+
 import bridgempp.BridgeService;
 import bridgempp.storage.PersistanceManager;
 
@@ -82,5 +84,43 @@ public class DataManager
 	private static String getUserIdentifier(String identifier, BridgeService service)
 	{
 		return identifier /*+ "@" + service.getName()*/;
+	}
+
+	public static Collection<Endpoint> getAllEndpoints() {
+		return PersistanceManager.getPersistanceManager().getEndpoints();
+	}
+
+	public static Group createGroup(String name) {
+		Group group = new Group(name);
+		PersistanceManager.getPersistanceManager().updateState(group);
+		return group;
+	}
+
+	public static void removeGroup(Group group) {
+		PersistanceManager.getPersistanceManager().removeState(group);
+	}
+
+	public static Group getGroup(String name) {
+		return PersistanceManager.getPersistanceManager().getGroup(name);
+	}
+
+	public static Collection<Group> getAllGroups() {
+		return PersistanceManager.getPersistanceManager().getGroups();
+	}
+
+	public static void createAccessKey(AccessKey accessKey) {
+		PersistanceManager.getPersistanceManager().updateState(accessKey);
+	}
+
+	public static AccessKey getAccessKey(String key) {
+		return PersistanceManager.getPersistanceManager().getFromPrimaryKey(AccessKey.class, key);
+	}
+
+	public static void removeAccessKey(AccessKey key) {
+		PersistanceManager.getPersistanceManager().removeState(key);
+	}
+
+	public static Collection<AccessKey> getAllAccessKeys() {
+		return PersistanceManager.getPersistanceManager().getQuery(AccessKey.class);
 	}
 }

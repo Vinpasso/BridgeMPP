@@ -166,8 +166,7 @@ public class CommandGroupOperations
 		{
 			return null;
 		}
-		Group group = GroupManager.newGroup();
-		group.setName(name);
+		Group group = GroupManager.newGroup(name);
 		return group;
 	}
 
