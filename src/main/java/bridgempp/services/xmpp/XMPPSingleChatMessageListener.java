@@ -36,7 +36,7 @@ class XMPPSingleChatMessageListener implements XMPPMessageListener, MessageListe
 		this.xmppService = xmppService;
 		this.chat = chat;
 		endpoint = DataManager.getOrNewEndpointForIdentifier(chat.getParticipant(), xmppService);
-		user = DataManager.getOrNewUserForIdentifier(chat.getParticipant(), xmppService, endpoint);
+		user = DataManager.getOrNewUserForIdentifier(chat.getParticipant(), endpoint);
 		xmppService.activeChats.put(endpoint.getIdentifier(), this);
 	}
 

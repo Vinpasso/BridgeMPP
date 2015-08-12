@@ -27,9 +27,9 @@ public class DataManager
 	 * @param identifier The Primary Key to find the User from
 	 * @return The User found from the Primary Key
 	 */
-	public static User getUserForIdentifier(String identifier, BridgeService service)
+	public static User getUserForIdentifier(String identifier)
 	{
-		return PersistanceManager.getPersistanceManager().getUserForIdentifier(getUserIdentifier(identifier, service));
+		return PersistanceManager.getPersistanceManager().getUserForIdentifier(identifier);
 	}
 	
 	/**
@@ -37,12 +37,12 @@ public class DataManager
 	 * @param identifier The Primary Key to find the User from
 	 * @return The User found from the Primary Key, or a new User
 	 */
-	public static User getOrNewUserForIdentifier(String identifier, BridgeService service, Endpoint... endpoints)
+	public static User getOrNewUserForIdentifier(String identifier, Endpoint... endpoints)
 	{
-		User user = getUserForIdentifier(identifier, service);
+		User user = getUserForIdentifier(identifier);
 		if(user == null)
 		{
-			user = registerUser(getUserIdentifier(identifier, service));
+			user = registerUser(identifier);
 		}
 		for(Endpoint endpoint : endpoints)
 		{
@@ -56,9 +56,9 @@ public class DataManager
 	 * @param identifier The Primary Key to find the Endpoint from
 	 * @return The Endpoint found from the Primary Key
 	 */
-	public static Endpoint getEndpointForIdentifier(String identifier, BridgeService service)
+	public static Endpoint getEndpointForIdentifier(String identifier)
 	{
-		return PersistanceManager.getPersistanceManager().getEndpointForIdentifier(getEndpointIdentifier(identifier, service));
+		return PersistanceManager.getPersistanceManager().getEndpointForIdentifier(identifier);
 	}
 	
 	/**
@@ -68,22 +68,12 @@ public class DataManager
 	 */
 	public static Endpoint getOrNewEndpointForIdentifier(String identifier, BridgeService service)
 	{
-		Endpoint endpoint = getEndpointForIdentifier(identifier, service);
+		Endpoint endpoint = getEndpointForIdentifier(identifier);
 		if(endpoint == null)
 		{
-			endpoint = registerEndpoint(service, getEndpointIdentifier(identifier, service));
+			endpoint = registerEndpoint(service, identifier);
 		}
 		return endpoint;
-	}
-	
-	private static String getEndpointIdentifier(String identifier, BridgeService service)
-	{
-		return identifier /*+ "@" + service.getName()*/;
-	}
-
-	private static String getUserIdentifier(String identifier, BridgeService service)
-	{
-		return identifier /*+ "@" + service.getName()*/;
 	}
 
 	public static Collection<Endpoint> getAllEndpoints() {

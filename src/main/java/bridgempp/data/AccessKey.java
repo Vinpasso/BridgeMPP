@@ -8,7 +8,7 @@ import javax.persistence.Id;
 @Entity(name = "ACCESS_TOKEN")
 public class AccessKey {
     @Id
-    @Column(name = "TOKEN", nullable = false, length = 50)
+    @Column(name = "TOKEN", nullable = false, length = 100)
     private String key;
     @Column(name = "PERMISSIONS", nullable = false)
     private int permissions;

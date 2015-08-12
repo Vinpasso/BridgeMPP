@@ -237,7 +237,7 @@ public class MailService extends BridgeService
 			{
 				String sender = message.getFrom()[0].toString();
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(sender, MailService.this);
-				User user = DataManager.getOrNewUserForIdentifier(sender, MailService.this, endpoint);
+				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
 				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, message.getContent().toString(), getSupportedMessageFormats()[0]);
 				CommandInterpreter.processMessage(bMessage);

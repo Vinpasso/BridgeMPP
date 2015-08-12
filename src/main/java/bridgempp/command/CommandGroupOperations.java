@@ -76,7 +76,7 @@ public class CommandGroupOperations
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpoint_id, service);
-		DataManager.getOrNewUserForIdentifier(user_id, service, endpoint);
+		DataManager.getOrNewUserForIdentifier(user_id, endpoint);
 		Group group = subscribeGroup(name, endpoint);
 		if (group != null)
 		{

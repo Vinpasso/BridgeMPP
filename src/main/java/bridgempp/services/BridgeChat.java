@@ -43,7 +43,7 @@ public class BridgeChat extends BridgeService {
 	@Override
 	public void connect() {
 		endpoint = DataManager.getOrNewEndpointForIdentifier("BridgeChat", this);
-		user = DataManager.getOrNewUserForIdentifier("BridgeChatUser", this, endpoint);
+		user = DataManager.getOrNewUserForIdentifier("BridgeChatUser", endpoint);
 		try {
 			socket = new Socket(host, port);
 			socket.getOutputStream().write(

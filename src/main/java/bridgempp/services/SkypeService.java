@@ -102,7 +102,7 @@ public class SkypeService extends BridgeService
 			String message = receivedChatMessage.getContent();
 			String sender = receivedChatMessage.getSenderDisplayName();
 			Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(chatID, SkypeService.this);
-			User user = DataManager.getOrNewUserForIdentifier(sender, SkypeService.this, endpoint);
+			User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 			Message bMessage = new Message(user, endpoint, message, getSupportedMessageFormats()[0]);
 			CommandInterpreter.processMessage(bMessage);
 		}

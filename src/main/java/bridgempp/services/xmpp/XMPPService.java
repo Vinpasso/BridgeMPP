@@ -8,6 +8,7 @@ package bridgempp.services.xmpp;
 import bridgempp.BridgeService;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -168,7 +170,7 @@ public class XMPPService extends BridgeService {
 
 	public void addEndpoint(Endpoint endpoint) {
 		ShadowManager.log(Level.INFO, "Loading Endpoint: " + endpoint.toString());
-		if (endpoint.getUsers().size() <= 1) {
+		if (isSingleUserEndpoint(endpoint)) {
 			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(this, endpoint);
 			listener.chat.addMessageListener(listener);
 		} else {
@@ -176,6 +178,12 @@ public class XMPPService extends BridgeService {
 			listener.multiUserChat.addMessageListener(listener);
 		}
 		ShadowManager.log(Level.INFO, "Loaded Endpoint: " + endpoint.toString());
+	}
+
+	private boolean isSingleUserEndpoint(Endpoint endpoint) {
+		//Check if a user with Identical ID to Endpoint exists
+		User user = DataManager.getUserForIdentifier(endpoint.getIdentifier());
+		return user != null || endpoint.getUsers().contains(user);
 	}
 
 	@Override

@@ -83,9 +83,9 @@ class XMPPMultiUserMessageListener implements XMPPMessageListener, PacketListene
 		String jid = multiUserChat.getOccupant(message.getFrom()).getJid();
 		User user;
 		if (jid != null) {
-			user = DataManager.getOrNewUserForIdentifier(jid.substring(0, jid.indexOf("/")), xmppService, endpoint);
+			user = DataManager.getOrNewUserForIdentifier(jid.substring(0, jid.indexOf("/")), endpoint);
 		} else {
-			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), xmppService, endpoint);
+			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), endpoint);
 		}
 		xmppService.interpretXMPPMessage(user, endpoint, message);
 	}

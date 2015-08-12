@@ -47,7 +47,7 @@ class ServerListener implements Runnable {
 
 					Socket socket = socketService.serverSocket.accept();
 					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(randomIdentifier, socketService);
-					User user = DataManager.getOrNewUserForIdentifier(randomIdentifier, socketService, endpoint);
+					User user = DataManager.getOrNewUserForIdentifier(randomIdentifier, endpoint);
 					SocketClient socketClient = new SocketClient(socketService, socket, user, endpoint);
 					socketClient.randomIdentifier = randomIdentifier;
 					socketService.connectedSockets.put(randomIdentifier, socketClient);

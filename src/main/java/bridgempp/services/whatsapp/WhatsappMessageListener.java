@@ -81,7 +81,7 @@ class WhatsappMessageListener implements Runnable {
 					String group = matcher.group(2);
 					String message = new String(Base64.getDecoder().decode(matcher.group(5)), "UTF-8");
 					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(group, whatsappService);
-					User user = DataManager.getOrNewUserForIdentifier(author, whatsappService, endpoint);
+					User user = DataManager.getOrNewUserForIdentifier(author, endpoint);
 					Message parsedMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
 					CommandInterpreter.processMessage(parsedMessage);
 				}

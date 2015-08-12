@@ -25,16 +25,16 @@ import bridgempp.ShadowManager;
  *
  * @author Vinpasso
  */
-@Entity(name = "Channel")
+@Entity(name = "CHANNEL")
 public class Group
 {
 
 	@Id
-	@Column(name = "GROUP_NAME", nullable = false, length = 50)
+	@Column(name = "CHANNEL_NAME", nullable = false, length = 50)
 	private String name;
 
 	@ManyToMany
-	@JoinTable(name = "SUBSCRIPTIONS", joinColumns = @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "IDENTIFIER", referencedColumnName = "IDENTIFIER"))
+	@JoinTable(name = "SUBSCRIPTIONS", joinColumns = @JoinColumn(name = "CHANNEL_NAME", referencedColumnName = "CHANNEL_NAME"), inverseJoinColumns = @JoinColumn(name = "IDENTIFIER", referencedColumnName = "IDENTIFIER"))
 	private Collection<Endpoint> endpoints;
 
 	@Version

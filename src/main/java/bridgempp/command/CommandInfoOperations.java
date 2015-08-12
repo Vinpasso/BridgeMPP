@@ -33,16 +33,11 @@ public class CommandInfoOperations {
 	
 	@CommandName("!getendpointusers: List all Users in an Endpoint")
 	@CommandTrigger("!getendpointusers")
-	@HelpTopic("Lists all registered Users for an Endpoint in the Database. Requires Endpoint Identifier and Service Identifier")
+	@HelpTopic("Lists all registered Users for an Endpoint in the Database. Requires Endpoint Identifier")
 	@RequiredPermission(Permission.LIST_ENDPOINTS)
-	public static String cmdGetEndpointUsers(Message message, String identifier, int serviceIdentifier)
+	public static String cmdGetEndpointUsers(Message message, String identifier)
 	{
-		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceIdentifier);
-		if(service == null)
-		{
-			return "Service not found!";
-		}
-		Endpoint endpoint = DataManager.getEndpointForIdentifier(identifier, service);
+		Endpoint endpoint = DataManager.getEndpointForIdentifier(identifier);
 		if(endpoint == null)
 		{
 			return "Endpoint not found!";

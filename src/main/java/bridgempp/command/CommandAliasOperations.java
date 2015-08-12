@@ -45,7 +45,7 @@ public class CommandAliasOperations
 	@RequiredPermission(Permission.IMPORT_ALIAS)
 	public static void cmdImportAliasList(Message message, String userID, int service, String alias)
 	{
-		User user = DataManager.getUserForIdentifier(userID, ServiceManager.getServiceByServiceIdentifier(service));
+		User user = DataManager.getUserForIdentifier(userID);
 		if (user == null)
 		{
 			message.getOrigin().sendOperatorMessage("User: " + userID + " not found. Skipping...");

@@ -51,6 +51,10 @@ public class StatisticsManager
 
 	private static void shuttingDown()
 	{
+		if(statisticStore == null)
+		{
+			return;
+		}
 		statisticStore.uptime += System.currentTimeMillis() - statisticStore.lastStartup;
 	}
 

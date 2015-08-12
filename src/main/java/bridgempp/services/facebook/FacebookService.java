@@ -110,7 +110,7 @@ public class FacebookService extends BridgeService
 	{
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(place, this);
 		// TODO: POST: GET ID AS TRACKER?
-		User user = DataManager.getOrNewUserForIdentifier(post.getId(), this, endpoint);
+		User user = DataManager.getOrNewUserForIdentifier(post.getId(), endpoint);
 		String postString = convertMessageToString(post);
 		Message message = new Message(user, endpoint, postString, MessageFormat.PLAIN_TEXT);
 		CommandInterpreter.processMessage(message);
