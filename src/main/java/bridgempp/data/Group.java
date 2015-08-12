@@ -25,7 +25,7 @@ import bridgempp.ShadowManager;
  *
  * @author Vinpasso
  */
-@Entity(name = "GROUP_LIST")
+@Entity(name = "Channel")
 public class Group
 {
 
