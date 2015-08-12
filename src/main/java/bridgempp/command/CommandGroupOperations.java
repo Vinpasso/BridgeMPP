@@ -66,7 +66,7 @@ public class CommandGroupOperations
 	
 	@CommandName("!remotesubscribegroup: Remote join a group")
 	@CommandTrigger("!remotesubscribegroup")
-	@HelpTopic("Subscribe the specified Endpoint to the specified Group with name. Requires SERVICE_ID, ENDPOINT_ID, USER_ID, Group_Names")
+	@HelpTopic("Subscribe the specified Endpoint to the specified Group with name. Requires SERVICE_ID, ENDPOINT_ID, USER_ID, GROUP_NAME")
 	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
 	public static String cmdRemoteSubscribeGroup(int serviceID, String endpoint_id, String user_id, String name, Message message)
 	{
@@ -88,6 +88,31 @@ public class CommandGroupOperations
 		}
 	}
 
+	@CommandName("!remoteunsubscribegroup: Remote join a group")
+	@CommandTrigger("!remoteunsubscribegroup")
+	@HelpTopic("Unsubscribe the specified Endpoint from the specified Group with name. Requires SERVICE_ID, ENDPOINT_ID, USER_ID, GROUP_NAME")
+	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
+	public static String cmdRemoteUnsubscribeGroup(int serviceID, String endpoint_id, String user_id, String name, Message message)
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpoint_id, service);
+		DataManager.getOrNewUserForIdentifier(user_id, endpoint);
+		Group group = unsubscribeGroup(name, endpoint);
+		if (group != null)
+		{
+			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName());
+			return "Group has been unsubscribed";
+		} else
+		{
+			return "Error: Group not found";
+		}
+	}
+
+	
 	@CommandName("!listgroups: List all groups")
 	@CommandTrigger("!listgroups")
 	@HelpTopic("Lists all the groups currently registered on BridgeMPP")

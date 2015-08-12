@@ -8,6 +8,8 @@ package bridgempp;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
+
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -36,7 +38,12 @@ public class GroupManager {
 
     public static void sendMessageToAllSubscribedGroups(final Message message) {
         Endpoint endpoint = message.getOrigin();
-        for(Group group : endpoint.getGroups())
+        Collection<Group> groups = endpoint.getGroups();
+        if(groups == null)
+        {
+        	return;
+        }
+        for(Group group : groups)
         {
         	group.sendMessage(message);
         }
@@ -44,7 +51,12 @@ public class GroupManager {
 
     public static void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
         Endpoint endpoint = message.getOrigin();
-        for(Group group : endpoint.getGroups())
+        Collection<Group> groups = endpoint.getGroups();
+        if(groups == null)
+        {
+        	return;
+        }
+		for(Group group : groups)
         {
         	group.sendMessageWithoutLoopback(message);
         }

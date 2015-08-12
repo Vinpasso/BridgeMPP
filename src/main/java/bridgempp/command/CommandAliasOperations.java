@@ -41,7 +41,7 @@ public class CommandAliasOperations
 
 	@CommandName("!importalias: Import a list of aliases")
 	@CommandTrigger("!importalias")
-	@HelpTopic("Imports a list of aliases to be assigned to their Users. Expectes a list of Type \"user; service; alias\"")
+	@HelpTopic("Imports a list of aliases to be assigned to their Users. Requires USER_IDENTIFIER, SERVICE_IDENTIFIER, NEW_ALIAS")
 	@RequiredPermission(Permission.IMPORT_ALIAS)
 	public static void cmdImportAliasList(Message message, String userID, int service, String alias)
 	{
