@@ -61,6 +61,7 @@ public class CommandInterpreter {
 		ShadowManager.log(Level.INFO, "Loading all Command Classes...");
 		addCommandClass(CommandAliasOperations.class);
 		addCommandClass(CommandGroupOperations.class);
+		addCommandClass(CommandEndpointOperations.class);
 		addCommandClass(CommandPermissionOperations.class);
 		addCommandClass(CommandServerOperations.class);
 		addCommandClass(CommandShadowOperations.class);

@@ -6,6 +6,8 @@
 package bridgempp;
 
 import bridgempp.services.ConsoleService;
+import bridgempp.state.EndpointStateManager;
+import bridgempp.state.NonPersistantEndpointRemover;
 import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
@@ -36,6 +38,10 @@ public class ServiceManager
 		{
 			BridgeService service = iterator.next();
 			ShadowManager.log(Level.INFO, "Loading Service: " + service.getName());
+			if(!service.isPersistent())
+			{
+				EndpointStateManager.addEndpointStateListener(new NonPersistantEndpointRemover());
+			}
 			loadService(service);
 			ShadowManager.log(Level.INFO, "Loaded Service: " + service.getName());
 		}

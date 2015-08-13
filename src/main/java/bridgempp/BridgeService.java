@@ -50,11 +50,7 @@ public abstract class BridgeService {
     public abstract String getName();
     //Check whether this Service is persistent across restarts
     public abstract boolean isPersistent();
-    
-    
-//    //Add Endpoint from Save to list of Endpoints
-//    public void addEndpoint(Endpoint endpoint);
-    
+        
     //Get the Supported Message Encodings by this Endpoint in order of descending priority
     public abstract MessageFormat[] getSupportedMessageFormats();
     

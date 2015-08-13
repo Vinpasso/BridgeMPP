@@ -68,11 +68,4 @@ public class GroupManager {
         }
         return listGroups;
     }
-
-    public static void removeEndpointFromAllGroups(Endpoint endpoint) {
-        for(Group group : endpoint.getGroups())
-        {
-        	group.removeEndpoint(endpoint);
-        }
-    }
 }

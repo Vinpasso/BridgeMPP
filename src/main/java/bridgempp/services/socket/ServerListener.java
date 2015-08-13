@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Random;
 import java.util.logging.Level;
 
 import bridgempp.Message;
@@ -40,17 +39,14 @@ class ServerListener implements Runnable {
 			socketService.serverSocket.setSoTimeout(5000);
 			while (!socketService.pendingShutdown && !socketService.serverSocket.isClosed()) {
 				try {
-					String randomIdentifier;
-					do {
-						randomIdentifier = new Random().nextInt(Integer.MAX_VALUE) + "";
-					} while (socketService.connectedSockets.containsKey(randomIdentifier));
-
 					Socket socket = socketService.serverSocket.accept();
-					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(randomIdentifier, socketService);
-					User user = DataManager.getOrNewUserForIdentifier(randomIdentifier, endpoint);
+					String identifier = socket.getInetAddress().toString() + ":" + socket.getPort();
+
+					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(identifier, socketService);
+					User user = DataManager.getOrNewUserForIdentifier(identifier, endpoint);
 					SocketClient socketClient = new SocketClient(socketService, socket, user, endpoint);
-					socketClient.randomIdentifier = randomIdentifier;
-					socketService.connectedSockets.put(randomIdentifier, socketClient);
+					socketClient.randomIdentifier = identifier;
+					socketService.connectedSockets.put(identifier, socketClient);
 					new Thread(socketClient, "Socket TCP Connection").start();
 				} catch (SocketTimeoutException e) {
 				}

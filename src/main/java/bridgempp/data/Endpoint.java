@@ -56,6 +56,7 @@ public class Endpoint {
     protected Endpoint()
     {
     	users = new ArrayList<>();
+    	groups = new ArrayList<>();
     }
     
     //Create a new Endpoint
@@ -123,18 +124,23 @@ public class Endpoint {
 
 	public void putUser(User user)
 	{
-		if(users == null)
-		{
-			users = new ArrayList<User>();
-		}
 		if(!users.contains(user))
 		{
 			users.add(user);
 		}
 	}
 	
+	public void removeUser(User user)
+	{
+		users.remove(user);
+	}
+	
     public Collection<Group> getGroups() {
 		return groups;
+	}
+
+	public void unsubscribeAllGroups() {
+		groups.clear();
 	}
 
 }

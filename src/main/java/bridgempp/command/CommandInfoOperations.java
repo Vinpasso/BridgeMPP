@@ -2,9 +2,7 @@ package bridgempp.command;
 
 import java.util.Collection;
 
-import bridgempp.BridgeService;
 import bridgempp.Message;
-import bridgempp.ServiceManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;

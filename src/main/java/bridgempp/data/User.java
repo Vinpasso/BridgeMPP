@@ -2,7 +2,6 @@ package bridgempp.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -96,4 +95,10 @@ public class User
 	public String getInfo() {
 		return identifier + ": " + name + ": " + permissions;
 	}
+	
+	public void removeAllEndpoints()
+	{
+		endpoints.clear();
+	}
+	
 }
