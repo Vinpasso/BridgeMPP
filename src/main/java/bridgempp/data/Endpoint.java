@@ -53,13 +53,14 @@ public class Endpoint {
     /**
      * JPA Constructor
      */
-    Endpoint()
+    protected Endpoint()
     {
-    	
+    	users = new ArrayList<>();
     }
     
     //Create a new Endpoint
     Endpoint(BridgeService bridgeService, String identifier) {
+    	this();
         this.service = bridgeService;
         this.identifier = identifier;
         permissions = 0;

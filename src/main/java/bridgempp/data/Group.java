@@ -119,13 +119,14 @@ public class Group
 	// Initialize the group endpoints
 	public Group(String name)
 	{
-		endpoints = new ArrayList<>();
+		this();
 		this.name = name;
 	}
 	
 	//JPA Constructor
 	protected Group()
 	{
+		endpoints = new ArrayList<>();
 	}
 
 	public boolean hasEndpoint(Endpoint endpoint)

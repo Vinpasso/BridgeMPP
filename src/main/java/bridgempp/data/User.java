@@ -1,5 +1,6 @@
 package bridgempp.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.Column;
@@ -32,13 +33,14 @@ public class User
 	/**
 	 * JPA Constructor
 	 */
-	User()
+	protected User()
 	{
-		
+		endpoints = new ArrayList<>();
 	}
 	
 	User(String identifier)
 	{
+		this();
 		this.identifier = identifier;
 		this.name = "";
 		this.permissions = 0;

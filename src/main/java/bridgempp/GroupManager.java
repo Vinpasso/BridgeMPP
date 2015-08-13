@@ -52,10 +52,6 @@ public class GroupManager {
     public static void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
         Endpoint endpoint = message.getOrigin();
         Collection<Group> groups = endpoint.getGroups();
-        if(groups == null)
-        {
-        	return;
-        }
 		for(Group group : groups)
         {
         	group.sendMessageWithoutLoopback(message);
