@@ -43,7 +43,7 @@ public class PersistanceManager
 	public synchronized <T> Collection<T> getQuery(Class<T> className)
 	{
 		Entity annotation = className.getAnnotation(Entity.class);
-		if(annotation == null)
+		if(annotation == null || annotation.name() == null || annotation.name().length() == 0)
 		{
 			return null;
 		}

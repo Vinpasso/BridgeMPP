@@ -22,14 +22,6 @@ public class DataManager
 	
 	public static void deregisterEndpoint(Endpoint endpoint)
 	{
-		while(!endpoint.getUsers().isEmpty())
-		{
-			User user = endpoint.getUsers().iterator().next();
-			endpoint.removeUser(user);
-			deregisterUser(user);
-		}
-		endpoint.unsubscribeAllGroups();
-		PERSISTANCE_MANAGER.updateState(endpoint);
 		PERSISTANCE_MANAGER.removeState(endpoint);
 		EndpointStateManager.removed(endpoint);
 	}
@@ -136,5 +128,9 @@ public class DataManager
 
 	public static Collection<AccessKey> getAllAccessKeys() {
 		return PERSISTANCE_MANAGER.getQuery(AccessKey.class);
+	}
+
+	public static Collection<User> getAllUsers() {
+		return PERSISTANCE_MANAGER.getQuery(User.class);
 	}
 }

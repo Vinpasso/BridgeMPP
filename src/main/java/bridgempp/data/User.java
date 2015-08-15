@@ -10,7 +10,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
-@Entity
+@Entity(name = "User")
 public class User
 {
 	@Id

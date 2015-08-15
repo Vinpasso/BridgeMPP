@@ -29,6 +29,21 @@ public class CommandInfoOperations {
 		return "Listing all Endpoints:\n" + endpointList.trim() + "\nListed all Endpoints";
 	}
 	
+	@CommandName("!listusers: List all BridgeMPP Users")
+	@CommandTrigger("!listusers")
+	@HelpTopic("Lists all Users in the BridgeMPP Database")
+	@RequiredPermission(Permission.LIST_ENDPOINTS)
+	public static String cmdListUsers(Message message)
+	{
+		Collection<User> users = DataManager.getAllUsers();
+		String userList = "";
+		for(User user : users)
+		{
+			userList += user.getIdentifier() + ": " + user.toString() + "\n";
+		}
+		return "Listing all Users:\n" + userList.trim() + "\nListed all Users";
+	}
+	
 	@CommandName("!getendpointusers: List all Users in an Endpoint")
 	@CommandTrigger("!getendpointusers")
 	@HelpTopic("Lists all registered Users for an Endpoint in the Database. Requires Endpoint Identifier")

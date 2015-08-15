@@ -62,6 +62,7 @@ public class CommandInterpreter {
 		addCommandClass(CommandAliasOperations.class);
 		addCommandClass(CommandGroupOperations.class);
 		addCommandClass(CommandEndpointOperations.class);
+		addCommandClass(CommandUserOperations.class);
 		addCommandClass(CommandPermissionOperations.class);
 		addCommandClass(CommandServerOperations.class);
 		addCommandClass(CommandShadowOperations.class);
