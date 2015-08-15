@@ -20,7 +20,7 @@ public class PersistanceManager
 	private EntityManagerFactory entityManagerFactory;
 	private EntityManager entityManager;
 
-	public static PersistanceManager getPersistanceManager()
+	public static synchronized PersistanceManager getPersistanceManager()
 	{
 		if (manager == null)
 		{
@@ -35,12 +35,12 @@ public class PersistanceManager
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public <T> T getFromPrimaryKey(Class<T> className, Object primaryKey)
+	public synchronized <T> T getFromPrimaryKey(Class<T> className, Object primaryKey)
 	{
 		return entityManager.find(className, primaryKey);
 	}
 	
-	public <T> Collection<T> getQuery(Class<T> className)
+	public synchronized <T> Collection<T> getQuery(Class<T> className)
 	{
 		Entity annotation = className.getAnnotation(Entity.class);
 		if(annotation == null)
@@ -50,7 +50,7 @@ public class PersistanceManager
 		return entityManager.createQuery("SELECT s FROM " + annotation.name() + " s", className).getResultList();
 	}
 	
-	public void updateState(Object... objects)
+	public synchronized void updateState(Object... objects)
 	{
 		EntityTransaction saveTransaction = entityManager.getTransaction();
 		saveTransaction.begin();
@@ -67,7 +67,7 @@ public class PersistanceManager
 		saveTransaction.commit();
 	}
 	
-	public void removeState(Object... objects)
+	public synchronized void removeState(Object... objects)
 	{
 		EntityTransaction transaction = entityManager.getTransaction();
 		transaction.begin();
@@ -81,7 +81,7 @@ public class PersistanceManager
 		transaction.commit();
 	}
 	
-	public void shutdown()
+	public synchronized void shutdown()
 	{
 		entityManager.close();
 		entityManagerFactory.close();

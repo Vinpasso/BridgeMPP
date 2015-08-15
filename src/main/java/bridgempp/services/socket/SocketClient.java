@@ -52,8 +52,8 @@ class SocketClient implements Runnable {
 			{
 				throw new IOException("Unknown Protocol");
 			}
-			ShadowManager.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
 			protoCarry = ProtoCarry.values()[initialProtocol];
+			ShadowManager.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
 			BufferedReader bufferedReader = null;
 			if (protoCarry == ProtoCarry.ProtoBuf) {
 
@@ -64,6 +64,10 @@ class SocketClient implements Runnable {
 				switch (protoCarry) {
 				case ProtoBuf:
 					ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
+					if(protoMessage == null)
+					{
+						throw new IOException("Failed to decode next ProtoBuf Message");
+					}
 					Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(),
 							MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
 					if (protoMessage.hasGroup()) {

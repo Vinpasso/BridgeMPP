@@ -88,26 +88,42 @@ public class Group
 		}
 	}
 
-	// Add a user/group to this groups recipients
+	/**
+	 * Add a user/group to this groups recipients
+	 * BI-DIRECTIONAL
+	 * @param endpoint The endpoint to add to a Group
+	 */
 	public void addEndpoint(Endpoint endpoint)
 	{
 		getEndpoints().add(endpoint);
+		endpoint.addGroupNonBidirectional(this);
 	}
 
-	// Remove a user/group from this groups recipients
+	// 
+	/**
+	 * Remove a user/group from this groups recipients
+	 * BI-DIRECTIONAL
+	 * @param endpoint The endpoint to remove from a Group
+	 */
 	public void removeEndpoint(Endpoint endpoint)
 	{
 		getEndpoints().remove(endpoint);
+		endpoint.removeGroupNonBidirectional(this);
 	}
 
-	// Remove all endpoints in preperation for Group destruction
+	
+	/**
+	 * Remove all endpoints in preperation for Group destruction
+	 * BI-DIRECTIONAL
+	 */
 	public void removeAllEndpoints()
 	{
 		Iterator<Endpoint> iterator = endpoints.iterator();
 		while (iterator.hasNext())
 		{
-			iterator.next();
+			Endpoint endpoint = iterator.next();
 			iterator.remove();
+			endpoint.removeGroupNonBidirectional(this);
 		}
 	}
 
@@ -116,14 +132,20 @@ public class Group
 		return name;
 	}
 
-	// Initialize the group endpoints
+	
+	/**
+	 * Initialize the group endpoints
+	 * @param name The name of the Group
+	 */
 	public Group(String name)
 	{
 		this();
 		this.name = name;
 	}
 	
-	//JPA Constructor
+	/**
+	 * JPA Constructor
+	 */
 	protected Group()
 	{
 		endpoints = new ArrayList<>();
@@ -157,7 +179,7 @@ public class Group
 	/**
 	 * @return the endpoints
 	 */
-	public Collection<Endpoint> getEndpoints()
+	private Collection<Endpoint> getEndpoints()
 	{
 		return endpoints;
 	}

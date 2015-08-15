@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
 import bridgempp.BridgeService;
@@ -122,17 +123,27 @@ public class Endpoint {
 		return Collections.unmodifiableCollection(users);
 	}
 
+	/**
+	 * BI-DIRECTIONAL
+	 * @param user
+	 */
 	public void putUser(User user)
 	{
 		if(!users.contains(user))
 		{
 			users.add(user);
+			user.addEndpointNonBidirectional(this);
 		}
 	}
 	
+	/**
+	 * BI-DIRECTIONAL
+	 * @param user
+	 */
 	public void removeUser(User user)
 	{
 		users.remove(user);
+		user.removeEndpointNonBidirectional(this);
 	}
 	
     public Collection<Group> getGroups() {
@@ -140,7 +151,31 @@ public class Endpoint {
 	}
 
 	public void unsubscribeAllGroups() {
-		groups.clear();
+		while(!groups.isEmpty())
+		{
+			groups.iterator().next().removeEndpoint(this);
+		}
 	}
 
+	@PreRemove
+	public void delete()
+	{
+		unsubscribeAllGroups();
+	}
+
+	/**
+	 * Non BI-DIRECTIONAL
+	 * @param group
+	 */
+	protected void addGroupNonBidirectional(Group group) {
+		groups.add(group);
+	}
+
+	/**
+	 * Non BI-DIRECTIONAL
+	 * @param group
+	 */
+	protected void removeGroupNonBidirectional(Group group) {
+		groups.remove(group);
+	}
 }

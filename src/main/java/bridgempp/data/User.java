@@ -2,10 +2,12 @@ package bridgempp.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
 @Entity
@@ -96,9 +98,36 @@ public class User
 		return identifier + ": " + name + ": " + permissions;
 	}
 	
+	/**
+	 * BI-DIRECTIONAL
+	 */
 	public void removeAllEndpoints()
 	{
-		endpoints.clear();
+		while(!endpoints.isEmpty())
+		{
+			endpoints.iterator().next().removeUser(this);
+		}
+	}
+
+	/**
+	 * NON-BIDIRECTIONAL
+	 * @param endpoint
+	 */
+	protected void removeEndpointNonBidirectional(Endpoint endpoint) {
+		endpoints.remove(endpoint);
+	}
+
+	/**
+	 * NON-BIDIRECTIONAL
+	 * @param endpoint
+	 */
+	protected void addEndpointNonBidirectional(Endpoint endpoint) {
+		endpoints.add(endpoint);
 	}
 	
+	@PreRemove
+	protected void delete()
+	{
+		removeAllEndpoints();
+	}
 }

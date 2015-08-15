@@ -29,13 +29,13 @@ public class DataManager
 			deregisterUser(user);
 		}
 		endpoint.unsubscribeAllGroups();
+		PERSISTANCE_MANAGER.updateState(endpoint);
 		PERSISTANCE_MANAGER.removeState(endpoint);
 		EndpointStateManager.removed(endpoint);
 	}
 	
 	public static void deregisterUser(User user)
 	{
-		user.removeAllEndpoints();
 		PERSISTANCE_MANAGER.removeState(user);
 	}
 	
