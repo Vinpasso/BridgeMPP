@@ -38,8 +38,8 @@ public class SocketService extends BridgeService {
 	@Column(name = "List_Port", nullable = false)
 	int listenPort;
 
-	transient HashMap<String, SocketClient> connectedSockets;
-	transient LinkedList<String> pendingDeletion;
+	transient volatile HashMap<String, SocketClient> connectedSockets;
+	transient volatile LinkedList<String> pendingDeletion;
 	private transient ServerListener serverListener;
 	protected transient boolean pendingShutdown = false;
 
