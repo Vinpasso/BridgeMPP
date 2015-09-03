@@ -4,7 +4,8 @@ import java.util.Collection;
 
 import bridgempp.BridgeService;
 import bridgempp.GroupManager;
-import bridgempp.state.EndpointStateManager;
+import bridgempp.state.EventManager;
+import bridgempp.state.EventManager.Event;
 import bridgempp.storage.PersistanceManager;
 
 public class DataManager
@@ -16,14 +17,14 @@ public class DataManager
 	{
 		Endpoint endpoint = new Endpoint(service, identifier);
 		PERSISTANCE_MANAGER.updateState(endpoint);
-		EndpointStateManager.created(endpoint);
+		EventManager.fireEvent(Event.ENDPOINT_CREATED, endpoint);
 		return endpoint;
 	}
 	
 	public static void deregisterEndpoint(Endpoint endpoint)
 	{
 		PERSISTANCE_MANAGER.removeState(endpoint);
-		EndpointStateManager.removed(endpoint);
+		EventManager.fireEvent(Event.ENDPOINT_REMOVED, endpoint);
 	}
 	
 	public static void deregisterUser(User user)

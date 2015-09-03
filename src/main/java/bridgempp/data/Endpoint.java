@@ -22,6 +22,8 @@ import javax.persistence.Version;
 import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.state.EventManager;
+import bridgempp.state.EventManager.Event;
 
 /**
  *

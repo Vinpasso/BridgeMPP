@@ -17,7 +17,8 @@ import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.socket.SocketService.ProtoCarry;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
-import bridgempp.state.EndpointStateManager;
+import bridgempp.state.EventManager;
+import bridgempp.state.EventManager.Event;
 
 class SocketClient implements Runnable {
 
@@ -42,7 +43,7 @@ class SocketClient implements Runnable {
 	@Override
 	public void run() {
 		ShadowManager.log(Level.INFO, "TCP client has connected");
-		EndpointStateManager.connected(endpoint);
+		EventManager.fireEvent(Event.ENDPOINT_CONNECTED, endpoint);
 		try {
 			int initialProtocol = socket.getInputStream().read();
 			if (initialProtocol >= 0x30) {
@@ -125,7 +126,7 @@ class SocketClient implements Runnable {
 		} catch (IOException e) {
 			ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
 		}
-		EndpointStateManager.disconnected(endpoint);
+		EventManager.fireEvent(Event.ENDPOINT_DISCONNECTED, endpoint);
 		this.socketService.pendingDeletion.add(randomIdentifier);
 		ShadowManager.log(Level.INFO, "TCP client has disconnected");
 	}
