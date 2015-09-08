@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import bridgempp.command.CommandInterpreter;
+import bridgempp.state.EventManager;
 import bridgempp.statistics.StatisticsManager;
 import bridgempp.storage.PersistanceManager;
 import bridgempp.util.LockdownLock;
@@ -51,6 +52,7 @@ public class BridgeMPP
 		}
 		ShadowManager.log(Level.INFO, "Server startup commencing...");
 		addShutdownHook();
+		EventManager.loadCentralEventSubscribers();
 		CommandInterpreter.loadCommands();
 		ServiceManager.loadAllServices();
 		StatisticsManager.loadStatistics();
@@ -73,6 +75,7 @@ public class BridgeMPP
 				{
 					ShadowManager.log(Level.WARNING, "Server Exit Sync interrupted. Shutting down BridgeMPP");
 				}
+				ShadowManager.log(Level.INFO, "Server will shut down due to scheduled restart");
 				exit();
 			}
 		});

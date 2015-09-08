@@ -7,7 +7,10 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.state.EventListener;
+import bridgempp.state.EventSubscribe;
+import bridgempp.state.EventManager.Event;
 
+@EventSubscribe(Event.ENDPOINT_DISCONNECTED)
 public class NonPersistantEndpointDisconnectedListener extends EventListener<Endpoint> {
 
 	@Override

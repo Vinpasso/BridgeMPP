@@ -1,12 +1,22 @@
 package bridgempp.state;
 
+import org.hibernate.AnnotationException;
+
 import bridgempp.state.endpoint.NonPersistantEndpointDisconnectedListener;
 
 public class EventManager {
 
-	public static <T> void loadEventListenerClass(Event event, EventListener<?> eventListener)
+	public static <T> void loadEventListenerClass(EventListener<?> eventListener)
 	{
-		StateManager.addListener(event, eventListener);
+		EventSubscribe annotation = eventListener.getClass().getAnnotation(EventSubscribe.class);
+		if(annotation == null)
+		{
+			throw new AnnotationException("Event Listener is missing Event Subscribe Annotation: " + eventListener.getClass().getName());
+		}
+		for(Event event : annotation.value())
+		{
+			StateManager.addListener(event, eventListener);
+		}
 	}
 	
 	public static <T> void fireEvent(Event event, Object eventParameter)
@@ -16,7 +26,8 @@ public class EventManager {
 	
 	public static void loadCentralEventSubscribers()
 	{
-		loadEventListenerClass(Event.ENDPOINT_DISCONNECTED, new NonPersistantEndpointDisconnectedListener());
+		StateManager.initializeEventSystem();
+		loadEventListenerClass(new NonPersistantEndpointDisconnectedListener());
 	}
 	
 	public enum Event
