@@ -28,7 +28,8 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
  */
 @Entity(name = "SOCKET_SERVICE")
 @DiscriminatorValue(value = "SOCKET_SERVICE")
-public class SocketService extends BridgeService {
+public class SocketService extends BridgeService
+{
 
 	transient ServerSocket serverSocket;
 
@@ -43,11 +44,11 @@ public class SocketService extends BridgeService {
 	private transient ServerListener serverListener;
 	protected transient boolean pendingShutdown = false;
 
-	private transient static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
-			MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
+	private transient static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
-	public void connect() {
+	public void connect()
+	{
 		ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
 
 		connectedSockets = new HashMap<>();
@@ -58,88 +59,95 @@ public class SocketService extends BridgeService {
 	}
 
 	@Override
-	public void disconnect() {
-		try {
+	public void disconnect()
+	{
+		try
+		{
 			pendingShutdown = true;
 			@SuppressWarnings("unchecked")
-			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>) connectedSockets
-					.clone();
-			for (SocketClient client : tempConnected.values()) {
+			HashMap<Integer, SocketClient> tempConnected = (HashMap<Integer, SocketClient>) connectedSockets.clone();
+			for (SocketClient client : tempConnected.values())
+			{
 				client.socket.close();
 			}
-		} catch (IOException ex) {
+		} catch (IOException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 
 	}
 
 	@Override
-	public void sendMessage(Message message) {
-		try {
-			SocketClient socketClient = connectedSockets.get(message
-					.getDestination().getIdentifier());
+	public void sendMessage(Message message)
+	{
+		try
+		{
+			SocketClient socketClient = connectedSockets.get(message.getDestination().getIdentifier());
 			OutputStream out = socketClient.socket.getOutputStream();
 			ProtoCarry protoCarry = socketClient.protoCarry;
-			switch (protoCarry) {
-			case Plain_Text:
-				out.write((message
-						.toComplexString(getSupportedMessageFormats()) + "\n")
-						.getBytes("UTF-8"));
-				break;
-			case XML_Embedded:
-				out.write(("<message>"
-						+ message.toComplexString(getSupportedMessageFormats()) + "</message>\n")
-						.getBytes("UTF-8"));
-				break;
-			case ProtoBuf:
-				ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message
-						.newBuilder();
-				protoMessageBuilder.setMessageFormat(message.getMessageFormat()
-						.getName());
-				protoMessageBuilder.setMessage(message.getMessage(message
-						.getMessageFormat()));
-				if (message.getGroup() != null) {
-					protoMessageBuilder.setGroup(message.getGroup().getName());
-				}
-				if (message.getOrigin() != null) {
-					protoMessageBuilder.setSender(message.getOrigin()
-							.toString());
-				}
-				if (message.getDestination() != null) {
-					protoMessageBuilder.setTarget(message.getDestination()
-							.toString());
-				}
-				ProtoBuf.Message protoMessage = protoMessageBuilder.build();
-				protoMessage.writeDelimitedTo(out);
-				break;
+			switch (protoCarry)
+			{
+				case Plain_Text:
+					out.write((message.toComplexString(getSupportedMessageFormats()) + "\n").getBytes("UTF-8"));
+					break;
+				case XML_Embedded:
+					out.write(("<message>" + message.toComplexString(getSupportedMessageFormats()) + "</message>\n").getBytes("UTF-8"));
+					break;
+				case ProtoBuf:
+					ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();
+					protoMessageBuilder.setMessageFormat(message.getMessageFormat().getName());
+					protoMessageBuilder.setMessage(message.getMessage(message.getMessageFormat()));
+					if (message.getGroup() != null)
+					{
+						protoMessageBuilder.setGroup(message.getGroup().getName());
+					}
+					if (message.getOrigin() != null)
+					{
+						protoMessageBuilder.setSender(message.getOrigin().toString());
+					}
+					if (message.getDestination() != null)
+					{
+						protoMessageBuilder.setTarget(message.getDestination().toString());
+					}
+					ProtoBuf.Message protoMessage = protoMessageBuilder.build();
+					protoMessage.writeDelimitedTo(out);
+					break;
+				case None:
+					ShadowManager.log(Level.WARNING, "Message not delivered due to Protocol None: "  + message.toString());
+					break;
 			}
-		} catch (IOException ex) {
+		} catch (IOException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
-			connectedSockets.get(message.getDestination().getIdentifier())
-					.disconnect();
+			connectedSockets.get(message.getDestination().getIdentifier()).disconnect();
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return "TCPSocket";
 	}
 
 	@Override
-	public boolean isPersistent() {
+	public boolean isPersistent()
+	{
 		return false;
 	}
 
 	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
+	public MessageFormat[] getSupportedMessageFormats()
+	{
 		return supportedMessageFormats;
 	}
 
-	public enum ProtoCarry {
-		Plain_Text, XML_Embedded, ProtoBuf
+	public enum ProtoCarry
+	{
+		Plain_Text, XML_Embedded, ProtoBuf, None
 	}
 
-	public void configure(String listenAddress, int listenPort) {
+	public void configure(String listenAddress, int listenPort)
+	{
 		this.listenAddress = listenAddress;
 		this.listenPort = listenPort;
 	}

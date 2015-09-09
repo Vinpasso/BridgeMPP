@@ -20,7 +20,8 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 
-class SocketClient implements Runnable {
+class SocketClient implements Runnable
+{
 
 	/**
 	 * 
@@ -30,10 +31,11 @@ class SocketClient implements Runnable {
 	User user;
 	Endpoint endpoint;
 	String randomIdentifier;
-	ProtoCarry protoCarry = ProtoCarry.Plain_Text;
+	ProtoCarry protoCarry = ProtoCarry.None;
 	boolean running = true;
 
-	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint) {
+	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint)
+	{
 		this.socketService = socketService;
 		this.socket = socket;
 		this.user = user;
@@ -41,89 +43,107 @@ class SocketClient implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public void run()
+	{
 		ShadowManager.log(Level.INFO, "TCP client has connected");
 		EventManager.fireEvent(Event.ENDPOINT_CONNECTED, endpoint);
-		try {
+		try
+		{
 			int initialProtocol = socket.getInputStream().read();
-			if (initialProtocol >= 0x30) {
+			if (initialProtocol >= 0x30)
+			{
 				initialProtocol -= 0x30;
 			}
-			if(initialProtocol >= ProtoCarry.values().length)
+			if (initialProtocol >= ProtoCarry.values().length)
 			{
 				throw new IOException("Unknown Protocol");
 			}
 			protoCarry = ProtoCarry.values()[initialProtocol];
 			ShadowManager.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
 			BufferedReader bufferedReader = null;
-			if (protoCarry == ProtoCarry.ProtoBuf) {
+			if (protoCarry == ProtoCarry.ProtoBuf)
+			{
 
-			} else {
+			} else
+			{
 				bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			}
-			while (running) {
-				switch (protoCarry) {
-				case ProtoBuf:
-					ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
-					if(protoMessage == null)
-					{
-						throw new IOException("Failed to decode next ProtoBuf Message");
-					}
-					Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(),
-							MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
-					if (protoMessage.hasGroup()) {
-						bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
-					}
-					if (bridgeMessage.getMessageFormat() == null) {
-						bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
-					}
-					if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0) {
-						break;
-					}
-					CommandInterpreter.processMessage(bridgeMessage);
-					break;
-				case XML_Embedded:
-					String buffer = "";
-					do {
-						String line = bufferedReader.readLine();
-						if (line == null) {
-							throw new IOException("End of Stream");
+			while (running)
+			{
+				switch (protoCarry)
+				{
+					case ProtoBuf:
+						ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
+						if (protoMessage == null)
+						{
+							throw new IOException("Failed to decode next ProtoBuf Message");
 						}
-						buffer += line + "\n";
-					} while (bufferedReader.ready());
-					buffer = buffer.trim();
-					Matcher matcher = Pattern.compile("(?<=<message>).+?(?=<\\/message>)", Pattern.DOTALL).matcher(
-							buffer);
-					while (matcher.find()) {
-						Message message = Message.parseMessage(matcher.group());
-						message.setOrigin(endpoint);
-						CommandInterpreter.processMessage(message);
-					}
-					break;
-				case Plain_Text:
-					String messageLine = bufferedReader.readLine();
-					if(messageLine == null)
-					{
+						Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(), MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
+						if (protoMessage.hasGroup())
+						{
+							bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
+						}
+						if (bridgeMessage.getMessageFormat() == null)
+						{
+							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
+						}
+						if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
+						{
+							break;
+						}
+						CommandInterpreter.processMessage(bridgeMessage);
+						break;
+					case XML_Embedded:
+						String buffer = "";
+						do
+						{
+							String line = bufferedReader.readLine();
+							if (line == null)
+							{
+								throw new IOException("End of Stream");
+							}
+							buffer += line + "\n";
+						} while (bufferedReader.ready());
+						buffer = buffer.trim();
+						Matcher matcher = Pattern.compile("(?<=<message>).+?(?=<\\/message>)", Pattern.DOTALL).matcher(buffer);
+						while (matcher.find())
+						{
+							Message message = Message.parseMessage(matcher.group());
+							message.setOrigin(endpoint);
+							CommandInterpreter.processMessage(message);
+						}
+						break;
+					case Plain_Text:
+						String messageLine = bufferedReader.readLine();
+						if (messageLine == null)
+						{
+							disconnect();
+							break;
+						}
+						CommandInterpreter.processMessage(new Message(user, endpoint, messageLine, MessageFormat.PLAIN_TEXT));
+						break;
+					case None:
+						ShadowManager.log(Level.SEVERE, "Established Socket has Protocol None, aborting");
 						disconnect();
 						break;
-					}
-					CommandInterpreter.processMessage(new Message(user, endpoint, messageLine,
-							MessageFormat.PLAIN_TEXT));
-					break;
 				}
 			}
 
-		} catch (IOException ex) {
+		} catch (IOException ex)
+		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 		disconnect();
 	}
 
-	public void disconnect() {
+	public void disconnect()
+	{
 		running = false;
-		try {
+		try
+		{
 			socket.close();
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
 		}
 		EventManager.fireEvent(Event.ENDPOINT_DISCONNECTED, endpoint);
