@@ -79,6 +79,10 @@ class SocketClient implements Runnable
 							throw new IOException("Failed to decode next ProtoBuf Message");
 						}
 						Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(), MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
+						if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
+						{
+							break;
+						}
 						if (protoMessage.hasGroup())
 						{
 							bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
@@ -86,10 +90,6 @@ class SocketClient implements Runnable
 						if (bridgeMessage.getMessageFormat() == null)
 						{
 							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
-						}
-						if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
-						{
-							break;
 						}
 						CommandInterpreter.processMessage(bridgeMessage);
 						break;
