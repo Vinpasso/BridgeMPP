@@ -21,6 +21,7 @@ import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
 import bridgempp.services.facebook.FacebookService;
+import bridgempp.services.leagueoflegends.LeagueOfLegendsService;
 import bridgempp.services.socket.SocketService;
 import bridgempp.services.whatsapp.WhatsappService;
 import bridgempp.services.xmpp.XMPPService;
@@ -82,6 +83,18 @@ public class CommandServiceOperations
 	public static String loadXMPPService(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String status)
 	{
 		XMPPService service = new XMPPService();
+		service.configure(host, port, domain, oldStyleSSL, username, password, status);
+		ServiceManager.loadService(service);
+		return "Loaded service: " + service.toString(); 
+	}
+	
+	@CommandName("!loadleagueoflegendsservice: Load a League Of Legends Service")
+	@CommandTrigger("!loadleagueoflegendsservice")
+	@HelpTopic("Creates a League Of Legends Service. Requires host, port, domain, oldStyleSSL (boolean), Username, Password, Status message.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String loadLeagueOfLegendsService(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String status)
+	{
+		LeagueOfLegendsService service = new LeagueOfLegendsService();
 		service.configure(host, port, domain, oldStyleSSL, username, password, status);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 

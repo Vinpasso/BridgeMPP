@@ -15,6 +15,7 @@ import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.xmpp.BOB.BOBIQ;
 
 import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -46,10 +47,10 @@ import javax.persistence.Entity;
 @DiscriminatorValue(value = "XMPP_SERVICE")
 public class XMPPService extends BridgeService {
 
-	transient XMPPTCPConnection connection;
-	transient ChatManager chatmanager;
-	transient HashMap<String, XMPPMessageListener> activeChats;
-	transient HashMap<String, String> cachedObjects;
+	protected transient XMPPTCPConnection connection;
+	protected transient ChatManager chatmanager;
+	protected transient HashMap<String, XMPPMessageListener> activeChats;
+	protected transient HashMap<String, String> cachedObjects;
 	
 	@Column(name = "HOST", nullable = false, length = 50)
 	String host;
@@ -69,7 +70,7 @@ public class XMPPService extends BridgeService {
 	@Column(name = "PASSWORD", nullable = false, length = 50)
 	String password;
 	
-	@Column(name = "STATUS_MESSAGE", nullable = false, length = 50)
+	@Column(name = "STATUS_MESSAGE", nullable = false, length = 500)
 	String statusMessage;
 
 	static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML,
@@ -94,9 +95,7 @@ public class XMPPService extends BridgeService {
 			connection = new XMPPTCPConnection(configuration);
 			connection.connect();
 			connection.login(username, password);
-			Presence presence = new Presence(Presence.Type.available);
-			presence.setStatus(statusMessage);
-			connection.sendPacket(presence);
+			sendPresenceUpdate();
 			connection.addConnectionListener(new XMPPConnectionListener());
 			connection.addPacketListener(new XMPPRosterListener(this), new PacketFilter() {
 
@@ -111,7 +110,8 @@ public class XMPPService extends BridgeService {
 				}
 
 			});
-			connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.manual);
+			connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+			connection.getRoster().addRosterListener(new XMPPStatusListener(this));
 			chatmanager = ChatManager.getInstanceFor(connection);
 			chatmanager.addChatListener(new XMPPChatListener(this));
 			MultiUserChat.addInvitationListener(connection, new XMPPMultiUserChatListener(this));
@@ -137,6 +137,13 @@ public class XMPPService extends BridgeService {
 			Endpoint endpoint = iterator.next();
 			addEndpoint(endpoint);
 		}
+	}
+
+	public void sendPresenceUpdate() throws NotConnectedException
+	{
+		Presence presence = new Presence(Presence.Type.available);
+		presence.setStatus(statusMessage);
+		connection.sendPacket(presence);
 	}
 
 	@Override
