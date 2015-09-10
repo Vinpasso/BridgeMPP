@@ -2,9 +2,7 @@ package bridgempp.data;
 
 import java.util.Collection;
 
-import bridgempp.GroupManager;
 import bridgempp.service.BridgeService;
-import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 import bridgempp.storage.PersistanceManager;
@@ -144,5 +142,10 @@ public class DataManager
 	public static void updateState(Object... objects)
 	{
 		PERSISTANCE_MANAGER.updateState(objects);
+	}
+
+	public static void removeState(Object... objects)
+	{
+		PERSISTANCE_MANAGER.removeState(objects);
 	}
 }

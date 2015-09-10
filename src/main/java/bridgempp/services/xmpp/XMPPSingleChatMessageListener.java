@@ -12,7 +12,6 @@ import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
-import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.MultiBridgeServiceHandle;

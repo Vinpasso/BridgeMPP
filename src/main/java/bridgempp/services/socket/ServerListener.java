@@ -7,12 +7,10 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
-import bridgempp.messageformat.MessageFormat;
 
 class ServerListener implements Runnable {
 	/**
@@ -46,14 +44,12 @@ class ServerListener implements Runnable {
 					User user = DataManager.getOrNewUserForIdentifier(identifier, endpoint);
 					SocketClient socketClient = new SocketClient(socketService, socket, user, endpoint);
 					socketClient.randomIdentifier = identifier;
-					socketService.connectedSockets.put(identifier, socketClient);
 					new Thread(socketClient, "Socket TCP Connection").start();
 				} catch (SocketTimeoutException e) {
 				}
 				if (System.currentTimeMillis() > lastKeepAlive + 60000) {
 					sendKeepAliveMessages();
 				}
-				removePendingDeletions();
 			}
 		} catch (IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
@@ -61,18 +57,8 @@ class ServerListener implements Runnable {
 	}
 
 	private void sendKeepAliveMessages() {
-		for (SocketClient client : socketService.connectedSockets.values()) {
-			socketService.sendMessage(new Message(client.user, client.endpoint, client.endpoint, null, "",
-					MessageFormat.PLAIN_TEXT));
-		}
+		socketService.sendKeepAliveMessages();
 		lastKeepAlive = System.currentTimeMillis();
-	}
-
-	private void removePendingDeletions() {
-		while (!socketService.pendingDeletion.isEmpty()) {
-			String index = socketService.pendingDeletion.removeFirst();
-			socketService.connectedSockets.remove(index);
-		}
 	}
 
 }

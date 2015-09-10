@@ -1,16 +1,12 @@
 package bridgempp.command;
 
-import java.util.logging.Level;
-
 import bridgempp.Message;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
-import bridgempp.data.Group;
 import bridgempp.data.User;
 
 public class CommandUserOperations {

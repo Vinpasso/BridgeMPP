@@ -12,21 +12,22 @@ import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.services.socket.SocketService.ProtoCarry;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 
-class SocketClient implements Runnable
+class SocketClient extends MultiBridgeServiceHandle<SocketService> implements Runnable
 {
 
 	/**
 	 * 
 	 */
-	private final SocketService socketService;
 	Socket socket;
 	User user;
 	Endpoint endpoint;
@@ -36,10 +37,9 @@ class SocketClient implements Runnable
 
 	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint)
 	{
-		this.socketService = socketService;
+		super(endpoint, socketService);
 		this.socket = socket;
 		this.user = user;
-		this.endpoint = endpoint;
 	}
 
 	@Override
@@ -147,7 +147,51 @@ class SocketClient implements Runnable
 			ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
 		}
 		EventManager.fireEvent(Event.ENDPOINT_DISCONNECTED, endpoint);
-		this.socketService.pendingDeletion.add(randomIdentifier);
+		DataManager.removeState(this);
 		ShadowManager.log(Level.INFO, "TCP client has disconnected");
+	}
+
+	@Override
+	public void sendMessage(Message message)
+	{
+		try
+		{
+
+			switch (protoCarry)
+			{
+				case Plain_Text:
+					socket.getOutputStream().write((message.toComplexString(service.getSupportedMessageFormats()) + "\n").getBytes("UTF-8"));
+					break;
+				case XML_Embedded:
+					socket.getOutputStream().write(("<message>" + message.toComplexString(service.getSupportedMessageFormats()) + "</message>\n").getBytes("UTF-8"));
+					break;
+				case ProtoBuf:
+					ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();
+					protoMessageBuilder.setMessageFormat(message.getMessageFormat().getName());
+					protoMessageBuilder.setMessage(message.getMessage(message.getMessageFormat()));
+					if (message.getGroup() != null)
+					{
+						protoMessageBuilder.setGroup(message.getGroup().getName());
+					}
+					if (message.getOrigin() != null)
+					{
+						protoMessageBuilder.setSender(message.getOrigin().toString());
+					}
+					if (message.getDestination() != null)
+					{
+						protoMessageBuilder.setTarget(message.getDestination().toString());
+					}
+					ProtoBuf.Message protoMessage = protoMessageBuilder.build();
+					protoMessage.writeDelimitedTo(socket.getOutputStream());
+					break;
+				case None:
+					ShadowManager.log(Level.WARNING, "Message not delivered due to Protocol None: " + message.toString());
+					break;
+			}
+		} catch (IOException e)
+		{
+			ShadowManager.log(Level.SEVERE, null, e);
+			disconnect();
+		}
 	}
 }

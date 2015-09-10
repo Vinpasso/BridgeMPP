@@ -15,7 +15,7 @@ import bridgempp.messageformat.MessageFormat;
 public abstract class SingleToMultiBridgeService extends BridgeService
 {
 	@OneToMany(mappedBy = "service")
-	private Collection<MultiBridgeServiceHandle<?>> handles;
+	protected Collection<MultiBridgeServiceHandle<?>> handles;
 
 	@Override
 	public abstract void connect();
