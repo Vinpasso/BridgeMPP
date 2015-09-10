@@ -17,7 +17,6 @@ import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.FacebookType;
 import com.restfb.types.Post;
 
-import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
@@ -25,6 +24,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 
 @Entity(name = "FACEBOOK_SERVICE")
 @DiscriminatorValue(value = "FACEBOOK_SERVICE")

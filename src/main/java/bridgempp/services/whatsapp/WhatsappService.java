@@ -7,6 +7,7 @@ package bridgempp.services.whatsapp;
 
 import bridgempp.*;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 
 import java.io.*;
 import java.util.Base64;

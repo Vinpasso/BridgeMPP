@@ -7,7 +7,6 @@ package bridgempp.command;
 
 import java.util.logging.Level;
 
-import bridgempp.BridgeService;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ServiceManager;
@@ -21,6 +20,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 
 /**
  *

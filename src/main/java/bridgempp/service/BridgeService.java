@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bridgempp;
+package bridgempp.service;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -18,6 +19,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
+import bridgempp.Message;
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
@@ -36,7 +38,7 @@ public abstract class BridgeService {
 	private int serviceIdentifier;
 	
 	@OneToMany(mappedBy="service")
-	protected Collection<Endpoint> endpoints;
+	protected Collection<Endpoint> endpoints = new LinkedList<Endpoint>();
 	    
     //Initialize Service
     public abstract void connect();

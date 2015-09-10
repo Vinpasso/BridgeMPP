@@ -3,7 +3,6 @@ package bridgempp.command;
 import java.util.List;
 import java.util.logging.Level;
 
-import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
@@ -16,6 +15,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 import bridgempp.services.BridgeChat;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;

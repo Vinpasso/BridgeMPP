@@ -16,10 +16,10 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
 
 /**

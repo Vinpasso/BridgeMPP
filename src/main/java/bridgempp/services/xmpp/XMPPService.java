@@ -5,15 +5,13 @@
  */
 package bridgempp.services.xmpp;
 
-import bridgempp.BridgeService;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
-import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
-
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -29,8 +27,6 @@ import org.jivesoftware.spark.util.DummySSLSocketFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,11 +41,10 @@ import javax.persistence.Entity;
  */
 @Entity(name = "XMPP_SERVICE")
 @DiscriminatorValue(value = "XMPP_SERVICE")
-public class XMPPService extends BridgeService {
+public class XMPPService extends SingleToMultiBridgeService {
 
 	protected transient XMPPTCPConnection connection;
 	protected transient ChatManager chatmanager;
-	protected transient HashMap<String, XMPPMessageListener> activeChats;
 	protected transient HashMap<String, String> cachedObjects;
 	
 	@Column(name = "HOST", nullable = false, length = 50)
@@ -77,7 +72,6 @@ public class XMPPService extends BridgeService {
 			MessageFormat.PLAIN_TEXT };
 
 	public XMPPService() {
-		activeChats = new HashMap<>();
 		cachedObjects = new HashMap<>();
 	}
 
@@ -127,16 +121,6 @@ public class XMPPService extends BridgeService {
 		} catch (XMPPException | SmackException | IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
-		if(endpoints == null)
-		{
-			endpoints = new LinkedList<Endpoint>();
-		}
-		Iterator<Endpoint> iterator = endpoints.iterator();
-		while(iterator.hasNext())
-		{
-			Endpoint endpoint = iterator.next();
-			addEndpoint(endpoint);
-		}
 	}
 
 	public void sendPresenceUpdate() throws NotConnectedException
@@ -160,11 +144,6 @@ public class XMPPService extends BridgeService {
 	}
 
 	@Override
-	public void sendMessage(bridgempp.Message message) {
-		activeChats.get(message.getDestination().getIdentifier()).sendMessage(message);
-	}
-
-	@Override
 	public String getName() {
 		return "XMPP";
 	}
@@ -172,24 +151,6 @@ public class XMPPService extends BridgeService {
 	@Override
 	public boolean isPersistent() {
 		return true;
-	}
-
-	public void addEndpoint(Endpoint endpoint) {
-		ShadowManager.log(Level.INFO, "Loading Endpoint: " + endpoint.toString());
-		if (isSingleUserEndpoint(endpoint)) {
-			XMPPSingleChatMessageListener listener = new XMPPSingleChatMessageListener(this, endpoint);
-			listener.chat.addMessageListener(listener);
-		} else {
-			XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(this, endpoint);
-			listener.multiUserChat.addMessageListener(listener);
-		}
-		ShadowManager.log(Level.INFO, "Loaded Endpoint: " + endpoint.toString());
-	}
-
-	private boolean isSingleUserEndpoint(Endpoint endpoint) {
-		//Check if a user with Identical ID to Endpoint exists
-		User user = DataManager.getUserForIdentifier(endpoint.getIdentifier());
-		return user != null || endpoint.getUsers().contains(user);
 	}
 
 	@Override

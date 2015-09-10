@@ -5,6 +5,7 @@
  */
 package bridgempp;
 
+import bridgempp.service.BridgeService;
 import bridgempp.services.ConsoleService;
 import bridgempp.storage.PersistanceManager;
 

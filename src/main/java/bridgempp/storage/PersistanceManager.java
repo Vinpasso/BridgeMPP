@@ -1,16 +1,17 @@
 package bridgempp.storage;
 
 import java.util.Collection;
+
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
-import bridgempp.BridgeService;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
+import bridgempp.service.BridgeService;
 import bridgempp.statistics.StatisticStore;
 
 public class PersistanceManager

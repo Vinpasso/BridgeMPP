@@ -33,7 +33,8 @@ class XMPPMultiUserChatListener implements InvitationListener {
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", password, discussionHistory, conn.getPacketReplyTimeout());
-			multiUserChat.addMessageListener(new XMPPMultiUserMessageListener(xmppService, multiUserChat));
+			XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(xmppService, multiUserChat);
+			multiUserChat.addMessageListener(listener);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);

@@ -2,8 +2,9 @@ package bridgempp.data;
 
 import java.util.Collection;
 
-import bridgempp.BridgeService;
 import bridgempp.GroupManager;
+import bridgempp.service.BridgeService;
+import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 import bridgempp.storage.PersistanceManager;
@@ -133,5 +134,15 @@ public class DataManager
 
 	public static Collection<User> getAllUsers() {
 		return PERSISTANCE_MANAGER.getQuery(User.class);
+	}
+
+	public static <T> T getFromPrimaryKey(Class<T> class1, Object identifier)
+	{
+		return PERSISTANCE_MANAGER.getFromPrimaryKey(class1, identifier);
+	}
+	
+	public static void updateState(Object... objects)
+	{
+		PERSISTANCE_MANAGER.updateState(objects);
 	}
 }

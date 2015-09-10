@@ -5,7 +5,6 @@
  */
 package bridgempp.services;
 
-import bridgempp.BridgeService;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
@@ -13,6 +12,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.BridgeService;
 
 import java.util.logging.Level;
 
