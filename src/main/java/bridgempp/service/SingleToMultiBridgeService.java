@@ -1,8 +1,10 @@
 package bridgempp.service;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.Level;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
@@ -12,10 +14,11 @@ import bridgempp.data.DataManager;
 import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "SingleToMultiBridgeService")
+@DiscriminatorValue("SingleToMultiBridgeService")
 public abstract class SingleToMultiBridgeService extends BridgeService
 {
 	@OneToMany(mappedBy = "service")
-	protected Collection<MultiBridgeServiceHandle<?>> handles;
+	protected Collection<MultiBridgeServiceHandle<?>> handles = new LinkedList<MultiBridgeServiceHandle<?>>();
 
 	@Override
 	public abstract void connect();
