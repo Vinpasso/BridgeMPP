@@ -15,7 +15,6 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.services.xmpp.XMPPService;
 import bridgempp.services.xmpp.XMPPStatusListener;
 
 public class LeagueOfLegendsStatusListener extends XMPPStatusListener
@@ -67,6 +66,15 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 				case "hostingRankedGame":
 					message = "Hosting a Ranked Game";
 					break;
+				case "inQueue":
+					message = "Is now in Queue";
+					break;
+				case "championSelect":
+					message = "Is selecting their Champion";
+					break;
+				case "inGame":
+					message = "Is now in Game";
+					break;
 				default:
 					message = "Unknown Status: " + matcher.group(1);
 			}
@@ -75,7 +83,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 		}
 		else
 		{
-			ShadowManager.log(Level.WARNING, "Received presence update without Game Status tag");
+			ShadowManager.log(Level.WARNING, "Received presence update without Game Status tag: " + presence.toString());
 		}
 	}
 }

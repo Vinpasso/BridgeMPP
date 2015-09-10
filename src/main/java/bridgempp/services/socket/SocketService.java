@@ -83,6 +83,11 @@ public class SocketService extends BridgeService
 		try
 		{
 			SocketClient socketClient = connectedSockets.get(message.getDestination().getIdentifier());
+			if(socketClient == null || socketClient.socket == null || socketClient.socket.isClosed())
+			{
+				ShadowManager.log(Level.WARNING, "Attempted to send Message to disconnected Socket: " + message.toString());
+				return;
+			}
 			OutputStream out = socketClient.socket.getOutputStream();
 			ProtoCarry protoCarry = socketClient.protoCarry;
 			switch (protoCarry)
