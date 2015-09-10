@@ -1,8 +1,12 @@
 package bridgempp.service;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -11,9 +15,11 @@ import bridgempp.Message;
 import bridgempp.data.Endpoint;
 
 @Entity(name = "MultiBridgeServiceHandle")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "HANDLE_TYPE", discriminatorType=DiscriminatorType.STRING, length = 50)
 public abstract class MultiBridgeServiceHandle<T extends SingleToMultiBridgeService>
 {
-	@Id()
+	@Id
 	@Column(name = "Identifier", nullable = false, length = 255)
 	private String handleIdentifier;
 	

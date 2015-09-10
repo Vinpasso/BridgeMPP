@@ -3,8 +3,8 @@ package bridgempp.services.xmpp;
 import java.util.logging.Level;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.PostLoad;
 
 import org.jivesoftware.smack.PacketListener;
@@ -18,27 +18,18 @@ import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
-import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.MultiBridgeServiceHandle;
 
 @Entity(name = "XMPPMultiUserChat")
+@DiscriminatorValue("XMPPMultiUserChatHandle")
 class XMPPMultiUserMessageListener extends MultiBridgeServiceHandle<XMPPService> implements PacketListener
 {
 
 	/**
 	 * 
 	 */
-	@Id
-	@Column(name = "Identifier", nullable = false, length = 255)
-	String multiUserIdentifier;
-
-	@Column(name = "XMPPService", nullable = false)
-	private XMPPService xmppService;
-
-	@Column(name = "Endpoint", nullable = false)
-	Endpoint endpoint;
 
 	transient MultiUserChat multiUserChat;
 
@@ -54,10 +45,10 @@ class XMPPMultiUserMessageListener extends MultiBridgeServiceHandle<XMPPService>
 	{
 		try
 		{
-			multiUserChat = new MultiUserChat(this.xmppService.connection, endpoint.getIdentifier());
+			multiUserChat = new MultiUserChat(service.connection, endpoint.getIdentifier());
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
-			multiUserChat.join("BridgeMPP", "", discussionHistory, this.xmppService.connection.getPacketReplyTimeout());
+			multiUserChat.join("BridgeMPP", "", discussionHistory, service.connection.getPacketReplyTimeout());
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException | SmackException.NotConnectedException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);
@@ -74,7 +65,7 @@ class XMPPMultiUserMessageListener extends MultiBridgeServiceHandle<XMPPService>
 			if (message.chooseMessageFormat(XMPPService.supportedMessageFormats).equals(MessageFormat.XHTML))
 			{
 				String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
-				messageContents = this.xmppService.cacheEmbeddedBase64Image(messageContents);
+				messageContents = service.cacheEmbeddedBase64Image(messageContents);
 				XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + messageContents + "</body>");
 			}
 			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
@@ -103,6 +94,6 @@ class XMPPMultiUserMessageListener extends MultiBridgeServiceHandle<XMPPService>
 		{
 			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), endpoint);
 		}
-		xmppService.interpretXMPPMessage(user, endpoint, message);
+		service.interpretXMPPMessage(user, endpoint, message);
 	}
 }

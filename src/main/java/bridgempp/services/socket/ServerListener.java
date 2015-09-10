@@ -43,7 +43,6 @@ class ServerListener implements Runnable {
 					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(identifier, socketService);
 					User user = DataManager.getOrNewUserForIdentifier(identifier, endpoint);
 					SocketClient socketClient = new SocketClient(socketService, socket, user, endpoint);
-					socketClient.randomIdentifier = identifier;
 					new Thread(socketClient, "Socket TCP Connection").start();
 				} catch (SocketTimeoutException e) {
 				}

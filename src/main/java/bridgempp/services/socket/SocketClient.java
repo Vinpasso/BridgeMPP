@@ -8,6 +8,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
@@ -22,18 +25,20 @@ import bridgempp.services.socketservice.protobuf.ProtoBuf;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 
+@Entity(name = "SOCKET_HANDLE")
+@DiscriminatorValue("SOCKET_HANDLE")
 class SocketClient extends MultiBridgeServiceHandle<SocketService> implements Runnable
 {
+
+	
+	transient User user;
 
 	/**
 	 * 
 	 */
-	Socket socket;
-	User user;
-	Endpoint endpoint;
-	String randomIdentifier;
-	ProtoCarry protoCarry = ProtoCarry.None;
-	boolean running = true;
+	transient Socket socket;
+	transient ProtoCarry protoCarry = ProtoCarry.None;
+	transient boolean running = true;
 
 	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint)
 	{
