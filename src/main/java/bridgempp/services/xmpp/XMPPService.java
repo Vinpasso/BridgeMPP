@@ -41,7 +41,7 @@ import javax.persistence.Entity;
  */
 @Entity(name = "XMPP_SERVICE")
 @DiscriminatorValue(value = "XMPP_SERVICE")
-public class XMPPService extends SingleToMultiBridgeService {
+public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHandle> {
 
 	protected transient XMPPTCPConnection connection;
 	protected transient ChatManager chatmanager;
@@ -72,6 +72,7 @@ public class XMPPService extends SingleToMultiBridgeService {
 			MessageFormat.PLAIN_TEXT };
 
 	public XMPPService() {
+		super(XMPPHandle.class);
 		cachedObjects = new HashMap<>();
 	}
 

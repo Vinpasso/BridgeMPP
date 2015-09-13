@@ -24,7 +24,7 @@ import bridgempp.service.MultiBridgeServiceHandle;
 
 @Entity(name = "XMPPMultiUserChat")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
-class XMPPMultiUserMessageListener extends MultiBridgeServiceHandle<XMPPService> implements PacketListener
+class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 {
 
 	/**

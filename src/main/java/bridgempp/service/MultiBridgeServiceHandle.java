@@ -17,7 +17,7 @@ import bridgempp.data.Endpoint;
 @Entity(name = "MultiBridgeServiceHandle")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "HANDLE_TYPE", discriminatorType=DiscriminatorType.STRING, length = 50)
-public abstract class MultiBridgeServiceHandle<T extends SingleToMultiBridgeService>
+public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeService<S, H>, H extends MultiBridgeServiceHandle<S, H>>
 {
 	@Id
 	@Column(name = "Identifier", nullable = false, length = 255)
@@ -25,7 +25,7 @@ public abstract class MultiBridgeServiceHandle<T extends SingleToMultiBridgeServ
 	
 	@ManyToOne(optional = false, targetEntity = SingleToMultiBridgeService.class)
 	@JoinColumn(name = "MULTI_BRIDGE_SERVICE_IDENTIFIER", referencedColumnName = "SERVICE_IDENTIFIER")
-	protected T service;
+	protected S service;
 
 	@OneToOne(optional = false)
 	protected Endpoint endpoint;
@@ -33,12 +33,12 @@ public abstract class MultiBridgeServiceHandle<T extends SingleToMultiBridgeServ
 	
 	public abstract void sendMessage(Message message);
 
-	protected MultiBridgeServiceHandle(Endpoint endpoint, T service)
+	protected MultiBridgeServiceHandle(Endpoint endpoint, S service)
 	{
 		this.endpoint = endpoint;
 		this.handleIdentifier = endpoint.getIdentifier();
 		this.service = service;
-		service.addHandle(this);
+		service.addHandle((H) this);
 	}
 	
 }

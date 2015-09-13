@@ -25,8 +25,13 @@ import bridgempp.service.SingleToMultiBridgeService;
  */
 @Entity(name = "SOCKET_SERVICE")
 @DiscriminatorValue(value = "SOCKET_SERVICE")
-public class SocketService extends SingleToMultiBridgeService
+public class SocketService extends SingleToMultiBridgeService<SocketService, SocketClient>
 {
+
+	public SocketService()
+	{
+		super(SocketClient.class);
+	}
 
 	transient ServerSocket serverSocket;
 
@@ -62,10 +67,10 @@ public class SocketService extends SingleToMultiBridgeService
 	
 	public void sendKeepAliveMessages()
 	{
-		Iterator<MultiBridgeServiceHandle<?>> iterator = handles.iterator();
+		Iterator<SocketClient> iterator = handles.iterator();
 		while(iterator.hasNext())
 		{
-			MultiBridgeServiceHandle<?> handle = iterator.next();
+			SocketClient handle = iterator.next();
 			handle.sendMessage(new Message(null, null, null, null, "",
 					MessageFormat.PLAIN_TEXT));
 		}

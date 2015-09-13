@@ -16,7 +16,7 @@ import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.MultiBridgeServiceHandle;
 
-class XMPPSingleChatMessageListener extends MultiBridgeServiceHandle<XMPPService> implements MessageListener {
+class XMPPSingleChatMessageListener extends XMPPHandle implements MessageListener {
 
 	/**
 	 * 
