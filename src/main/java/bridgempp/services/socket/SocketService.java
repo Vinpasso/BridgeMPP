@@ -28,11 +28,6 @@ import bridgempp.service.SingleToMultiBridgeService;
 public class SocketService extends SingleToMultiBridgeService<SocketService, SocketClient>
 {
 
-	public SocketService()
-	{
-		super(SocketClient.class);
-	}
-
 	transient ServerSocket serverSocket;
 
 	@Column(name = "Listen_Address", nullable = false, length = 50)
@@ -61,13 +56,13 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 		pendingShutdown = true;
 		while (!handles.isEmpty())
 		{
-			((SocketClient) handles.iterator().next()).disconnect();
+			((SocketClient) handles.values().iterator().next()).disconnect();
 		}
 	}
 	
 	public void sendKeepAliveMessages()
 	{
-		Iterator<SocketClient> iterator = handles.iterator();
+		Iterator<SocketClient> iterator = handles.values().iterator();
 		while(iterator.hasNext())
 		{
 			SocketClient handle = iterator.next();

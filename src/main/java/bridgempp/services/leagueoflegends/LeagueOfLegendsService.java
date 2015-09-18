@@ -18,7 +18,7 @@ public class LeagueOfLegendsService extends XMPPService
 		connection.getRoster().addRosterListener(new LeagueOfLegendsStatusListener(this));
 	}
 	
-	public void addEndpoint(Endpoint endpoint)
+	public void importFromEndpoint(Endpoint endpoint)
 	{
 		//Don't attempt to recover chats
 	}

@@ -36,7 +36,7 @@ public class GroupManager {
         return DataManager.getGroup(name);
     }
 
-    public static void sendMessageToAllSubscribedGroups(final Message message) {
+    public static synchronized void sendMessageToAllSubscribedGroups(final Message message) {
         Endpoint endpoint = message.getOrigin();
         Collection<Group> groups = endpoint.getGroups();
         if(groups == null)
@@ -49,7 +49,7 @@ public class GroupManager {
         }
     }
 
-    public static void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
+    public static synchronized void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
         Endpoint endpoint = message.getOrigin();
         Collection<Group> groups = endpoint.getGroups();
 		for(Group group : groups)

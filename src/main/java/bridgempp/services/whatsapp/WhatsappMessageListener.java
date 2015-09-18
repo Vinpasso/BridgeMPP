@@ -89,8 +89,14 @@ class WhatsappMessageListener implements Runnable {
 		} catch (UnsupportedOperationException | IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
-		this.whatsappService.senderThread.interrupt();
-		this.whatsappService.yowsup.destroyForcibly();
+		if(whatsappService.senderThread != null)
+		{
+			this.whatsappService.senderThread.interrupt();
+		}
+		if(whatsappService.yowsup != null)
+		{
+			this.whatsappService.yowsup.destroyForcibly();
+		}
 		ShadowManager.log(Level.INFO, "Stopped Yowsup Process");
 	}
 }

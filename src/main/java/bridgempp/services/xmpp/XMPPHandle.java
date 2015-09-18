@@ -10,5 +10,12 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 	{
 		super(endpoint, service);
 	}
+	
+	protected XMPPHandle()
+	{
+		super();
+	}
+
+	public abstract void onLoad();
 
 }

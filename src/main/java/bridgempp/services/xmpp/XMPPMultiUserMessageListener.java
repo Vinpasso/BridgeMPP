@@ -2,11 +2,8 @@ package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PostLoad;
-
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -20,7 +17,6 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.MultiBridgeServiceHandle;
 
 @Entity(name = "XMPPMultiUserChat")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
@@ -39,16 +35,22 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 		this.multiUserChat = multiUserChat;
 	}
 	
+	protected XMPPMultiUserMessageListener()
+	{
+		super();
+	}
+	
 	// For resumed Chats
-	@PostLoad
 	public void onLoad()
 	{
+		ShadowManager.log(Level.INFO, "Resumed XMPP Multi User Chat from Handle: " + endpoint.getIdentifier());
 		try
 		{
 			multiUserChat = new MultiUserChat(service.connection, endpoint.getIdentifier());
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", "", discussionHistory, service.connection.getPacketReplyTimeout());
+			multiUserChat.addMessageListener(this);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException | SmackException.NotConnectedException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);

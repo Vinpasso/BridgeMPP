@@ -15,7 +15,6 @@ import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
-import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
@@ -39,6 +38,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 	transient Socket socket;
 	transient ProtoCarry protoCarry = ProtoCarry.None;
 	transient boolean running = true;
+	transient Thread thread;
 
 	public SocketClient(SocketService socketService, Socket socket, User user, Endpoint endpoint)
 	{
@@ -46,7 +46,23 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 		this.socket = socket;
 		this.user = user;
 	}
+	
+	
+	/**
+	 * JPA Constructor
+	 */
+	@SuppressWarnings("unused")
+	private SocketClient()
+	{
+		super();
+	}
 
+	public void connect()
+	{
+		thread = new Thread(this, "Socket TCP Connection " + endpoint.getIdentifier());
+		thread.start();
+	}
+	
 	@Override
 	public void run()
 	{
@@ -144,15 +160,18 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 	public void disconnect()
 	{
 		running = false;
-		try
+		if (socket != null)
 		{
-			socket.close();
-		} catch (IOException e)
-		{
-			ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
+			try
+			{
+				socket.close();
+			} catch (IOException e)
+			{
+				ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
+			}
 		}
+		removeHandle();
 		EventManager.fireEvent(Event.ENDPOINT_DISCONNECTED, endpoint);
-		DataManager.removeState(this);
 		ShadowManager.log(Level.INFO, "TCP client has disconnected");
 	}
 
@@ -191,6 +210,11 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 					break;
 				case None:
 					ShadowManager.log(Level.WARNING, "Message not delivered due to Protocol None: " + message.toString());
+					if(thread == null || !thread.isAlive())
+					{
+						ShadowManager.log(Level.WARNING, "Found dead Socket Connection. Will disconnect.");
+						disconnect();
+					}
 					break;
 			}
 		} catch (IOException e)

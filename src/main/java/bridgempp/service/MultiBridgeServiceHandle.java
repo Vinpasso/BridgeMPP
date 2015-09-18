@@ -20,8 +20,8 @@ import bridgempp.data.Endpoint;
 public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeService<S, H>, H extends MultiBridgeServiceHandle<S, H>>
 {
 	@Id
-	@Column(name = "Identifier", nullable = false, length = 255)
-	private String handleIdentifier;
+	@Column(name = "HANDLE_IDENTIFIER", nullable = false, length = 255)
+	protected String identifier;
 	
 	@ManyToOne(optional = false, targetEntity = SingleToMultiBridgeService.class)
 	@JoinColumn(name = "MULTI_BRIDGE_SERVICE_IDENTIFIER", referencedColumnName = "SERVICE_IDENTIFIER")
@@ -36,9 +36,21 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	protected MultiBridgeServiceHandle(Endpoint endpoint, S service)
 	{
 		this.endpoint = endpoint;
-		this.handleIdentifier = endpoint.getIdentifier();
+		this.identifier = endpoint.getIdentifier();
 		this.service = service;
 		service.addHandle((H) this);
+	}
+	
+	/**
+	 * JPA Constructor
+	 */
+	protected MultiBridgeServiceHandle()
+	{
+	}
+	
+	protected void removeHandle()
+	{
+		service.removeHandle((H) this);
 	}
 	
 }

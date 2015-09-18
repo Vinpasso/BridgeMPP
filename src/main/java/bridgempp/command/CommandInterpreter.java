@@ -31,7 +31,7 @@ public class CommandInterpreter {
 	}
 
 	// Process incomming messages and forward them to targets
-	public static void processMessage(Message message) {
+	public static synchronized void processMessage(Message message) {
 		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0) {
 			return;
 		}

@@ -2,8 +2,6 @@ package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
 
-import javax.persistence.PostLoad;
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
@@ -14,7 +12,6 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.MultiBridgeServiceHandle;
 
 class XMPPSingleChatMessageListener extends XMPPHandle implements MessageListener {
 
@@ -30,10 +27,15 @@ class XMPPSingleChatMessageListener extends XMPPHandle implements MessageListene
 		user = DataManager.getOrNewUserForIdentifier(chat.getParticipant(), endpoint);
 	}
 	
-	@PostLoad
+	protected XMPPSingleChatMessageListener()
+	{
+		super();
+	}
+	
 	public void onLoad()
 	{
 		chat = service.chatmanager.createChat(endpoint.getIdentifier(), this);
+		chat.addMessageListener(this);
 	}
 
 	@Override
