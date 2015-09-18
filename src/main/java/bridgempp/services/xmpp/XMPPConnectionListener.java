@@ -1,5 +1,7 @@
 package bridgempp.services.xmpp;
 
+import java.util.logging.Level;
+
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -23,12 +25,12 @@ final class XMPPConnectionListener implements ConnectionListener {
 
 	@Override
 	public void connectionClosedOnError(Exception e) {
-		ShadowManager.fatal(e);
+		ShadowManager.log(Level.WARNING, "The XMPP Connection has been disconnected", e);
 	}
 
 	@Override
 	public void connectionClosed() {
-		ShadowManager.fatal("XMPP Service has disconnected");
+		ShadowManager.log(Level.WARNING, "XMPP Service has disconnected");
 	}
 
 	@Override
