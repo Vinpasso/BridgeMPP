@@ -196,7 +196,7 @@ public class CommandGroupOperations
 	}
 
 	// Subscribe the Message's Sender to the specified Group with name
-	private static Group subscribeGroup(String message, Endpoint sender)
+	protected static Group subscribeGroup(String message, Endpoint sender)
 	{
 		Group group = GroupManager.findGroup(message);
 		if (group == null)

@@ -69,6 +69,7 @@ public class CommandInterpreter {
 		addCommandClass(CommandServiceOperations.class);
 		addCommandClass(CommandStatisticsOperations.class);
 		addCommandClass(CommandInfoOperations.class);
+		addCommandClass(CommandBotOperations.class);
 		addCommandClass(CommandHelp.class);
 		ShadowManager.log(Level.INFO, "Loaded all Command Classes");
 	}
