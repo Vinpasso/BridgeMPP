@@ -16,7 +16,6 @@ import javax.persistence.Entity;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.service.SingleToMultiBridgeService;
 
 /**
