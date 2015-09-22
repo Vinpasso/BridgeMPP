@@ -16,7 +16,6 @@ import javax.persistence.Entity;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.service.SingleToMultiBridgeService;
 
 /**
@@ -62,13 +61,20 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 	
 	public void sendKeepAliveMessages()
 	{
-		Iterator<SocketClient> iterator = handles.values().iterator();
-		while(iterator.hasNext())
+		ShadowManager.log(Level.INFO, "Sending Keep-Alive Messages");
+		try
 		{
-			SocketClient handle = iterator.next();
-			handle.sendMessage(new Message(null, null, null, null, "",
-					MessageFormat.PLAIN_TEXT));
+			Iterator<SocketClient> iterator = handles.values().iterator();
+			while (iterator.hasNext())
+			{
+				SocketClient handle = iterator.next();
+				handle.sendMessage(new Message(null, null, null, null, "", MessageFormat.PLAIN_TEXT));
+			}
+		} catch (Exception e)
+		{
+			ShadowManager.log(Level.WARNING, "Aborted sending Keep-Alive due to exception ", e);
 		}
+		ShadowManager.log(Level.INFO, "Sent Keep-Alive Messages");
 	}
 
 	@Override

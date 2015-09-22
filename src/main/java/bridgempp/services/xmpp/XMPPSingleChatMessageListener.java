@@ -2,6 +2,9 @@ package bridgempp.services.xmpp;
 
 import java.util.logging.Level;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
@@ -13,13 +16,15 @@ import bridgempp.data.DataManager;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
+@Entity(name = "XMPPSingleUserChat")
+@DiscriminatorValue("XMPPSingleUserChatHandle")
 class XMPPSingleChatMessageListener extends XMPPHandle implements MessageListener {
 
 	/**
 	 * 
 	 */
-	User user;
-	Chat chat;
+	transient User user;
+	transient Chat chat;
 
 	public XMPPSingleChatMessageListener(XMPPService xmppService, Chat chat) {
 		super(DataManager.getOrNewEndpointForIdentifier(chat.getParticipant(), xmppService), xmppService);

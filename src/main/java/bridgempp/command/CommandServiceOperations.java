@@ -90,12 +90,12 @@ public class CommandServiceOperations
 	
 	@CommandName("!loadleagueoflegendsservice: Load a League Of Legends Service")
 	@CommandTrigger("!loadleagueoflegendsservice")
-	@HelpTopic("Creates a League Of Legends Service. Requires host, port, domain, oldStyleSSL (boolean), Username, Password, Status message.")
+	@HelpTopic("Creates a League Of Legends Service. Requires host, port, domain, oldStyleSSL (boolean), Username, Password, Status message, Status Filter.")
 	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
-	public static String loadLeagueOfLegendsService(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String status)
+	public static String loadLeagueOfLegendsService(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String status, String filter)
 	{
 		LeagueOfLegendsService service = new LeagueOfLegendsService();
-		service.configure(host, port, domain, oldStyleSSL, username, password, status);
+		service.configure(host, port, domain, oldStyleSSL, username, password, status, filter);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
 	}

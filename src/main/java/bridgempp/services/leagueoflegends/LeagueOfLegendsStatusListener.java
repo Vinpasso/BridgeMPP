@@ -20,9 +20,12 @@ import bridgempp.services.xmpp.XMPPStatusListener;
 public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 {
 
-	public LeagueOfLegendsStatusListener(LeagueOfLegendsService service)
+	private String acceptedStatus;
+	
+	public LeagueOfLegendsStatusListener(LeagueOfLegendsService service, String acceptedStatus)
 	{
 		super(service);
+		this.acceptedStatus = acceptedStatus;
 	}
 	
 	@Override
@@ -52,6 +55,11 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 		String message = "";
 		if(matcher.find())
 		{
+			if(!acceptedStatus.contains(matcher.group(1)))
+			{
+				ShadowManager.log(Level.INFO, "Ignored Status update: " + matcher.group(1) + " from " + user.toString());
+				return;
+			}
 			switch(matcher.group(1))
 			{
 				case "outOfGame":
