@@ -6,6 +6,7 @@
 package bridgempp.services.socket;
 
 import java.net.ServerSocket;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -72,6 +73,10 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 				handle.sendMessage(new Message(null, null, null, null, "", MessageFormat.PLAIN_TEXT));
 				sent++;
 			}
+		} catch (ConcurrentModificationException e)
+		{
+			ShadowManager.log(Level.INFO, "The Data Model has changed, resending Keep-Alive Messages");
+			sendKeepAliveMessages();
 		} catch (Exception e)
 		{
 			ShadowManager.log(Level.WARNING, "Aborted sending Keep-Alive due to exception ", e);

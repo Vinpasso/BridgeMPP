@@ -12,7 +12,7 @@ public class DataManager
 
 	private static final PersistanceManager PERSISTANCE_MANAGER = PersistanceManager.getPersistanceManager();
 
-	private static Endpoint registerEndpoint(BridgeService service, String identifier)
+	private static synchronized Endpoint registerEndpoint(BridgeService service, String identifier)
 	{
 		Endpoint endpoint = new Endpoint(service, identifier);
 		PERSISTANCE_MANAGER.updateState(endpoint);
@@ -20,18 +20,18 @@ public class DataManager
 		return endpoint;
 	}
 	
-	public static void deregisterEndpoint(Endpoint endpoint)
+	public static synchronized void deregisterEndpoint(Endpoint endpoint)
 	{
 		PERSISTANCE_MANAGER.removeState(endpoint);
 		EventManager.fireEvent(Event.ENDPOINT_REMOVED, endpoint);
 	}
 	
-	public static void deregisterUser(User user)
+	public static synchronized void deregisterUser(User user)
 	{
 		PERSISTANCE_MANAGER.removeState(user);
 	}
 	
-	private static User registerUser(String identifier)
+	private static synchronized User registerUser(String identifier)
 	{
 		User user = new User(identifier);
 		PERSISTANCE_MANAGER.updateState(user);
@@ -43,7 +43,7 @@ public class DataManager
 	 * @param identifier The Primary Key to find the User from
 	 * @return The User found from the Primary Key
 	 */
-	public static User getUserForIdentifier(String identifier)
+	public static synchronized User getUserForIdentifier(String identifier)
 	{
 		return PERSISTANCE_MANAGER.getUserForIdentifier(identifier);
 	}
@@ -53,7 +53,7 @@ public class DataManager
 	 * @param identifier The Primary Key to find the User from
 	 * @return The User found from the Primary Key, or a new User
 	 */
-	public static User getOrNewUserForIdentifier(String identifier, Endpoint... endpoints)
+	public static synchronized User getOrNewUserForIdentifier(String identifier, Endpoint... endpoints)
 	{
 		User user = getUserForIdentifier(identifier);
 		if(user == null)
@@ -72,7 +72,7 @@ public class DataManager
 	 * @param identifier The Primary Key to find the Endpoint from
 	 * @return The Endpoint found from the Primary Key
 	 */
-	public static Endpoint getEndpointForIdentifier(String identifier)
+	public static synchronized Endpoint getEndpointForIdentifier(String identifier)
 	{
 		return PERSISTANCE_MANAGER.getEndpointForIdentifier(identifier);
 	}
@@ -82,7 +82,7 @@ public class DataManager
 	 * @param identifier The Primary Key to find the Endpoint from
 	 * @return The Endpoint found from the Primary Key, or a new Endpoint
 	 */
-	public static Endpoint getOrNewEndpointForIdentifier(String identifier, BridgeService service)
+	public static synchronized Endpoint getOrNewEndpointForIdentifier(String identifier, BridgeService service)
 	{
 		Endpoint endpoint = getEndpointForIdentifier(identifier);
 		if(endpoint == null)
@@ -92,59 +92,59 @@ public class DataManager
 		return endpoint;
 	}
 
-	public static Collection<Endpoint> getAllEndpoints() {
+	public static synchronized Collection<Endpoint> getAllEndpoints() {
 		return PERSISTANCE_MANAGER.getEndpoints();
 	}
 
-	public static Group createGroup(String name) {
+	public static synchronized Group createGroup(String name) {
 		Group group = new Group(name);
 		PERSISTANCE_MANAGER.updateState(group);
 		return group;
 	}
 
-	public static void removeGroup(Group group) {
+	public static synchronized void removeGroup(Group group) {
 		PERSISTANCE_MANAGER.removeState(group);
 	}
 
-	public static Group getGroup(String name) {
+	public static synchronized Group getGroup(String name) {
 		return PERSISTANCE_MANAGER.getGroup(name);
 	}
 
-	public static Collection<Group> getAllGroups() {
+	public static synchronized Collection<Group> getAllGroups() {
 		return PERSISTANCE_MANAGER.getGroups();
 	}
 
-	public static void createAccessKey(AccessKey accessKey) {
+	public static synchronized void createAccessKey(AccessKey accessKey) {
 		PERSISTANCE_MANAGER.updateState(accessKey);
 	}
 
-	public static AccessKey getAccessKey(String key) {
+	public static synchronized AccessKey getAccessKey(String key) {
 		return PERSISTANCE_MANAGER.getFromPrimaryKey(AccessKey.class, key);
 	}
 
-	public static void removeAccessKey(AccessKey key) {
+	public static synchronized void removeAccessKey(AccessKey key) {
 		PERSISTANCE_MANAGER.removeState(key);
 	}
 
-	public static Collection<AccessKey> getAllAccessKeys() {
+	public static synchronized Collection<AccessKey> getAllAccessKeys() {
 		return PERSISTANCE_MANAGER.getQuery(AccessKey.class);
 	}
 
-	public static Collection<User> getAllUsers() {
+	public static synchronized Collection<User> getAllUsers() {
 		return PERSISTANCE_MANAGER.getQuery(User.class);
 	}
 
-	public static <T> T getFromPrimaryKey(Class<T> class1, Object identifier)
+	public static synchronized <T> T getFromPrimaryKey(Class<T> class1, Object identifier)
 	{
 		return PERSISTANCE_MANAGER.getFromPrimaryKey(class1, identifier);
 	}
 	
-	public static void updateState(Object... objects)
+	public static synchronized void updateState(Object... objects)
 	{
 		PERSISTANCE_MANAGER.updateState(objects);
 	}
 
-	public static void removeState(Object... objects)
+	public static synchronized void removeState(Object... objects)
 	{
 		PERSISTANCE_MANAGER.removeState(objects);
 	}

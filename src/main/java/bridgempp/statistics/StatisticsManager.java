@@ -13,7 +13,7 @@ public class StatisticsManager
 
 	private static StatisticStore statisticStore;
 
-	public static void processMessage(Message message)
+	public static synchronized void processMessage(Message message)
 	{
 		statisticStore.messageCount++;
 	}

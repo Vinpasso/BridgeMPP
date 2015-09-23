@@ -16,6 +16,7 @@ import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
 import bridgempp.command.wrapper.CommandHelp;
 import bridgempp.command.wrapper.CommandWrapper;
+import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.statistics.StatisticsManager;
 
@@ -27,7 +28,10 @@ public class CommandInterpreter {
 
 	// Interpret a Message message with leading !
 	public static void interpretCommand(Message message) {
-		CommandWrapper.executeCommand(message);
+		synchronized(DataManager.class)
+		{
+			CommandWrapper.executeCommand(message);
+		}
 	}
 
 	// Process incomming messages and forward them to targets
