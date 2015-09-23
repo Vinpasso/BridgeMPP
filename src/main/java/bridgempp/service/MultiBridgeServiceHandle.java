@@ -33,6 +33,7 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	
 	public abstract void sendMessage(Message message);
 
+	@SuppressWarnings("unchecked")
 	protected MultiBridgeServiceHandle(Endpoint endpoint, S service)
 	{
 		this.endpoint = endpoint;
@@ -48,6 +49,7 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	{
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void removeHandle()
 	{
 		service.removeHandle((H) this);

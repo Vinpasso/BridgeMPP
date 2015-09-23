@@ -5,8 +5,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import org.apache.commons.collections.functors.FalsePredicate;
-
 import bridgempp.data.Endpoint;
 import bridgempp.services.xmpp.XMPPService;
 
