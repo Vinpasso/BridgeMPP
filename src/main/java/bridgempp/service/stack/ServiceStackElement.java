@@ -22,4 +22,9 @@ public abstract class ServiceStackElement<H, L>
 	{
 		layer.sendToUpper(element);
 	}
+	
+	protected ServiceStackLayer<H, L> getLayer()
+	{
+		return layer;
+	}
 }

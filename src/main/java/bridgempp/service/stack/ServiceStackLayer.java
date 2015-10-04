@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import bridgempp.ShadowManager;
@@ -17,6 +18,9 @@ public class ServiceStackLayer<H, L>
 	@OneToMany(mappedBy = "layer")
 	private Collection<ServiceStackElement<H, L>> stackElements = new LinkedList<>();
 
+	@ManyToOne(optional = false)
+	private ServiceStack stack;
+	
 	private ServiceStackLayer<L, ?> lower;
 	
 	private ServiceStackLayer<?, H> upper;
@@ -77,6 +81,11 @@ public class ServiceStackLayer<H, L>
 			lower = (ServiceStackLayer<L, ?>) iterator.next();
 			lower.updateStackReferences(iterator);
 		}
+	}
+
+	public ServiceStack getStack()
+	{
+		return stack;
 	}
 	
 }

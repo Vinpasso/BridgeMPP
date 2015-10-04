@@ -18,7 +18,7 @@ import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.MultiBridgeServiceHandle;
+import bridgempp.service.stack.handle.MultiBridgeServiceHandle;
 import bridgempp.services.socket.SocketService.ProtoCarry;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
 import bridgempp.state.EventManager;

@@ -1,7 +1,7 @@
 package bridgempp.state.endpoint;
 
 import bridgempp.data.Endpoint;
-import bridgempp.service.SingleToMultiBridgeService;
+import bridgempp.service.stack.handle.SingleToMultiBridgeService;
 import bridgempp.state.EventListener;
 import bridgempp.state.EventManager.Event;
 import bridgempp.state.EventSubscribe;

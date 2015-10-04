@@ -11,7 +11,8 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
-import bridgempp.service.SingleToMultiBridgeService;
+import bridgempp.service.stack.StackBridgeService;
+import bridgempp.service.stack.handle.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
 
 import org.jivesoftware.smack.*;
@@ -44,7 +45,7 @@ import javax.persistence.Entity;
  */
 @Entity(name = "XMPP_SERVICE")
 @DiscriminatorValue(value = "XMPP_SERVICE")
-public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHandle>
+public class XMPPService extends StackBridgeService
 {
 
 	protected transient XMPPTCPConnection connection;
