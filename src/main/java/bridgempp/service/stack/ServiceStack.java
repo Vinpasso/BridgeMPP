@@ -10,7 +10,7 @@ public class ServiceStack
 
 	//Index 0 is Top of Stack
 	//Top of Stack is highest abstraction (CommandInterpreterSender)
-	private List<ServiceStackElement> stackElements;
+	private List<ServiceStackLayer<?, ?>> stackElements;
 	
 	
 	public void sendMessage(Message message)
@@ -24,38 +24,21 @@ public class ServiceStack
 		{
 			return;
 		}
-		ServiceStackElement serviceStackElement = stackElements.get(0);
+		ServiceStackLayer<Message, ?> serviceStackElement = (ServiceStackLayer<Message, ?>) stackElements.get(0);
 		serviceStackElement.messageDescending(message);
 	}
 	
-	protected void sendMessageFromBottom(Message message)
-	{
-		if(stackElements.isEmpty())
-		{
-			return;
-		}
-		ServiceStackElement serviceStackElement = stackElements.get(stackElements.size() - 1);
-		serviceStackElement.messageDescending(message);
-	}
-	
-	public void insertAtTop(ServiceStackElement element)
-	{
-		stackElements.add(0, element);
-	}
-	
-	public void insertAtBottom(ServiceStackElement element)
-	{
-		stackElements.add(element);
-	}
-	
-	public void removeStackElement(ServiceStackElement element)
-	{
-		stackElements.remove(element);
-	}
-	
-	public List<ServiceStackElement> getStackElements()
+	public List<ServiceStackLayer<?,?>> getStackLayers()
 	{
 		return Collections.unmodifiableList(stackElements);
 	}
 	
+	public void addLayer(ServiceStackLayer<?, ?> layer)
+	{
+		stackElements.add(layer);
+		if(stackElements.size() > 1)
+		{
+			stackElements.get(0).updateStackReferences(stackElements.listIterator(1));
+		}
+	}
 }

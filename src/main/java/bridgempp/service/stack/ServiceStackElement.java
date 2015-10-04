@@ -1,46 +1,25 @@
 package bridgempp.service.stack;
 
-import java.util.logging.Level;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
-import bridgempp.Message;
-import bridgempp.ShadowManager;
-
-public abstract class ServiceStackElement
+@Entity(name = "Service_Stack_Element")
+public abstract class ServiceStackElement<H, L>
 {
-	private ServiceStackElement above;
-	private ServiceStackElement below;
+	@ManyToOne(optional = false)
+	private ServiceStackLayer<H, L> layer;
 
-	protected abstract void messageAscending(Message message);
+	protected abstract void messageAscending(L input);
 	
-	protected abstract void messageDescending(Message message);
+	protected abstract void messageDescending(H input);
 	
-	protected void sendToLower(Message message)
+	protected void sendToLower(L element)
 	{
-		if(below == null)
-		{
-			ShadowManager.log(Level.WARNING, "Sent message below the Stack bottom");
-			return;
-		}
-		below.messageDescending(message);
+		layer.sendToLower(element);
 	}
 	
-	protected void sendToUpper(Message message)
+	protected void sendToUpper(H element)
 	{
-		if(above == null)
-		{
-			ShadowManager.log(Level.WARNING, "Sent message over the Stack top");
-			return;
-		}
-		above.messageAscending(message);
-	}
-	
-	protected void setAbove(ServiceStackElement above)
-	{
-		this.above = above;
-	}
-	
-	protected void setBelow(ServiceStackElement below)
-	{
-		this.below = below;
+		layer.sendToUpper(element);
 	}
 }
