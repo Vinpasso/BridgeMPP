@@ -20,12 +20,14 @@ import com.sun.mail.imap.protocol.IMAPProtocol;
 import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 
 /**
@@ -64,11 +66,17 @@ public class MailService extends BridgeService
 		try
 		{
 
-			System.getProperties().setProperty("mail.store.protocol", "imaps");
-			System.getProperties().setProperty("mail.smtp.submitter", "username");
-			System.getProperties().setProperty("mail.smtp.auth", "true");
-			System.getProperties().setProperty("mail.smtp.host", smtphost);
-			System.getProperties().setProperty("mail.smtp.port", smtpport + "");
+			Properties mailProperties = new Properties();
+			
+			mailProperties.setProperty("mail.store.protocol", "imaps");
+			mailProperties.setProperty("mail.smtp.submitter", username);
+			mailProperties.setProperty("mail.smtp.auth", "true");
+			mailProperties.setProperty("mail.smtp.host", smtphost);
+			mailProperties.setProperty("mail.smtp.port", smtpport + "");
+			mailProperties.put("mail.smtp.socketFactory.port", smtpport);
+			mailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			mailProperties.put("mail.smtp.socketFactory.fallback", "false");
+			mailProperties.put("mail.smtp.starttls.enable", "true");
 
 			Authenticator authenticator = new Authenticator() {
 				@Override
@@ -79,7 +87,7 @@ public class MailService extends BridgeService
 
 			};
 
-			session = Session.getDefaultInstance(System.getProperties(), authenticator);
+			session = Session.getDefaultInstance(mailProperties, authenticator);
 			store = session.getStore("imaps");
 			store.connect(imaphost, imapport, username, password);
 			folder = (IMAPFolder) store.getFolder("Inbox");
@@ -121,12 +129,12 @@ public class MailService extends BridgeService
 		try
 		{
 			MimeMessage mimeMessage = new MimeMessage(session);
-			mimeMessage.setFrom(username);
-			mimeMessage.setRecipients(Message.RecipientType.TO, message.getDestination().getIdentifier());
+			mimeMessage.setFrom(new InternetAddress(username, "BridgeMPP"));
+			mimeMessage.setRecipients(Message.RecipientType.TO, new Address[] {new InternetAddress(message.getDestination().getIdentifier(), message.getDestination().toString()) });
 			mimeMessage.setSubject(message.toSimpleString(getSupportedMessageFormats()));
 			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()));
 			Transport.send(mimeMessage, username, password);
-		} catch (MessagingException ex)
+		} catch (Exception ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
@@ -198,10 +206,10 @@ public class MailService extends BridgeService
 			{
 				try
 				{
-					for (Message message : folder.getMessages())
-					{
-						processMessage(message);
-					}
+//					for (Message message : folder.getMessages())
+//					{
+//						processMessage(message);
+//					}
 					folder.idle();
 				} catch (MessagingException ex)
 				{
@@ -231,7 +239,7 @@ public class MailService extends BridgeService
 		{
 		}
 
-		public void processMessage(Message message)
+		public synchronized void processMessage(Message message)
 		{
 			try
 			{
@@ -239,7 +247,7 @@ public class MailService extends BridgeService
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(sender, MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
-				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, message.getContent().toString(), getSupportedMessageFormats()[0]);
+				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);
 				CommandInterpreter.processMessage(bMessage);
 				folder.copyMessages(new Message[] { message }, processedFolder);
 				folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
@@ -250,6 +258,25 @@ public class MailService extends BridgeService
 			{
 				ShadowManager.log(Level.SEVERE, null, ex);
 			}
+		}
+
+		protected String getMessageContent(Message message) throws IOException, MessagingException
+		{
+			Object messageContent = message.getContent();
+			if(messageContent instanceof Multipart)
+			{
+				Multipart container = (Multipart) messageContent;
+				for(int i = 0; i < container.getCount(); i++)
+				{
+					BodyPart part = container.getBodyPart(i);
+					Object content = part.getContent();
+					if(content instanceof String)
+					{
+						return (String) content;
+					}
+				}
+			}
+			return messageContent.toString();
 		}
 	}
 
