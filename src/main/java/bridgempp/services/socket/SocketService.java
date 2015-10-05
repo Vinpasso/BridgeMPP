@@ -16,6 +16,7 @@ import javax.persistence.Entity;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.service.stack.StackBridgeService;
 import bridgempp.service.stack.handle.SingleToMultiBridgeService;
 
 /**
@@ -24,7 +25,7 @@ import bridgempp.service.stack.handle.SingleToMultiBridgeService;
  */
 @Entity(name = "SOCKET_SERVICE")
 @DiscriminatorValue(value = "SOCKET_SERVICE")
-public class SocketService extends SingleToMultiBridgeService<SocketService, SocketClient>
+public class SocketService extends StackBridgeService
 {
 
 	transient ServerSocket serverSocket;

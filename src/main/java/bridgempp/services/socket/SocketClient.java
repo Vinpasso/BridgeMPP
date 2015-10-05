@@ -26,7 +26,7 @@ import bridgempp.state.EventManager.Event;
 
 @Entity(name = "SOCKET_HANDLE")
 @DiscriminatorValue("SOCKET_HANDLE")
-class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient> implements Runnable
+class SocketClient extends MultiBridgeServiceHandle implements Runnable
 {
 
 	
