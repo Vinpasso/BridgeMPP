@@ -197,9 +197,9 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 					{
 						protoMessageBuilder.setGroup(message.getGroup().getName());
 					}
-					if (message.getOrigin() != null)
+					if (message.getSender() != null)
 					{
-						protoMessageBuilder.setSender(message.getOrigin().toString());
+						protoMessageBuilder.setSender(message.getSender().toString());
 					}
 					if (message.getDestination() != null)
 					{
