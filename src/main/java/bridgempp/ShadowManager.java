@@ -77,9 +77,9 @@ public class ShadowManager {
         }
     }
 
-	public static void log(Level level, String message, Exception e) {
+	public static void log(Level level, String message, Throwable cause) {
 		logWithStackTraceDepth(level, message, 3);
-		e.printStackTrace();
+		cause.printStackTrace();
 	}
 
 	public static void info(String msg)

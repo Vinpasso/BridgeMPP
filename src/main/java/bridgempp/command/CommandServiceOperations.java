@@ -20,6 +20,7 @@ import bridgempp.services.BridgeChat;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
+import bridgempp.services.asyncsocket.ASyncSocketService;
 import bridgempp.services.facebook.FacebookService;
 import bridgempp.services.leagueoflegends.LeagueOfLegendsService;
 import bridgempp.services.socket.SocketService;
@@ -108,6 +109,18 @@ public class CommandServiceOperations
 	{
 		SocketService service = new SocketService();
 		service.configure(listenAddress, port);
+		ServiceManager.loadService(service);
+		return "Loaded service: " + service.toString(); 
+	}
+	
+	@CommandName("!loadasyncsocketservice: Load a Asynchronous Socket Service")
+	@CommandTrigger("!loadasyncsocketservice")
+	@HelpTopic("Creates a Asynchronous Socket Service. Requires listen address, port, numServerThreads, numClientThreads.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String loadASyncSocketService(String listenAddress, int port, int numServerThreads, int numClientThreads)
+	{
+		ASyncSocketService service = new ASyncSocketService();
+		service.configure(listenAddress, port, numServerThreads, numClientThreads);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
 	}

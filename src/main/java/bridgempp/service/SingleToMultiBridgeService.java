@@ -1,6 +1,7 @@
 package bridgempp.service;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -8,6 +9,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+import javax.persistence.PostRemove;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
@@ -18,7 +20,7 @@ import bridgempp.messageformat.MessageFormat;
 @DiscriminatorValue("SingleToMultiBridgeService")
 public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeService<S, H>, H extends MultiBridgeServiceHandle<S, H>> extends BridgeService
 {
-	@OneToMany(mappedBy = "service",targetEntity = MultiBridgeServiceHandle.class)
+	@OneToMany(mappedBy = "service", targetEntity = MultiBridgeServiceHandle.class)
 	@MapKey(name = "identifier")
 	protected Map<String, H> handles = new HashMap<String, H>();
 
@@ -26,13 +28,25 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 	public abstract void connect();
 
 	@Override
-	public abstract void disconnect();
-	
+	public void disconnect()
+	{
+		if (!isPersistent())
+		{
+			Iterator<H> iterator = handles.values().iterator();
+			while (iterator.hasNext())
+			{
+				H handle = iterator.next();
+				iterator.remove();
+				DataManager.removeState(handle);
+			}
+		}
+	}
+
 	@Override
 	public void sendMessage(Message message)
 	{
 		MultiBridgeServiceHandle<S, H> handle = getHandle(message.getDestination().getIdentifier());
-		if(handle == null)
+		if (handle == null)
 		{
 			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle: " + message.toString());
 			return;
@@ -44,17 +58,22 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 	{
 		return handles.get(identifier);
 	}
-	
+
 	protected void addHandle(H handle)
 	{
 		DataManager.updateState(handle);
 		handles.put(handle.identifier, handle);
 	}
-	
+
 	protected void removeHandle(H handle)
 	{
 		handles.remove(handle.identifier);
 		DataManager.removeState(handle);
+		while (!handle.endpoint.getUsers().isEmpty())
+		{
+			DataManager.deregisterUser(handle.endpoint.getUsers().iterator().next());
+		}
+		DataManager.deregisterEndpoint(handle.endpoint);
 	}
 
 	@Override
