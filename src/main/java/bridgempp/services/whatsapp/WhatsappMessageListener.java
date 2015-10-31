@@ -48,7 +48,7 @@ class WhatsappMessageListener implements Runnable {
 			String pythonCommand = System.getProperty("os.name").toLowerCase().contains("win") ? "C:\\python27\\python.exe"
 					: "python3";
 			ProcessBuilder builder = new ProcessBuilder(pythonCommand, "-u", BridgeMPP.getPathLocation()
-					+ "/yowsup/src/yowsup-cli", "demos", "-l " + this.whatsappService.phone + ":"
+					+ "/yowsup/src/yowsup-cli", "demos", "-l", this.whatsappService.phone + ":"
 					+ this.whatsappService.password, "--yowsup");
 			builder.directory(new File(BridgeMPP.getPathLocation() + "/yowsup/src/"));
 			builder.environment().put("PYTHONPATH", BridgeMPP.getPathLocation() + "/yowsup/src/");
