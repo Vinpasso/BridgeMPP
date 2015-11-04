@@ -1,7 +1,9 @@
 package bridgempp.data;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
+import bridgempp.ShadowManager;
 import bridgempp.service.BridgeService;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
@@ -147,5 +149,15 @@ public class DataManager
 	public static synchronized void removeState(Object... objects)
 	{
 		PERSISTANCE_MANAGER.removeState(objects);
+	}
+
+	public static synchronized void deregisterEndpointAndUsers(Endpoint endpoint)
+	{
+		while(!endpoint.getUsers().isEmpty())
+		{
+			User user = endpoint.getUsers().iterator().next();
+			DataManager.deregisterUser(user);
+		}
+		DataManager.deregisterEndpoint(endpoint);		
 	}
 }

@@ -35,6 +35,10 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 
 	protected void messageReceived(bridgempp.services.socketservice.protobuf.ProtoBuf.Message protoMessage)
 	{
+		if(protoMessage.getMessage().length() == 0)
+		{
+			return;
+		}
 		Message message = new Message();
 		message.setMessageFormat(MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
 		message.setMessage(protoMessage.getMessage());

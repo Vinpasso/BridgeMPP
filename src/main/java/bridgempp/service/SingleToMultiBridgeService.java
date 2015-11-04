@@ -49,6 +49,7 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 		if (handle == null)
 		{
 			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle: " + message.toString());
+			DataManager.deregisterEndpointAndUsers(message.getDestination());
 			return;
 		}
 		handle.sendMessage(message);

@@ -23,6 +23,8 @@ public class CommandWrapper {
 				if (!attemptMatch(method, message)) {
 					continue;
 				}
+				ShadowManager.log(Level.INFO, "Invoking Command: " + method.getName()
+						+ " due to " + message.getSender().toString());
 				if (!testPermissions(method, message)) {
 					sendInsufficientPermissions(method, message);
 					continue;
@@ -37,6 +39,8 @@ public class CommandWrapper {
 					continue;
 				}
 				callCommand(method, parameters, message);
+				ShadowManager.log(Level.INFO, "Command executed: " + method.getName()
+						+ " due to " + message.getSender().toString());
 			}
 		}
 	}
@@ -56,8 +60,6 @@ public class CommandWrapper {
 
 	private static void callCommand(Method method, Object[] parameters,
 			Message message) {
-		ShadowManager.log(Level.INFO, "Invoking Command: " + method.getName()
-				+ " due to " + message.getSender().toString());
 		try {
 			Object result = method.invoke(null, parameters);
 			if (result != null) {
@@ -71,8 +73,6 @@ public class CommandWrapper {
 							"Failed to execute BridgeMPP Command. Could not invoke Command Method",
 							message, e);
 		}
-		ShadowManager.log(Level.INFO, "Command executed: " + method.getName()
-				+ " due to " + message.getSender().toString());
 	}
 
 	private static Object[] fetchParameters(Method command, Message message) {
