@@ -15,43 +15,48 @@ import bridgempp.data.Group;
 public class CommandBotOperations
 {
 
+	private static final String MESSAGE_SUCCESS = "command status success";
+	
 	@CommandName("!botcreatealias: Set the current users alias")
 	@CommandTrigger("!botcreatealias")
 	@HelpTopic("Sets the current users alias to the given parameter. Does not send confirmation messages.")
-	public static void cmdCreateAlias(Message message, String newAlias)
+	public static String cmdCreateAlias(Message message, String newAlias)
 	{
 		ShadowManager.log(Level.FINER, "Endpoint: " + message.getOrigin().toString() + " now has assigned Alias: " + newAlias);
 		message.getSender().setName(newAlias);
+		return MESSAGE_SUCCESS;
 	}
 	
 	@CommandName("!botsubscribegroup: Join a group")
 	@CommandTrigger("!botsubscribegroup")
 	@HelpTopic("Subscribe the Message's Sender to the specified Group with name. Does not send confirmation messages.")
 	@RequiredPermission(Permission.SUBSCRIBE_UNSUBSCRIBE_GROUP)
-	public static void cmdSubscribeGroup(String name, Message message)
+	public static String cmdSubscribeGroup(String name, Message message)
 	{
 		Group group = CommandGroupOperations.subscribeGroup(name, message.getOrigin());
 		if (group != null)
 		{
 			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
+			return MESSAGE_SUCCESS;
 		} else
 		{
-			message.getOrigin().sendOperatorMessage("Error: Group not found");
+			return "Error: Group not found";
 		}
 	}
 	
 	@CommandName("!botusekey: Use a BridgeMPP access key")
 	@CommandTrigger("!botusekey")
 	@HelpTopic("Uses a BridgeMPP Access key to give the Sender of the message the key's rights. Does not send confirmation messages.")
-	public static void cmdUseKey(String key, Message message)
+	public static String cmdUseKey(String key, Message message)
 	{
 		boolean success = PermissionsManager.useKey(key, message.getOrigin());
 		if (success)
 		{
 			ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has used key and now has " + message.getOrigin().getPermissions());
+			return MESSAGE_SUCCESS;
 		} else
 		{
-			message.getOrigin().sendOperatorMessage("Key Failure. Incorrect Key");
+			return "Key Failure. Incorrect Key";
 		}
 	}
 	
