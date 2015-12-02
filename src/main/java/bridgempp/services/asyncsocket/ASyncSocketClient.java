@@ -1,10 +1,14 @@
 package bridgempp.services.asyncsocket;
 
+import java.util.logging.Level;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+
 import io.netty.channel.socket.SocketChannel;
 import bridgempp.GroupManager;
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
@@ -60,6 +64,12 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 	@Override
 	public void sendMessage(Message message)
 	{
+		if(socketChannel == null)
+		{
+			ShadowManager.log(Level.WARNING, "Attempted to send Message to non connected Socket Handle");
+			removeHandle();
+			return;
+		}
 		ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();
 		protoMessageBuilder.setMessageFormat(message.getMessageFormat().getName());
 		protoMessageBuilder.setMessage(message.getMessage(message.getMessageFormat()));
