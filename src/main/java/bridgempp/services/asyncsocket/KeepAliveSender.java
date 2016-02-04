@@ -27,35 +27,39 @@ public class KeepAliveSender extends ChannelDuplexHandler {
 		if (event instanceof IdleStateEvent) {
 			IdleStateEvent idleEvent = (IdleStateEvent) event;
 			if (idleEvent.state() == IdleState.WRITER_IDLE) {
-				ProtoBuf.Message protoMessage = ProtoBuf.Message.newBuilder()
-						.setMessageFormat(MessageFormat.PLAIN_TEXT.getName())
-						.setMessage("").setSender("").setTarget("")
-						.setGroup("").build();
-				ChannelFuture future = context.writeAndFlush(protoMessage);
-				future.addListener(new ChannelFutureListener() {
-
-					@Override
-					public void operationComplete(ChannelFuture future)
-							throws Exception {
-						if (!future.isSuccess()) {
-							ShadowManager.log(Level.SEVERE,
-									"A Connection has been disconnected after PING: "
-											+ future.toString()
-											+ ", exiting...");
-							client.disconnect();
-						}
-					}
-				});
+				sendPing(context);
 			} else if (idleEvent.state() == IdleState.READER_IDLE) {
-				ShadowManager.log(Level.SEVERE,
-						"A Connection has died due to READER_IDLE");
-				client.disconnect();
+				ShadowManager.log(Level.WARNING,
+						"A Connection is stalling due to READER_IDLE");
+				sendPing(context);
 			} else if (idleEvent.state() == IdleState.ALL_IDLE) {
-				ShadowManager.log(Level.SEVERE,
-								"Communications have stalled on a connection due to ALL_IDLE");
-				client.disconnect();
+				ShadowManager.log(Level.WARNING,
+								"Communications are stalling on a connection due to ALL_IDLE");
+				sendPing(context);
 			}
 		}
+	}
+
+	private void sendPing(ChannelHandlerContext context) {
+		ProtoBuf.Message protoMessage = ProtoBuf.Message.newBuilder()
+				.setMessageFormat(MessageFormat.PLAIN_TEXT.getName())
+				.setMessage("").setSender("").setTarget("")
+				.setGroup("").build();
+		ChannelFuture future = context.writeAndFlush(protoMessage);
+		future.addListener(new ChannelFutureListener() {
+
+			@Override
+			public void operationComplete(ChannelFuture future)
+					throws Exception {
+				if (!future.isSuccess()) {
+					ShadowManager.log(Level.SEVERE,
+							"A Connection has been disconnected after PING: "
+									+ future.toString()
+									+ ", exiting...");
+					client.disconnect();
+				}
+			}
+		});
 	}
 
 	@Override
