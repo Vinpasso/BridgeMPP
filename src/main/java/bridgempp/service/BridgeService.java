@@ -20,6 +20,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
 import bridgempp.Message;
+import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
 
@@ -41,12 +42,21 @@ public abstract class BridgeService {
 	protected Collection<Endpoint> endpoints = new LinkedList<Endpoint>();
 	    
     //Initialize Service
-    public abstract void connect();
+    public abstract void connect() throws Exception;
     //Deinitialize Service
-    public abstract void disconnect();
+    public abstract void disconnect() throws Exception;
     
     //Send message bridged from other Messages
     public abstract void sendMessage(Message message);
+    
+    /**
+     * Method to process the Messages received by this Service
+     * @param message
+     */
+    public void receiveMessage(Message message)
+    {
+    	CommandInterpreter.processMessage(message);
+    }
     
     //Get user-friendly name of this Service
     public abstract String getName();

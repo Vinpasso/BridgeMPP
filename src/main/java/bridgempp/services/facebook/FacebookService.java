@@ -19,7 +19,6 @@ import com.restfb.types.Post;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
@@ -113,7 +112,7 @@ public class FacebookService extends BridgeService
 		User user = DataManager.getOrNewUserForIdentifier(post.getId(), endpoint);
 		String postString = convertMessageToString(post);
 		Message message = new Message(user, endpoint, postString, MessageFormat.PLAIN_TEXT);
-		CommandInterpreter.processMessage(message);
+		receiveMessage(message);
 	}
 
 	private String convertMessageToString(Post post)

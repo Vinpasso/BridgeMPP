@@ -248,7 +248,7 @@ public class MailService extends BridgeService
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
 				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);
-				CommandInterpreter.processMessage(bMessage);
+				receiveMessage(bMessage);
 				folder.copyMessages(new Message[] { message }, processedFolder);
 				folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
 				folder.expunge();

@@ -83,7 +83,7 @@ class WhatsappMessageListener implements Runnable {
 					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(group, whatsappService);
 					User user = DataManager.getOrNewUserForIdentifier(author, endpoint);
 					Message parsedMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
-					CommandInterpreter.processMessage(parsedMessage);
+					whatsappService.receiveMessage(parsedMessage);
 				}
 			}
 		} catch (UnsupportedOperationException | IOException ex) {

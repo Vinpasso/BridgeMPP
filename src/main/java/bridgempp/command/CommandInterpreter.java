@@ -30,9 +30,17 @@ public class CommandInterpreter
 	// Interpret a Message message with leading !
 	public static void interpretCommand(Message message)
 	{
-		synchronized (DataManager.class)
+		try
 		{
-			CommandWrapper.executeCommand(message);
+			DataManager.acquireDOMWritePermission();
+			synchronized (DataManager.class)
+			{
+				CommandWrapper.executeCommand(message);
+			}
+			DataManager.releaseDOMWritePermission();
+		} catch (InterruptedException e)
+		{
+			ShadowManager.logAndReply(Level.SEVERE, "Failed to get write permission to DOM", message, e);
 		}
 	}
 

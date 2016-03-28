@@ -49,7 +49,7 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 		message.setSender(user);
 		message.setOrigin(endpoint);
 		message.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
-		CommandInterpreter.processMessage(message);
+		service.receiveMessage(message);
 	}
 
 	public void disconnect()

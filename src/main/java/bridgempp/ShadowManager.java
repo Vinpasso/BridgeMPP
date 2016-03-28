@@ -96,4 +96,5 @@ public class ShadowManager {
 		log(Level.SEVERE, "Fatal BridgeMPP Error\nWill respawn\n" + msg);
 		BridgeMPP.exit();		
 	}
+
 }

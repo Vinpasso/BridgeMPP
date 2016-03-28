@@ -112,7 +112,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 						{
 							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
 						}
-						CommandInterpreter.processMessage(bridgeMessage);
+						service.receiveMessage(bridgeMessage);
 						break;
 					case XML_Embedded:
 						String buffer = "";

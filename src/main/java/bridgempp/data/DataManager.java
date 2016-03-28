@@ -1,6 +1,7 @@
 package bridgempp.data;
 
 import java.util.Collection;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import bridgempp.ShadowManager;
@@ -14,6 +15,11 @@ public class DataManager
 
 	private static final PersistanceManager PERSISTANCE_MANAGER = PersistanceManager.getPersistanceManager();
 
+	private static final int READ_PERMITS = Integer.MAX_VALUE;
+
+	private static Semaphore domRead = new Semaphore(READ_PERMITS, true);
+	private static Semaphore domWrite = new Semaphore(1, true);
+	
 	private static synchronized Endpoint registerEndpoint(BridgeService service, String identifier)
 	{
 		Endpoint endpoint = new Endpoint(service, identifier);
@@ -159,5 +165,17 @@ public class DataManager
 			DataManager.deregisterUser(user);
 		}
 		DataManager.deregisterEndpoint(endpoint);		
+	}
+	
+	public static void acquireDOMWritePermission() throws InterruptedException
+	{
+		domWrite.acquire();
+		domRead.acquire(READ_PERMITS);
+	}
+	
+	public static void releaseDOMWritePermission()
+	{
+		domRead.release(READ_PERMITS);
+		domWrite.release();
 	}
 }

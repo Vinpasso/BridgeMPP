@@ -9,8 +9,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
-import javax.persistence.PostRemove;
-
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;

@@ -1,6 +1,8 @@
 package bridgempp.storage;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import javax.persistence.Entity;
@@ -13,6 +15,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
+import bridgempp.data.processing.DataProcessor;
 import bridgempp.service.BridgeService;
 import bridgempp.statistics.StatisticStore;
 
@@ -75,8 +78,25 @@ public class PersistanceManager
 		}
 		saveTransaction.commit();
 	}
-
+	
 	public synchronized void removeState(Object... objects)
+	{
+		ShadowManager.log(Level.INFO, "Scheduled remove Operation on " + objects.length + " objects");
+
+		DataProcessor.schedule(new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception
+			{
+				executeRemoveState(objects);
+				ShadowManager.log(Level.INFO, "Executed remove Operation on " + objects.length + " objects");
+				return null;
+			}
+			
+		});
+	}
+
+	public synchronized void executeRemoveState(Object... objects)
 	{
 		EntityTransaction transaction = entityManager.getTransaction();
 		transaction.begin();

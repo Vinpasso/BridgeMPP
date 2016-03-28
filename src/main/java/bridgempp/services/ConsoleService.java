@@ -88,7 +88,7 @@ public class ConsoleService extends BridgeService
 						Endpoint origin = DataManager.getOrNewEndpointForIdentifier("Console", ConsoleService.this);
 						User user = DataManager.getOrNewUserForIdentifier("Console", origin);
 						Message message = new Message(user, origin, scanner.nextLine(), getSupportedMessageFormats()[0]);
-						CommandInterpreter.processMessage(message);
+						receiveMessage(message);
 					} else
 					{
 						Thread.sleep(1000);

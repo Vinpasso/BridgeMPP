@@ -55,7 +55,7 @@ public class BridgeChat extends BridgeService {
 				public void run() {
 					try {
 						while (true) {
-							CommandInterpreter.processMessage(new Message(user, 
+							receiveMessage(new Message(user, 
 									endpoint, BridgeChatProtoBuf.UserEvent
 											.parseFrom(socket.getInputStream())
 											.getChatMessage(),

@@ -48,7 +48,7 @@ public class XMPPStatusListener implements RosterListener
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier("XMPP_Presence", service);
 		User user = DataManager.getOrNewUserForIdentifier(presence.getFrom(), endpoint);
 		Message message = new Message(user, endpoint, presence.getStatus(), MessageFormat.PLAIN_TEXT);
-		CommandInterpreter.processMessage(message);
+		service.receiveMessage(message);
 	}
 
 }

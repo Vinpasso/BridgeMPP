@@ -87,7 +87,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 					message = "Unknown Status: " + matcher.group(1);
 			}
 			Message bridgeMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
-			CommandInterpreter.processMessage(bridgeMessage);
+			service.receiveMessage(bridgeMessage);
 		}
 		else
 		{
