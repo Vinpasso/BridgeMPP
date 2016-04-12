@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import bridgempp.BridgeMPP;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;

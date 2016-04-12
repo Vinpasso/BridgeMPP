@@ -10,7 +10,6 @@ import org.jivesoftware.smack.packet.Presence;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;

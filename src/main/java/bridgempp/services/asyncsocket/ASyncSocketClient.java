@@ -9,7 +9,6 @@ import io.netty.channel.socket.SocketChannel;
 import bridgempp.GroupManager;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;

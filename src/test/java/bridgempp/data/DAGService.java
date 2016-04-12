@@ -1,7 +1,5 @@
 package bridgempp.data;
 
-import java.io.IOException;
-
 import bridgempp.Message;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.service.BridgeService;

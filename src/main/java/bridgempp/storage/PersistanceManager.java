@@ -2,7 +2,6 @@ package bridgempp.storage;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import javax.persistence.Entity;

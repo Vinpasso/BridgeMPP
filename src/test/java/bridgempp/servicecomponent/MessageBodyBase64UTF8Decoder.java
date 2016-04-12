@@ -2,8 +2,6 @@ package bridgempp.servicecomponent;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.logging.Level;
-
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.MessageNodeIO;

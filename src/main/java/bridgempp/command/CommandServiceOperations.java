@@ -211,7 +211,7 @@ public class CommandServiceOperations
 	@CommandTrigger("!reloadservice")
 	@HelpTopic("Reload a Service by disconnecting and reconnecting it. Requires SERVICE_ID.")
 	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
-	public static String reloadService(int serviceID)
+	public static String reloadService(int serviceID) throws Exception
 	{
 		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
 		if(service == null)

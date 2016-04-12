@@ -2,9 +2,6 @@ package bridgempp.data;
 
 import java.util.Collection;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-
-import bridgempp.ShadowManager;
 import bridgempp.service.BridgeService;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
