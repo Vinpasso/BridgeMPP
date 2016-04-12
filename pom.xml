@@ -83,6 +83,11 @@
 			<version>4.0.24.Final</version>
 			<scope>compile</scope>
 		</dependency>
+		        <dependency>
+            <groupId>com.github.theholywaffle</groupId>
+            <artifactId>teamspeak3-api</artifactId>
+            <version>[1.0.0,2.0.0)</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -124,4 +129,14 @@
 			<url>scpexe://vinpasso@vinpasso.org/home/vinpasso/BridgeMPP</url>
 		</repository>
 	</distributionManagement>
+	    <repositories>
+        <repository>
+            <id>TeamSpeak-3-Java-API-mvn-repo</id>
+            <url>https://raw.githubusercontent.com/TheHolyWaffle/TeamSpeak-3-Java-API/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
