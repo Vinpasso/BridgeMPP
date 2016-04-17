@@ -1,3 +1,9 @@
+Project Status
+=========
+BridgeMPP: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP)
+Bots: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP-Bot.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP-Bot)
+
+
 About BridgeMPP:
 =========
 BridgeMPP is an instant messaging bridge enabling users to send messages across the walls of each single instant messenger.
