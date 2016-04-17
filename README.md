@@ -1,5 +1,3 @@
-BridgeMPP: Platform independent messaging
-=========
 About BridgeMPP:
 =========
 BridgeMPP is an instant messaging bridge enabling users to send messages across the walls of each single instant messenger.
@@ -44,7 +42,7 @@ At this point messages can already be exchanged, however exchanging messages isn
 Help!
 ========
 A list of all BridgeMPP commands can be obtained by typing `!help`.
-Command syntax can be obtained by typing `!command !<commandname`.
+Command syntax can be obtained by typing `!command !<commandname>`.
 All other problems and feature-requests can hopefully be solved by opening a GitHub issue. 
 
 Develop
@@ -53,53 +51,55 @@ Be sure to fork BridgeMPP to improve it, don't be afraid to send a pull request 
 
 License
 ========
-Gnu GPL v3
+Gnu GPL v3: http://www.gnu.org/licenses/gpl-3.0.html
 
-Console
+Services
 ========
+
+## Console
+
 Messages can be sent straight from and to the Server Console (Text only). Any non-command message will be routed to their destinations.
 This service is activated by default. Loading this service should not be necessary, however `!loadconsoleservice` can be used to manually load this service.
 
-E-Mail
-========
+## E-Mail
+
 Provided an email account (imap/smtp), BridgeMPP can send and receive HTML/Text Emails.
 Can be loaded by typing `!loadmailservice <imap-host> <imap-port> <imap-smtp-username> <imap-smtp-password> <smtp-host> <smtp-port>`. The outgoing smtp username and password should be identical to the incomming imap username and password. BridgeMPP will move received messages from the inbox into the BridgeMPP-Processed folder.
 
-Skype
-========
+## Skype
+
 Requires a Desktop Skype client running, BridgeMPP will send and receive Text Messages over the Skype Desktop API. Since Microsoft no longer supports the Skype API this is unstable at best. Messages are known to be received in duplicates.
 Can be loaded by typing `!loadskypeservice`. This will attempt to connect to the locally running Skype desktop client (a Popup will appear to ask for permission). Skype needs to be running for BridgeMPP to send and receive messages.
 
-Asynchronous Network Sockets
-========
+## Asynchronous Network Sockets
+
 BridgeMPP can send and receive all supported message types over asynchronous network sockets. Uses the Google ProtoBuf included in the resources folder. The official BridgeMPP Bots use this interface to communicate with BridgeMPP.
 Asynchronous sockets scale better than their synchronous counterparts to more clients.
 Can be loaded with `!loadasyncsocketservice <listenAddress> <port> <numberOfServerThreads> <numberOfClientThreads>`. This listen address refers to the local network interface that should be used to listen for connections. Use 0.0.0.0 to listen on all interfaces. The Port refers to the port used to listen for incomming connections. The Number of Server Threads refers to the number of threads used to accept incomming connections and build client threads. This should be set to a value between (1-3). The Number of Client Threads refers to the number of threads used to communicate with the network. 3-10 threads should suffice.
 
-Synchronous Network Sockets
-========
+## Synchronous Network Sockets
+
 BridgeMPP can send and receive messages in 3 different styles with synchronous sockets. Mode 0 uses plain text, interpreting every newline as a seperate message. Mode 1 uses XML parsing with the <message></message> tags to support multi-line messages. Mode 3 uses the same Google ProtoBuf as described in Asynchronous Network Sockets.
 
-Facebook
-========
+## Facebook
+
 Sending and receiving messages from Facebook users and groups is still work in progress.
 
-League of Legends
-========
+## League of Legends
 BridgeMPP uses the League of Legends XMPP Server to send and receive text messages from the League of Legends Chat Service. BridgeMPP can also monitor game statuses, such as main menu, hosting game or in game, which can be found in the XMPP_Presence endpoint.
 
-Teamspeak
-========
+## Teamspeak
+
 BridgeMPP can use the Teamspeak Server Query API to communicate text messages to clients in the teamspeak channel. Currently only the default channel is supported.
 
-Telegram
-=========
+## Telegram
+
 BridgeMPP can use the Telegram Bot API to send and receive messages from Telegram groups and chats. Currently only text messages are supported.
 
-Whatsapp
-=========
+## Whatsapp
+
 BridgeMPP uses Yowsup to communicate with WhatsApp. Acquire a fully working Yowsup installation before attempting to launch the BridgeMPP WhatsApp service. Text messages can be sent/received. Media messages can be received while they are unencrypted.
 
-XMPP
-=========
+## XMPP
+
 XMPP is BridgeMPP most supported protocol. Text and media can be sent and received.
