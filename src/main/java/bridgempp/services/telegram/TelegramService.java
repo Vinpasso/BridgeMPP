@@ -24,7 +24,7 @@ public class TelegramService extends BridgeService
 	public void connect() throws Exception
 	{
 		api = new TelegramBotsApi();
-		bot = new TelegramBot();
+		bot = new TelegramBot(this);
 		api.registerBot(bot);
 	}
 
@@ -62,6 +62,11 @@ public class TelegramService extends BridgeService
 	public String getToken()
 	{
 		return token;
+	}
+
+	public void configure(String token)
+	{
+		this.token = token;
 	}
 
 }

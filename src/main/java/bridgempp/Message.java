@@ -147,9 +147,10 @@ public class Message {
     public String toComplexString(MessageFormat... messageFormats) {
     	String messageFormat = chooseMessageFormat(messageFormats).getName() + ": ";
         String group = (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: ";
-        String sender = (getOrigin() != null)?getOrigin().toString():"Unknown";
+        String sender = (getSender() != null)?getSender().toString():"Unknown";
+        String origin = (getOrigin() != null)?getOrigin().toString():"Unknown";
         String target = (getDestination() != null)?(getDestination().toString() + ": "):("Unknown: ");
-        return messageFormat + group + sender + " --> " + target + getMessage(messageFormats);
+        return messageFormat + group + sender + " (" + origin + ") --> " + target + getMessage(messageFormats);
     }
     
     public static Message parseMessage(String complexString)

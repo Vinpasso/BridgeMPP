@@ -77,22 +77,12 @@ public class PersistanceManager
 		}
 		saveTransaction.commit();
 	}
-	
+
 	public synchronized void removeState(Object... objects)
 	{
 		ShadowManager.log(Level.INFO, "Scheduled remove Operation on " + objects.length + " objects");
-
-		DataProcessor.schedule(new Callable<Void>() {
-
-			@Override
-			public Void call() throws Exception
-			{
-				executeRemoveState(objects);
-				ShadowManager.log(Level.INFO, "Executed remove Operation on " + objects.length + " objects");
-				return null;
-			}
-			
-		});
+		executeRemoveState(objects);
+		ShadowManager.log(Level.INFO, "Executed remove Operation on " + objects.length + " objects");
 	}
 
 	public synchronized void executeRemoveState(Object... objects)

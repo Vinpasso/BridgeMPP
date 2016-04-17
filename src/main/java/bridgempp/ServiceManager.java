@@ -61,6 +61,11 @@ public class ServiceManager
 	public static void loadService(BridgeService service)
 	{
 		services.add(service);
+		if(!service.isEnabled())
+		{
+			ShadowManager.log(Level.WARNING, "Service: " + service.toString() + " is Disabled");
+			return;
+		}
 		connectService(service);
 		PersistanceManager.getPersistanceManager().updateState(service);
 	}
@@ -85,6 +90,11 @@ public class ServiceManager
 			try
 			{
 				ShadowManager.log(Level.INFO, "Unloading Service: " + services.get(i).getName());
+				if(!services.get(i).isEnabled())
+				{
+					ShadowManager.log(Level.WARNING, "Service: " + services.get(i).toString() + " is Disabled");
+					continue;
+				}
 				services.get(i).disconnect();
 				ShadowManager.log(Level.INFO, "Unloaded Service: " + services.get(i).getName());
 			} catch (Exception e)

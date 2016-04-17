@@ -10,6 +10,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
+import bridgempp.util.StringOperations;
+
 @Entity(name = "User")
 public class User
 {
@@ -92,6 +94,11 @@ public class User
 	public String getIdentifier()
 	{
 		return identifier;
+	}
+	
+	public String getPartOneIdentifier()
+	{
+		return StringOperations.getPartOneIdentifier(identifier);
 	}
 
 	public String getInfo() {

@@ -9,7 +9,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
@@ -19,6 +18,12 @@ public class TelegramBot extends TelegramLongPollingBot
 {
 
 	private TelegramService service;
+
+	public TelegramBot(TelegramService service)
+	{
+		super();
+		this.service = service;
+	}
 
 	@Override
 	public String getBotUsername()
@@ -38,8 +43,13 @@ public class TelegramBot extends TelegramLongPollingBot
 
 	private void handleIncomingMessage(org.telegram.telegrambots.api.objects.Message message)
 	{
-		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(message.getChatId() + "", service);
-		User user = DataManager.getOrNewUserForIdentifier(message.getFrom().getId() + "", endpoint);
+		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(message.getChatId() + "@telegram-groups", service);
+		User user = DataManager.getOrNewUserForIdentifier(message.getFrom().getId() + "@telegram-users", endpoint);
+		if(!user.hasAlias())
+		{
+			user.setName(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
+			ShadowManager.log(Level.INFO, "Automatically extracted Alias from Telegram");
+		}
 		Message bridgeMessage = new Message(user, endpoint, message.getText(), MessageFormat.PLAIN_TEXT);
 		service.receiveMessage(bridgeMessage);
 	}
@@ -47,7 +57,7 @@ public class TelegramBot extends TelegramLongPollingBot
 	public void sendMessage(Message bridgeMessage)
 	{
 		SendMessage message = new SendMessage();
-		message.setChatId(bridgeMessage.getDestination().getIdentifier());
+		message.setChatId(bridgeMessage.getDestination().getPartOneIdentifier());
 		message.setText(bridgeMessage.getPlainTextMessage());
 		try
 		{

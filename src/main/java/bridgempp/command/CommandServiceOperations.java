@@ -24,6 +24,7 @@ import bridgempp.services.asyncsocket.ASyncSocketService;
 import bridgempp.services.facebook.FacebookService;
 import bridgempp.services.leagueoflegends.LeagueOfLegendsService;
 import bridgempp.services.socket.SocketService;
+import bridgempp.services.telegram.TelegramService;
 import bridgempp.services.whatsapp.WhatsappService;
 import bridgempp.services.xmpp.XMPPService;
 
@@ -169,6 +170,18 @@ public class CommandServiceOperations
 	{
 		FacebookService service = new FacebookService();
 		service.configure(appid, apikey, accesstoken);
+		ServiceManager.loadService(service);
+		return "Loaded service: " + service.toString(); 
+	}
+	
+	@CommandName("!loadtelegramservice: Load a Telegram Service")
+	@CommandTrigger("!loadtelegramservice")
+	@HelpTopic("Creates a Telegram Service. Requires Bot Token.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String loadTelegramService(String token)
+	{
+		TelegramService service = new TelegramService();
+		service.configure(token);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
 	}

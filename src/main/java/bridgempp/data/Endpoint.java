@@ -22,6 +22,7 @@ import javax.persistence.Version;
 import bridgempp.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
+import bridgempp.util.StringOperations;
 
 /**
  *
@@ -38,7 +39,7 @@ public class Endpoint {
 	private BridgeService service;
     
     @ManyToMany
-    @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "SERVICE_IDENTIFIER", referencedColumnName = "IDENTIFIER"), inverseJoinColumns = @JoinColumn(name = "ENDPOINT_IDENTIFIER", referencedColumnName = "IDENTIFIER"))
+    @JoinTable(name = "ENDPOINT_USERS", joinColumns = @JoinColumn(name = "ENDPOINT_IDENTIFIER", referencedColumnName = "IDENTIFIER"), inverseJoinColumns = @JoinColumn(name = "USER_IDENTIFIER", referencedColumnName = "IDENTIFIER"))
     private Collection<User> users;
     
     @Column(name = "PERMISSIONS", nullable = false)
@@ -92,6 +93,11 @@ public class Endpoint {
     public String getIdentifier() {
         return identifier;
     }
+    
+	public String getPartOneIdentifier()
+	{
+		return StringOperations.getPartOneIdentifier(identifier);
+	}
 
     /**
      * @return the permissions
