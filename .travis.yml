@@ -1,0 +1,9 @@
+language: java
+jdk:
+    oraclejdk8
+cache:
+    directories:
+       - '$HOME/.m2/repository'
+
+before_cache:
+   - mv -fv "$HOME/.m2/repository/org/vinpasso/" "$HOME"
