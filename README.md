@@ -1,8 +1,14 @@
+[![Project BridgeMPP](https://github.com/Vinpasso/BridgeMPP/raw/master/src/main/resources/BridgeMPP-Logo-No-Background.png )](https://github.com/Vinpasso/BridgeMPP/)
+
 Project Status
 =========
-BridgeMPP: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP)
+BridgeMPP: 
 
-Bots: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP-Bot.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP-Bot)
+[![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP)
+
+BridgeMPP-Bots: 
+
+[![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP-Bot.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP-Bot)
 
 
 About BridgeMPP:
