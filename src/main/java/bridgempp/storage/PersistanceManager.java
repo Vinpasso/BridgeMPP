@@ -1,7 +1,6 @@
 package bridgempp.storage;
 
 import java.util.Collection;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import javax.persistence.Entity;
@@ -14,7 +13,6 @@ import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.User;
-import bridgempp.data.processing.DataProcessor;
 import bridgempp.service.BridgeService;
 import bridgempp.statistics.StatisticStore;
 

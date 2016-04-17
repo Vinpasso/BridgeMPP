@@ -26,6 +26,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -129,8 +131,17 @@ public class MailService extends BridgeService
 		{
 			MimeMessage mimeMessage = new MimeMessage(session);
 			mimeMessage.setFrom(new InternetAddress(username, "BridgeMPP"));
-			mimeMessage.setRecipients(Message.RecipientType.TO, new Address[] {new InternetAddress(message.getDestination().getIdentifier(), message.getDestination().toString()) });
-			mimeMessage.setSubject(message.toSimpleString(getSupportedMessageFormats()));
+			Collection<User> recipients = message.getDestination().getUsers();
+			Address[] recipientAddresses = new Address[recipients.size()];
+			Iterator<User> iterator = recipients.iterator();
+			for(int i = 0; i < recipients.size(); i++)
+			{
+				User user = iterator.next();
+				recipientAddresses[i] = new InternetAddress(user.getIdentifier(), user.getName());
+			}
+			
+			mimeMessage.setRecipients(Message.RecipientType.TO, recipientAddresses);
+			mimeMessage.setSubject(message.getDestination().getIdentifier());
 			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()));
 			Transport.send(mimeMessage, username, password);
 		} catch (Exception ex)
@@ -242,8 +253,17 @@ public class MailService extends BridgeService
 		{
 			try
 			{
-				String sender = message.getFrom()[0].toString();
-				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(sender, MailService.this);
+				Address[] address = message.getFrom();
+				String sender = "";
+				for(int i = 0; i < address.length; i++)
+				{
+					if(address[i] != null)
+					{
+						sender = ((InternetAddress)address[i]).getAddress();
+					}
+				}
+				
+				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(message.getSubject(), MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
 				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);

@@ -5,6 +5,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import org.telegram.telegrambots.TelegramBotsApi;
+import org.telegram.telegrambots.updatesreceivers.BotSession;
 
 import bridgempp.Message;
 import bridgempp.messageformat.MessageFormat;
@@ -19,18 +20,20 @@ public class TelegramService extends BridgeService
 	
 	private transient TelegramBotsApi api;
 	private transient TelegramBot bot;
+	private transient BotSession session;
 	
 	@Override
 	public void connect() throws Exception
 	{
 		api = new TelegramBotsApi();
 		bot = new TelegramBot(this);
-		api.registerBot(bot);
+		session = api.registerBot(bot);
 	}
 
 	@Override
 	public void disconnect() throws Exception
 	{
+		session.close();
 		api = null;
 		bot = null;
 	}
