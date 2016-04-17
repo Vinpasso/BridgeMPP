@@ -41,7 +41,7 @@ public class TelegramBot extends TelegramLongPollingBot
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(message.getChatId() + "", service);
 		User user = DataManager.getOrNewUserForIdentifier(message.getFrom().getId() + "", endpoint);
 		Message bridgeMessage = new Message(user, endpoint, message.getText(), MessageFormat.PLAIN_TEXT);
-		CommandInterpreter.processMessage(bridgeMessage);
+		service.receiveMessage(bridgeMessage);
 	}
 	
 	public void sendMessage(Message bridgeMessage)

@@ -41,6 +41,9 @@ public abstract class BridgeService {
 	@OneToMany(mappedBy="service")
 	protected Collection<Endpoint> endpoints = new LinkedList<Endpoint>();
 	    
+	@Column(name = "ENABLED", nullable = false)
+	private boolean isEnabled = true;
+	
     //Initialize Service
     public abstract void connect() throws Exception;
     //Deinitialize Service
@@ -75,4 +78,14 @@ public abstract class BridgeService {
     {
     	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent)":" (Non-Persistent)");
     }
+    
+	public boolean isEnabled()
+	{
+		return isEnabled;
+	}
+	
+	public void setEnabled(boolean enable)
+	{
+		this.isEnabled = enable;
+	}
 }

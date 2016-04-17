@@ -58,7 +58,7 @@ public class TeamspeakService extends BridgeService
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(e.get("channel"), TeamspeakService.this);
 				User user = DataManager.getOrNewUserForIdentifier(e.getInvokerUniqueId(), endpoint);
 				Message message = new Message(user, endpoint, e.getMessage(), MessageFormat.PLAIN_TEXT);
-				CommandInterpreter.processMessage(message);
+				receiveMessage(message);
 			}
 		});
 	}

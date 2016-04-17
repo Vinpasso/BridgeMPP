@@ -223,4 +223,38 @@ public class CommandServiceOperations
 		service.connect();
 		return "Reloaded Service: " + service.toString(); 
 	}
+	
+	@CommandName("!setserviceenabled: Enable a Service")
+	@CommandTrigger("!setserviceenabled")
+	@HelpTopic("Enable a Service after previously disabling it. Requires SERVICE_ID.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String enableService(int serviceID) throws Exception
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		ShadowManager.log(Level.WARNING, "Enabling Service: " + service.toString());
+		service.setEnabled(true);
+		service.connect();
+		return "Enabled Service: " + service.toString(); 
+	}
+	
+	@CommandName("!setservicedisabled: Disable a Service")
+	@CommandTrigger("!setservicedisabled")
+	@HelpTopic("Disable a Service, shutting down the Message Routing without deleting endpoints. Requires SERVICE_ID.")
+	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+	public static String disableService(int serviceID) throws Exception
+	{
+		BridgeService service = ServiceManager.getServiceByServiceIdentifier(serviceID);
+		if(service == null)
+		{
+			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
+		}
+		ShadowManager.log(Level.WARNING, "Disabling Service: " + service.toString());
+		service.disconnect();
+		service.setEnabled(false);
+		return "Disabled Service: " + service.toString(); 
+	}
 }

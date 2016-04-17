@@ -71,6 +71,10 @@ public class Endpoint {
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message) {
         message.setDestination(this);
+        if(!service.isEnabled())
+        {
+        	return;
+        }
         service.sendMessage(message);
     }
 
