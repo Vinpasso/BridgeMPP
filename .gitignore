@@ -3,4 +3,6 @@
 /bridgedb/
 /.settings/
 /derby.log
-/.classpath
+.classpath
+.project
+/bin/
