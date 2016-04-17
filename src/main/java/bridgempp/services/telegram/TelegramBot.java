@@ -47,7 +47,11 @@ public class TelegramBot extends TelegramLongPollingBot
 		User user = DataManager.getOrNewUserForIdentifier(message.getFrom().getId() + "@telegram-users", endpoint);
 		if(!user.hasAlias())
 		{
-			user.setName(message.getFrom().getFirstName() + " " + message.getFrom().getLastName());
+			String username = "";
+			username += (message.getFrom().getFirstName()==null)?"":message.getFrom().getFirstName();
+			username += (message.getFrom().getLastName()==null)?"":message.getFrom().getLastName();
+			username = (username.length()==0)?message.getFrom().getUserName():username;
+			user.setName(username);
 			ShadowManager.log(Level.INFO, "Automatically extracted Alias from Telegram");
 		}
 		Message bridgeMessage = new Message(user, endpoint, message.getText(), MessageFormat.PLAIN_TEXT);
