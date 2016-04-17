@@ -11,6 +11,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 
 import bridgempp.ShadowManager;
@@ -95,6 +96,11 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 		} else
 		{
 			user = DataManager.getOrNewUserForIdentifier(message.getFrom().substring(message.getFrom().indexOf("/")), endpoint);
+		}
+		Occupant sender = multiUserChat.getOccupant(message.getFrom());
+		if(sender.getNick() != null && !user.hasAlias())
+		{
+			user.setName(sender.getNick());
 		}
 		service.interpretXMPPMessage(user, endpoint, message);
 	}
