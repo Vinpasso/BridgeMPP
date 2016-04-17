@@ -1,6 +1,7 @@
 Project Status
 =========
 BridgeMPP: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP)
+
 Bots: [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP-Bot.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP-Bot)
 
 
