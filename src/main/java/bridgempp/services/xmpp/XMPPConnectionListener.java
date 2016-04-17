@@ -15,7 +15,7 @@ final class XMPPConnectionListener implements ConnectionListener {
 
 	@Override
 	public void reconnectionFailed(Exception e) {
-		ShadowManager.fatal(e);
+		ShadowManager.fatal("XMPP Service could not reconnect", e);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ final class XMPPConnectionListener implements ConnectionListener {
 
 	@Override
 	public void connectionClosedOnError(Exception e) {
-		ShadowManager.log(Level.WARNING, "The XMPP Connection has been disconnected", e);
+		ShadowManager.log(Level.WARNING, "The XMPP Connection has been disconnected: " + e.getMessage());
 	}
 
 	@Override

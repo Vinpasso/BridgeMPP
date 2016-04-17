@@ -81,6 +81,12 @@ public class ShadowManager {
 		logWithStackTraceDepth(level, message, 3);
 		cause.printStackTrace();
 	}
+	
+	public static void fatal(String message, Throwable cause) {
+		logWithStackTraceDepth(Level.SEVERE, message, 3);
+		cause.printStackTrace();
+		BridgeMPP.exit();
+	}
 
 	public static void info(String msg)
 	{

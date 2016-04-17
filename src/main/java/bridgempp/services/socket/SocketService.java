@@ -62,7 +62,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 	
 	public void sendKeepAliveMessages()
 	{
-		ShadowManager.log(Level.INFO, "Sending " + handles.size() + " Keep-Alive Messages");
+		//ShadowManager.log(Level.INFO, "Sending " + handles.size() + " Keep-Alive Messages");
 		int sent = 0;
 		try
 		{
@@ -81,7 +81,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 		{
 			ShadowManager.log(Level.WARNING, "Aborted sending Keep-Alive due to exception ", e);
 		}
-		ShadowManager.log(Level.INFO, "Sent " + sent + "/" + handles.size() + " Keep-Alive Messages");
+		//ShadowManager.log(Level.INFO, "Sent " + sent + "/" + handles.size() + " Keep-Alive Messages");
 	}
 
 	@Override
