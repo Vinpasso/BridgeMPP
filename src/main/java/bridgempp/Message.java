@@ -140,7 +140,7 @@ public class Message {
 
     public String toSimpleString(MessageFormat... messageFormats) {
         String messageSender = (getSender() != null)?getSender().toString():null;
-        String messageOrigin = (getOrigin() != null)?getOrigin().toString():null;
+        String messageOrigin = (getOrigin() != null)?getOrigin().toString():"Unknown";
 		return ((messageSender!=null)?messageSender:messageOrigin) + ": " + getMessage(messageFormats);
     }
 

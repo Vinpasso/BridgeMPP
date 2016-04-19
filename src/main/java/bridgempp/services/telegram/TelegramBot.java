@@ -62,7 +62,7 @@ public class TelegramBot extends TelegramLongPollingBot
 	{
 		SendMessage message = new SendMessage();
 		message.setChatId(bridgeMessage.getDestination().getPartOneIdentifier());
-		message.setText(bridgeMessage.getPlainTextMessage());
+		message.setText(bridgeMessage.toSimpleString(service.getSupportedMessageFormats()));
 		try
 		{
 			sendMessage(message);
