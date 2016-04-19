@@ -138,12 +138,28 @@ public class Message {
         this.group = group;
     }
 
+    /**
+     * Return the End-User friendly Description of this Message
+     * This attempts to format the Message in the following way:
+     * <sender>: Message
+     * If the sender is unavailable the origin is used instead
+     * If the origin is unavailable unknown will be used
+     * @param messageFormats The Messages Format to return the message in
+     * @return The formatted Message
+     */
     public String toSimpleString(MessageFormat... messageFormats) {
         String messageSender = (getSender() != null)?getSender().toString():null;
         String messageOrigin = (getOrigin() != null)?getOrigin().toString():"Unknown";
 		return ((messageSender!=null)?messageSender:messageOrigin) + ": " + getMessage(messageFormats);
     }
 
+    /**
+     * This returns a more detailed description of the Message in the following format
+     * <Message Format>: <Group>: <Sender> (<Origin>) --> <Destination>: <Message Format>"
+     * This is the default format in the toString Method (Plain-Text)
+     * @param messageFormats The requested format to return the message in
+     * @return The formatted Message
+     */
     public String toComplexString(MessageFormat... messageFormats) {
     	String messageFormat = chooseMessageFormat(messageFormats).getName() + ": ";
         String group = (getGroup() != null)?(getGroup().getName() + ": "):"Direct Message: ";

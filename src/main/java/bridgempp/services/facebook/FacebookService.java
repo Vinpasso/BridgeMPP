@@ -69,7 +69,7 @@ public class FacebookService extends BridgeService
 	{
 		if (message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
 		{
-			facebook.publish(message.getDestination().getIdentifier(), FacebookType.class, Parameter.with("message", message.getPlainTextMessage()));
+			facebook.publish(message.getDestination().getIdentifier(), FacebookType.class, Parameter.with("message", message.toSimpleString(getSupportedMessageFormats())));
 		} else
 		{
 			throw new NotImplementedException("Can not currently Post non Plain Text-able Messages");

@@ -61,7 +61,7 @@ public class WhatsappService extends BridgeService {
 					+ message.getDestination().getIdentifier().substring(0, message.getDestination().getIdentifier().indexOf("@"))
 					+ " \""
 					+ Base64.getEncoder().encodeToString(
-							(message.getSender().toString() + ": " + message.getMessage(supportedMessageFormats))
+							message.toSimpleString(getSupportedMessageFormats())
 									.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
 			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
