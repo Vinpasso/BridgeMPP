@@ -57,7 +57,7 @@ public class SmartFacebookPollService implements Runnable {
 				}
 			});
 		});
-		service.setLastUpdate(System.currentTimeMillis());
+		service.setLastUpdate();
 	}
 
 	

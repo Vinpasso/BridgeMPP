@@ -14,6 +14,7 @@ import bridgempp.command.CommandInterpreter;
 import bridgempp.state.EventManager;
 import bridgempp.statistics.StatisticsManager;
 import bridgempp.storage.PersistanceManager;
+import bridgempp.util.JUnitTestTest;
 import bridgempp.util.LockdownLock;
 
 /**
@@ -103,7 +104,7 @@ public class BridgeMPP
 
 	public static void exit()
 	{
-		if (shutdownCommencing)
+		if (shutdownCommencing || JUnitTestTest.isJUnitTest())
 		{
 			return;
 		}

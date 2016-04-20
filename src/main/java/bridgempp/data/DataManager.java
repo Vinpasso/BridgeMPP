@@ -2,6 +2,8 @@ package bridgempp.data;
 
 import java.util.Collection;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import bridgempp.service.BridgeService;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
@@ -13,9 +15,7 @@ public class DataManager
 	private static final PersistanceManager PERSISTANCE_MANAGER = PersistanceManager.getPersistanceManager();
 
 	private static final int READ_PERMITS = Integer.MAX_VALUE;
-
-	private static Semaphore domRead = new Semaphore(READ_PERMITS, true);
-	private static Semaphore domWrite = new Semaphore(1, true);
+	private static ReentrantReadWriteLock domLock = new ReentrantReadWriteLock(true);
 	
 	private static synchronized Endpoint registerEndpoint(BridgeService service, String identifier)
 	{
@@ -166,13 +166,11 @@ public class DataManager
 	
 	public static void acquireDOMWritePermission() throws InterruptedException
 	{
-		domWrite.acquire();
-		domRead.acquire(READ_PERMITS);
+		domLock.writeLock().lock();;
 	}
 	
 	public static void releaseDOMWritePermission()
 	{
-		domRead.release(READ_PERMITS);
-		domWrite.release();
+		domLock.writeLock().unlock();
 	}
 }

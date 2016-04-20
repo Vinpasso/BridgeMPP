@@ -1,6 +1,8 @@
 package bridgempp.services.facebook;
 
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -39,7 +41,7 @@ public class FacebookService extends BridgeService
 	@Column(name = "APP_SECRET", nullable = false, length = 50)
 	private String appSecret;
 	@Column(name = "LAST_UPDATE", nullable = false)
-	private long lastUpdate;
+	private Date lastUpdate;
 
 	@Override
 	public void connect()
@@ -129,7 +131,7 @@ public class FacebookService extends BridgeService
 		this.accessToken = accessToken;
 	}
 
-	public long getLastUpdate() {
+	public Date getLastUpdate() {
 		return lastUpdate;
 	}
 	
@@ -138,8 +140,8 @@ public class FacebookService extends BridgeService
 		return endpoints;
 	}
 
-	public void setLastUpdate(long currentTimeMillis) {
-		lastUpdate = currentTimeMillis;
+	public void setLastUpdate() {
+		lastUpdate = Date.from(Instant.now());
 	}
 
 }

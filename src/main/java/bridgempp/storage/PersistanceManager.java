@@ -16,129 +16,118 @@ import bridgempp.data.User;
 import bridgempp.service.BridgeService;
 import bridgempp.statistics.StatisticStore;
 
-public class PersistanceManager
-{
+public class PersistanceManager {
 	private static PersistanceManager manager;
 
 	private EntityManagerFactory entityManagerFactory;
 	private EntityManager entityManager;
 
-	public static synchronized PersistanceManager getPersistanceManager()
-	{
-		if (manager == null)
-		{
+	public static synchronized PersistanceManager getPersistanceManager() {
+		if (manager == null) {
 			manager = new PersistanceManager();
 		}
 		return manager;
 	}
 
-	private PersistanceManager()
-	{
-		entityManagerFactory = Persistence.createEntityManagerFactory("bridgempp");
+	private PersistanceManager() {
+		entityManagerFactory = Persistence
+				.createEntityManagerFactory("bridgempp");
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public synchronized <T> T getFromPrimaryKey(Class<T> className, Object primaryKey)
-	{
+	public synchronized <T> T getFromPrimaryKey(Class<T> className,
+			Object primaryKey) {
 		return entityManager.find(className, primaryKey);
 	}
 
-	public synchronized <T> Collection<T> getQuery(Class<T> className)
-	{
+	public synchronized <T> Collection<T> getQuery(Class<T> className) {
 		Entity annotation = className.getAnnotation(Entity.class);
-		if (annotation == null || annotation.name() == null || annotation.name().length() == 0)
-		{
+		if (annotation == null || annotation.name() == null
+				|| annotation.name().length() == 0) {
 			return null;
 		}
-		return entityManager.createQuery("SELECT s FROM " + annotation.name() + " s", className).getResultList();
+		return entityManager.createQuery(
+				"SELECT s FROM " + annotation.name() + " s", className)
+				.getResultList();
 	}
 
-	public synchronized void updateState(Object... objects)
-	{
+	public synchronized void updateState(Object... objects) {
 		EntityTransaction saveTransaction = entityManager.getTransaction();
-		saveTransaction.begin();
-		for (Object object : objects)
-		{
-			try
-			{
-				if (entityManager.contains(object))
-				{
+		try {
+			saveTransaction.begin();
+			for (Object object : objects) {
+
+				if (entityManager.contains(object)) {
 					entityManager.merge(object);
-				} else
-				{
+				} else {
 					entityManager.persist(object);
 				}
-			} catch (Exception e)
-			{
-				ShadowManager.log(Level.SEVERE, "Error while writing to Database", e);
+				
 			}
+			saveTransaction.commit();
+		} catch (Exception e) {
+			ShadowManager.fatal("Error while writing to Database", e);
 		}
-		saveTransaction.commit();
 	}
 
-	public synchronized void removeState(Object... objects)
-	{
-		ShadowManager.log(Level.INFO, "Scheduled remove Operation on " + objects.length + " objects");
+	public synchronized void removeState(Object... objects) {
+		ShadowManager.log(Level.INFO, "Scheduled remove Operation on "
+				+ objects.length + " objects");
 		executeRemoveState(objects);
-		ShadowManager.log(Level.INFO, "Executed remove Operation on " + objects.length + " objects");
+		ShadowManager.log(Level.INFO, "Executed remove Operation on "
+				+ objects.length + " objects");
 	}
 
-	public synchronized void executeRemoveState(Object... objects)
-	{
+	public synchronized void executeRemoveState(Object... objects) {
 		EntityTransaction transaction = entityManager.getTransaction();
-		transaction.begin();
-		for (Object object : objects)
+		try
 		{
+		transaction.begin();
+		for (Object object : objects) {
 			entityManager.remove(object);
 		}
 		transaction.commit();
+	} catch (Exception e) {
+		ShadowManager.fatal("Error while writing to Database", e);
+	}
 	}
 
-	public synchronized void shutdown()
-	{
+	public synchronized void shutdown() {
 		entityManager.close();
 		entityManagerFactory.close();
 	}
 
 	// Many convenience Methods
 
-	public Collection<StatisticStore> getStatisticsStore()
-	{
+	public Collection<StatisticStore> getStatisticsStore() {
 		return getQuery(StatisticStore.class);
 	}
 
-	public void saveStatisticsStore(StatisticStore statisticStore)
-	{
+	public void saveStatisticsStore(StatisticStore statisticStore) {
 		updateState(statisticStore);
 	}
 
-	public Collection<BridgeService> getServiceConfigurations()
-	{
+	public Collection<BridgeService> getServiceConfigurations() {
 		return getQuery(BridgeService.class);
 	}
 
-	public User getUserForIdentifier(String identifier)
-	{
+	public User getUserForIdentifier(String identifier) {
 		return getFromPrimaryKey(User.class, identifier);
 	}
 
-	public Endpoint getEndpointForIdentifier(String identifier)
-	{
+	public Endpoint getEndpointForIdentifier(String identifier) {
 		return getFromPrimaryKey(Endpoint.class, identifier);
 	}
 
-	public Collection<Endpoint> getEndpoints()
-	{
+	public Collection<Endpoint> getEndpoints() {
 		return getQuery(Endpoint.class);
 	}
 
-	public Group getGroup(String name)
-	{
+	public Group getGroup(String name) {
 		return getFromPrimaryKey(Group.class, name);
 	}
 
-	public Collection<Group> getGroups()
-	{
+	public Collection<Group> getGroups() {
 		return getQuery(Group.class);
 	}
 }
