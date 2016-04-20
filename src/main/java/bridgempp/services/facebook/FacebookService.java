@@ -1,6 +1,7 @@
 package bridgempp.services.facebook;
 
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.persistence.Column;
@@ -15,13 +16,11 @@ import com.restfb.Parameter;
 import com.restfb.Version;
 import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.FacebookType;
-import com.restfb.types.Post;
 
 import bridgempp.Message;
 import bridgempp.ShadowManager;
-import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
-import bridgempp.data.User;
+import bridgempp.data.processing.DataProcessor;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -32,28 +31,23 @@ public class FacebookService extends BridgeService
 
 	transient private FacebookClient facebook;
 	transient private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
-	transient private FacebookPollService pollService;
+	transient private SmartFacebookPollService pollService;
 	@Column(name = "ACCESS_TOKEN", nullable = false, length = 50)
 	private String accessToken;
 	@Column(name = "APP_ID", nullable = false, length = 50)
 	private String appID;
 	@Column(name = "APP_SECRET", nullable = false, length = 50)
 	private String appSecret;
+	@Column(name = "LAST_UPDATE", nullable = false)
+	private long lastUpdate;
 
 	@Override
 	public void connect()
 	{
 		ShadowManager.log(Level.INFO, "Facebook Client starting up");
 		facebook = new DefaultFacebookClient(accessToken, appSecret, Version.VERSION_2_3);
-		pollService = new FacebookPollService(this);
-		Thread thread = new Thread(pollService);
-		thread.setName("Facebook Poll Service");
-		thread.start();
-		Iterator<Endpoint> iterator = endpoints.iterator();
-		while (iterator.hasNext())
-		{
-			addEndpoint(iterator.next());
-		}
+		pollService = new SmartFacebookPollService(this);
+		DataProcessor.scheduleRepeatWithPeriod(pollService, 0, 15, TimeUnit.MINUTES);
 		ShadowManager.log(Level.INFO, "Facebook Client ready");
 	}
 
@@ -69,7 +63,7 @@ public class FacebookService extends BridgeService
 	{
 		if (message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
 		{
-			facebook.publish(message.getDestination().getIdentifier(), FacebookType.class, Parameter.with("message", message.toSimpleString(getSupportedMessageFormats())));
+			facebook.publish(message.getDestination().getPartOneIdentifier(), FacebookType.class, Parameter.with("message", message.toSimpleString(getSupportedMessageFormats())));
 		} else
 		{
 			throw new NotImplementedException("Can not currently Post non Plain Text-able Messages");
@@ -88,12 +82,6 @@ public class FacebookService extends BridgeService
 		return true;
 	}
 
-	public void addEndpoint(Endpoint endpoint)
-	{
-		// TODO: UGH
-		pollService.addConnection(endpoint.getIdentifier(), endpoint.getUsers().iterator().next().getIdentifier());
-	}
-
 	@Override
 	public MessageFormat[] getSupportedMessageFormats()
 	{
@@ -103,21 +91,6 @@ public class FacebookService extends BridgeService
 	public FacebookClient getFacebook()
 	{
 		return facebook;
-	}
-
-	public void processPost(String place, Post post)
-	{
-		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(place, this);
-		// TODO: POST: GET ID AS TRACKER?
-		User user = DataManager.getOrNewUserForIdentifier(post.getId(), endpoint);
-		String postString = convertMessageToString(post);
-		Message message = new Message(user, endpoint, postString, MessageFormat.PLAIN_TEXT);
-		receiveMessage(message);
-	}
-
-	private String convertMessageToString(Post post)
-	{
-		return post.toString();
 	}
 
 	public String getAccessToken()
@@ -154,6 +127,19 @@ public class FacebookService extends BridgeService
 		this.appID = appID;
 		this.appSecret = appSecret;
 		this.accessToken = accessToken;
+	}
+
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+	
+	public Collection<Endpoint> getEndpoints()
+	{
+		return endpoints;
+	}
+
+	public void setLastUpdate(long currentTimeMillis) {
+		lastUpdate = currentTimeMillis;
 	}
 
 }
