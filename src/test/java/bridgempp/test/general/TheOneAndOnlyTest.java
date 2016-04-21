@@ -18,56 +18,56 @@ public class TheOneAndOnlyTest {
 	boolean success = true;
 	List<String> ignoredMethods = new LinkedList<>();
 
-	@Test
-	public void test() throws IllegalAccessException {
-		ignoredMethods.add("main");
-		ignoredMethods.add("shutdown");
-		ignoredMethods.add("exit");
-		
-		for(Method m :new Object().getClass().getMethods())
-		{
-			ignoredMethods.add(m.getName());
-		}
-		
-		
-		
-		getAllTestedClasses().forEach(c -> {
-			Object cObject = null;
-			try {
-				Constructor<?>[] constructors = c.getDeclaredConstructors();
-				for (Constructor<?> cc : constructors) {
-					Object[] parameters = fillParameters(cc.getParameters());
-					cc.setAccessible(true);
-					cObject = cc.newInstance(parameters);
-				}
-			}
-			catch (InvocationTargetException e)
-			{
-				System.out.println("Constructor error. class: " + c.getName());
-				e.getCause().printStackTrace();
-				success = false;
-				return;
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			for (Method m : c.getDeclaredMethods()) {
-				if(ignoredMethods.contains(m.getName())) continue;
-				try {
-					Object[] parameters = fillParameters(m.getParameters());
-					m.setAccessible(true);
-					m.invoke(cObject, parameters);
-					System.out.println("Is null pointer safe:" + m.getName());
-				} catch (Exception e) {
-					System.err.println("Not null pointer safe:" + m.getName());
-					success = false;
-				}
-			}
-		});
-//		if (!success) {
-//			fail("Some Methods were not Null Pointer Safe!");
+//	@Test
+//	public void test() throws IllegalAccessException {
+//		ignoredMethods.add("main");
+//		ignoredMethods.add("shutdown");
+//		ignoredMethods.add("exit");
+//		
+//		for(Method m :new Object().getClass().getMethods())
+//		{
+//			ignoredMethods.add(m.getName());
 //		}
-	}
+//		
+//		
+//		
+//		getAllTestedClasses().forEach(c -> {
+//			Object cObject = null;
+//			try {
+//				Constructor<?>[] constructors = c.getDeclaredConstructors();
+//				for (Constructor<?> cc : constructors) {
+//					Object[] parameters = fillParameters(cc.getParameters());
+//					cc.setAccessible(true);
+//					cObject = cc.newInstance(parameters);
+//				}
+//			}
+//			catch (InvocationTargetException e)
+//			{
+//				System.out.println("Constructor error. class: " + c.getName());
+//				e.getCause().printStackTrace();
+//				success = false;
+//				return;
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			for (Method m : c.getDeclaredMethods()) {
+//				if(ignoredMethods.contains(m.getName())) continue;
+//				try {
+//					Object[] parameters = fillParameters(m.getParameters());
+//					m.setAccessible(true);
+//					m.invoke(cObject, parameters);
+//					System.out.println("Is null pointer safe:" + m.getName());
+//				} catch (Exception e) {
+//					System.err.println("Not null pointer safe:" + m.getName());
+//					success = false;
+//				}
+//			}
+//		});
+////		if (!success) {
+////			fail("Some Methods were not Null Pointer Safe!");
+////		}
+//	}
 
 	private Object[] fillParameters(Parameter[] reflectionParameters) {
 		Object[] parameters = new Object[reflectionParameters.length];
