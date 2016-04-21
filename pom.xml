@@ -93,6 +93,11 @@
 			<artifactId>TelegramBots</artifactId>
 			<version>[v2.0.0,v3.0.0)</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>[4.12, 5.0)</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
