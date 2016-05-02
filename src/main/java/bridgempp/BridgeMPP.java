@@ -155,7 +155,7 @@ public class BridgeMPP
 				syncTime += System.currentTimeMillis() - startTime;
 			}
 		}
-		ShadowManager.log(Level.INFO, "Killing Process. This was " + ((shutdownCommencing)?"":"NOT ") + " a scheduled restart");
+		ShadowManager.log(Level.INFO, "Killing Process. This was" + ((scheduledShutdown)?" ":" NOT ") + "a scheduled restart");
 		Runtime.getRuntime().halt((scheduledShutdown)?0:-1);
 	}
 
