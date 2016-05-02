@@ -25,6 +25,7 @@ public class BridgeMPP
 {
 
 	private static volatile boolean shutdownCommencing = false;
+	private static volatile boolean scheduledShutdown = false;
 	private static LockdownLock lockdown = new LockdownLock();
 
 	/**
@@ -72,11 +73,12 @@ public class BridgeMPP
 				try
 				{
 					Thread.sleep(parseLong);
+					scheduledShutdown = true;
+					ShadowManager.log(Level.INFO, "Server will shut down due to scheduled restart");
 				} catch (InterruptedException e)
 				{
-					ShadowManager.log(Level.WARNING, "Server Exit Sync interrupted. Shutting down BridgeMPP");
+					ShadowManager.log(Level.WARNING, "Server exit sync interrupted. Shutting down BridgeMPP");
 				}
-				ShadowManager.log(Level.INFO, "Server will shut down due to scheduled restart");
 				exit();
 			}
 		});
@@ -153,8 +155,8 @@ public class BridgeMPP
 				syncTime += System.currentTimeMillis() - startTime;
 			}
 		}
-		ShadowManager.log(Level.INFO, "Killing Process");
-		Runtime.getRuntime().halt(0);
+		ShadowManager.log(Level.INFO, "Killing Process. This was " + ((shutdownCommencing)?"":"NOT ") + " a scheduled restart");
+		Runtime.getRuntime().halt((scheduledShutdown)?0:-1);
 	}
 
 	public static void lockdown()
