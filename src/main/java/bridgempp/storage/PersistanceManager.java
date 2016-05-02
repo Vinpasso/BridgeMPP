@@ -71,11 +71,7 @@ public class PersistanceManager {
 	}
 
 	public synchronized void removeState(Object... objects) {
-		ShadowManager.log(Level.INFO, "Scheduled remove Operation on "
-				+ objects.length + " objects");
 		executeRemoveState(objects);
-		ShadowManager.log(Level.INFO, "Executed remove Operation on "
-				+ objects.length + " objects");
 	}
 
 	public synchronized void executeRemoveState(Object... objects) {
