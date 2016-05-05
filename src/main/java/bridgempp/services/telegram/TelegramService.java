@@ -24,6 +24,8 @@ public class TelegramService extends BridgeService
 	private transient TelegramBotsApi api;
 	private transient TelegramBot bot;
 	private transient BotSession session;
+
+	private static final MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT, MessageFormat.FILE_BACKED_IMAGE_FORMAT};
 	
 	@Override
 	public void connect() throws Exception
@@ -59,12 +61,6 @@ public class TelegramService extends BridgeService
 		return true;
 	}
 
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return MessageFormat.PLAIN_TEXT_ONLY;
-	}
-
 	public String getToken()
 	{
 		return token;
@@ -73,6 +69,12 @@ public class TelegramService extends BridgeService
 	public void configure(String token)
 	{
 		this.token = token;
+	}
+
+	@Override
+	public MessageFormat[] getSupportedMessageFormats()
+	{
+		return supportedMessageFormats ;
 	}
 
 }

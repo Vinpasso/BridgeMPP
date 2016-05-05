@@ -111,10 +111,7 @@ public abstract class BridgeService {
     public abstract String getName();
     //Check whether this Service is persistent across restarts
     public abstract boolean isPersistent();
-        
-    //Get the Supported Message Encodings by this Endpoint in order of descending priority
-    public abstract MessageFormat[] getSupportedMessageFormats();
-    
+            
     public int getIdentifier()
     {
     	return serviceIdentifier;
@@ -134,4 +131,6 @@ public abstract class BridgeService {
 	{
 		this.isEnabled = enable;
 	}
+	
+	public abstract MessageFormat[] getSupportedMessageFormats();
 }

@@ -12,7 +12,6 @@ import javax.persistence.OneToMany;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
-import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "SingleToMultiBridgeService")
 @DiscriminatorValue("SingleToMultiBridgeService")
@@ -80,8 +79,5 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 
 	@Override
 	public abstract boolean isPersistent();
-
-	@Override
-	public abstract MessageFormat[] getSupportedMessageFormats();
 
 }
