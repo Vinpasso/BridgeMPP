@@ -8,7 +8,7 @@ import bridgempp.ShadowManager;
 
 public class RateLimiter implements Function<Message, Message>
 {
-	private long lastMessage;
+	private long lastMessage = 0;
 	private long messageDelay = 5000l;
 
 	@Override
