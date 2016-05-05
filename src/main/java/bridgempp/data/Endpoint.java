@@ -76,7 +76,7 @@ public class Endpoint {
         {
         	return;
         }
-        service.sendMessage(message);
+        service.processMessage(message);
     }
 
     public void sendOperatorMessage(String message) {

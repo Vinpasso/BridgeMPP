@@ -1,8 +1,6 @@
 package bridgempp.storage;
 
 import java.util.Collection;
-import java.util.logging.Level;
-
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

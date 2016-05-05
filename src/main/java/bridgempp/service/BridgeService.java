@@ -5,8 +5,12 @@
  */
 package bridgempp.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Function;
+import java.util.logging.Level;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -20,6 +24,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.messageformat.MessageFormat;
@@ -43,6 +48,8 @@ public abstract class BridgeService {
 	    
 	@Column(name = "ENABLED", nullable = false)
 	private boolean isEnabled = true;
+
+	private transient ArrayList<Function<Message, Message>> filters = new ArrayList<>();
 	
     //Initialize Service
     public abstract void connect() throws Exception;
@@ -61,6 +68,45 @@ public abstract class BridgeService {
     	CommandInterpreter.processMessage(message);
     }
     
+	public BridgeService()
+	{
+		super();
+		ServiceFilter[] filterAnnotations = getClass().getAnnotationsByType(ServiceFilter.class);
+		for(ServiceFilter filter : filterAnnotations)
+		{
+			try
+			{
+				addFilter(filter.value().newInstance());
+			} catch (Exception e) {
+				ShadowManager.log(Level.SEVERE, "Failed to apply filter to service", e);
+			}
+		}
+	}
+	
+	public final void processMessage(Message message)
+	{
+		Iterator<Function<Message, Message>> iterator = filters.iterator();
+		while(iterator.hasNext())
+		{
+			message = iterator.next().apply(message);
+			if(message == null)
+			{
+				return;
+			}
+		}
+		sendMessage(message);
+	}
+	
+	protected void addFilter(Function<Message, Message> filter)
+	{
+		filters.add(filter);
+	}
+	
+	protected void removeFilter(Function<Message, Message> filter)
+	{
+		filters.remove(filter);
+	}
+    
     //Get user-friendly name of this Service
     public abstract String getName();
     //Check whether this Service is persistent across restarts
@@ -76,7 +122,7 @@ public abstract class BridgeService {
     
     public String toString()
     {
-    	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent)":" (Non-Persistent)");
+    	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent) ":" (Non-Persistent) ") + (isEnabled()?"(Enabled)":"(Disabled)");
     }
     
 	public boolean isEnabled()

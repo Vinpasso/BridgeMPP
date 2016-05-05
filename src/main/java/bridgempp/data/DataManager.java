@@ -1,7 +1,6 @@
 package bridgempp.data;
 
 import java.util.Collection;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import bridgempp.service.BridgeService;
@@ -14,7 +13,6 @@ public class DataManager
 
 	private static final PersistanceManager PERSISTANCE_MANAGER = PersistanceManager.getPersistanceManager();
 
-	private static final int READ_PERMITS = Integer.MAX_VALUE;
 	private static ReentrantReadWriteLock domLock = new ReentrantReadWriteLock(true);
 	
 	private static synchronized Endpoint registerEndpoint(BridgeService service, String identifier)

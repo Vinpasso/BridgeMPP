@@ -1,17 +1,10 @@
 package bridgempp.test.general;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
-import org.junit.Test;
 
 public class TheOneAndOnlyTest {
 
@@ -69,7 +62,7 @@ public class TheOneAndOnlyTest {
 ////		}
 //	}
 
-	private Object[] fillParameters(Parameter[] reflectionParameters) {
+	protected Object[] fillParameters(Parameter[] reflectionParameters) {
 		Object[] parameters = new Object[reflectionParameters.length];
 		for(int i = 0; i < reflectionParameters.length; i++)
 		{

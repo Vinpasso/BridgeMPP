@@ -63,7 +63,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 	public void sendKeepAliveMessages()
 	{
 		//ShadowManager.log(Level.INFO, "Sending " + handles.size() + " Keep-Alive Messages");
-		int sent = 0;
+//		int sent = 0;
 		try
 		{
 			Iterator<SocketClient> iterator = handles.values().iterator();
@@ -71,7 +71,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 			{
 				SocketClient handle = iterator.next();
 				handle.sendMessage(new Message(null, null, null, null, "", MessageFormat.PLAIN_TEXT));
-				sent++;
+//				sent++;
 			}
 		} catch (ConcurrentModificationException e)
 		{

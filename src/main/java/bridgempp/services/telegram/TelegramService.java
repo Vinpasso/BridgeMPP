@@ -10,9 +10,12 @@ import org.telegram.telegrambots.updatesreceivers.BotSession;
 import bridgempp.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
+import bridgempp.service.ServiceFilter;
+import bridgempp.service.filter.RateLimiter;
 
 @Entity(name = "TELEGRAM_SERVICE_CONFIGURATION")
 @DiscriminatorValue("TELEGRAM_SERVICE")
+@ServiceFilter(RateLimiter.class)
 public class TelegramService extends BridgeService
 {
 	@Column(name = "TOKEN", nullable = false, length = 255)

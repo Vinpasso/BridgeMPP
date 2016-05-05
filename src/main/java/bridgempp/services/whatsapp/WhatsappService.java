@@ -8,6 +8,8 @@ package bridgempp.services.whatsapp;
 import bridgempp.*;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
+import bridgempp.service.ServiceFilter;
+import bridgempp.service.filter.RateLimiter;
 
 import java.io.*;
 import java.util.Base64;
@@ -24,6 +26,7 @@ import javax.persistence.Entity;
  */
 @Entity(name = "WHATSAPP_SERVICE_CONFIGURATION")
 @DiscriminatorValue("WHATSAPP_SERVICE")
+@ServiceFilter(RateLimiter.class)
 public class WhatsappService extends BridgeService {
 	
 	transient Process yowsup;
