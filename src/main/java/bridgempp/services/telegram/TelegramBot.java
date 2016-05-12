@@ -53,10 +53,10 @@ public class TelegramBot extends TelegramLongPollingBot
 		if (!user.hasAlias())
 		{
 			String username = "";
-			username += (message.getFrom().getFirstName() == null) ? "" : message.getFrom().getFirstName();
+			username += (message.getFrom().getFirstName() == null) ? "" : message.getFrom().getFirstName() + " ";
 			username += (message.getFrom().getLastName() == null) ? "" : message.getFrom().getLastName();
 			username = (username.length() == 0) ? message.getFrom().getUserName() : username;
-			user.setName(username);
+			user.setName(username.trim());
 			ShadowManager.log(Level.INFO, "Automatically extracted Alias from Telegram");
 		}
 		if (message.hasText())
