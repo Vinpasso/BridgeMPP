@@ -9,11 +9,15 @@ public class PlainTextMessageFormat extends MessageFormat {
 	public PlainTextMessageFormat()
 	{
 		super();
-		addConversion(BASE_64_PLAIN_TEXT, new PlainTextToBase64());
 	}
 	
 	@Override
 	public String getName() {
 		return "Plain Text";
+	}
+
+	@Override
+	public void registerConversions() {
+		addConversion(BASE_64_PLAIN_TEXT, new PlainTextToBase64());	
 	}
 }

@@ -7,12 +7,16 @@ public class HTMLMessageFormat extends MessageFormat {
 
 	public HTMLMessageFormat() {
 		super();
-		addConversion(PLAIN_TEXT, new HTMLToPlainText());
 	}
 	
 	@Override
 	public String getName() {
 		return "HTML";
+	}
+
+	@Override
+	public void registerConversions() {
+		addConversion(PLAIN_TEXT, new HTMLToPlainText());	
 	}
 
 }

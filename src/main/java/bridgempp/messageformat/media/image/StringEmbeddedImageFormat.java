@@ -11,14 +11,18 @@ public class StringEmbeddedImageFormat extends MessageFormat
 	public StringEmbeddedImageFormat()
 	{
 		super();
-		addConversion(BASE_64_IMAGE_FORMAT, new Base64ToPlainText());
-		addConversion(FILE_BACKED_IMAGE_FORMAT, new EmbeddedToFileBacked());
 	}
 
 	@Override
 	public String getName()
 	{
 		return "Image (Embedded)";
+	}
+
+	@Override
+	public void registerConversions() {
+		addConversion(BASE_64_IMAGE_FORMAT, new Base64ToPlainText());
+		addConversion(FILE_BACKED_IMAGE_FORMAT, new EmbeddedToFileBacked());
 	}
 
 }

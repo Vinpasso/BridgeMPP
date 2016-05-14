@@ -13,7 +13,6 @@ public class Base64ImageFormat extends MessageFormat
 	public Base64ImageFormat()
 	{
 		super();
-		addConversion(STRING_EMBEDDED_IMAGE_FORMAT, new Base64ToPlainText());
 	}
 	
 	
@@ -21,6 +20,12 @@ public class Base64ImageFormat extends MessageFormat
 	public String getName()
 	{
 		return "Image (Base64)";
+	}
+
+
+	@Override
+	public void registerConversions() {
+		addConversion(STRING_EMBEDDED_IMAGE_FORMAT, new Base64ToPlainText());		
 	}
 
 }

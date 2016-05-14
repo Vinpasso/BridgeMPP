@@ -7,12 +7,16 @@ public class XHTMLMessageFormat extends MessageFormat {
 
 	public XHTMLMessageFormat() {
 		super();
-		addConversion(HTML, Converter.identity());
 	}
 	
 	@Override
 	public String getName() {
 		return "XHTML";
+	}
+
+	@Override
+	public void registerConversions() {
+		addConversion(HTML, Converter.identity());	
 	}
 
 
