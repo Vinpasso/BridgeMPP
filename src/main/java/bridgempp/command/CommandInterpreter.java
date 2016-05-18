@@ -55,7 +55,7 @@ public class CommandInterpreter
 				{
 					return;
 				}
-				BridgeMPP.syncLockdown();
+				BridgeMPP.readLock();
 				StatisticsManager.processMessage(message);
 				if (isCommand(message.getPlainTextMessage()))
 				{
@@ -85,6 +85,7 @@ public class CommandInterpreter
 				{
 					ShadowManager.log(Level.SEVERE, "Process Message failure (This is final): ", e);
 				}
+				BridgeMPP.readUnlock();
 			}
 		}
 	}

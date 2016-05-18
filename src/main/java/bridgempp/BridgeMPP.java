@@ -8,6 +8,8 @@ package bridgempp;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
 import bridgempp.command.CommandInterpreter;
@@ -26,7 +28,7 @@ public class BridgeMPP
 
 	private static volatile boolean shutdownCommencing = false;
 	private static volatile boolean scheduledShutdown = false;
-	private static LockdownLock lockdown = new LockdownLock();
+	private static ReentrantReadWriteLock lockdown = new ReentrantReadWriteLock();
 
 	/**
 	 * @param args
@@ -34,7 +36,7 @@ public class BridgeMPP
 	 */
 	public static void main(String[] args)
 	{
-		lockdown();
+		writeLock();
 		if (args.length != 0)
 		{
 			for (int i = 0; i < args.length; i++)
@@ -58,7 +60,7 @@ public class BridgeMPP
 		CommandInterpreter.loadCommands();
 		ServiceManager.loadAllServices();
 		StatisticsManager.loadStatistics();
-		allClear();
+		writeUnlock();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
 	}
 
@@ -112,7 +114,7 @@ public class BridgeMPP
 		}
 		shutdownCommencing = true;
 		ShadowManager.log(Level.INFO, "Server shutdown commencing...");
-		lockdown();
+		writeLock();
 		try
 		{
 			ServiceManager.unloadAllServices();
@@ -159,19 +161,24 @@ public class BridgeMPP
 		Runtime.getRuntime().halt((scheduledShutdown)?0:-1);
 	}
 
-	public static void lockdown()
+	public static void writeLock()
 	{
-		lockdown.lock();
+		lockdown.writeLock().lock();
 	}
 
-	public static void allClear()
+	public static void writeUnlock()
 	{
-		lockdown.unlock();
+		lockdown.writeLock().unlock();
 	}
 
-	public static void syncLockdown() throws InterruptedException
+	public static void readLock() throws InterruptedException
 	{
-		lockdown.syncLock();
+		lockdown.readLock().lock();
+	}
+	
+	public static void readUnlock() 
+	{
+		lockdown.readLock().unlock();
 	}
 
 	private static void addShutdownHook()

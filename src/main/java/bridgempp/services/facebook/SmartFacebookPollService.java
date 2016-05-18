@@ -31,7 +31,8 @@ public class SmartFacebookPollService implements Runnable {
 	public void run() {
 		//Check that BridgeMPP is ready to do stuff
 		try {
-			BridgeMPP.syncLockdown();
+			BridgeMPP.readLock();
+			BridgeMPP.readUnlock();
 		} catch (InterruptedException e1) {
 			ShadowManager.log(Level.WARNING, "Facebook Query Poll was cancelled");
 			return;
