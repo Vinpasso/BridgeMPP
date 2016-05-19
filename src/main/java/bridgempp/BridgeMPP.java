@@ -37,29 +37,36 @@ public class BridgeMPP
 	public static void main(String[] args)
 	{
 		writeLock();
-		if (args.length != 0)
+		try
 		{
-			for (int i = 0; i < args.length; i++)
+			if (args.length != 0)
 			{
-				if (args[i].trim().equalsIgnoreCase("-stopTime"))
+				for (int i = 0; i < args.length; i++)
 				{
-					try
+					if (args[i].trim().equalsIgnoreCase("-stopTime"))
 					{
-						startExitSync(Long.parseLong(args[i + 1]));
-					} catch (Exception e)
-					{
-						System.err.println("Syntax Error");
-						System.exit(0);
+						try
+						{
+							startExitSync(Long.parseLong(args[i + 1]));
+						} catch (Exception e)
+						{
+							System.err.println("Syntax Error");
+							System.exit(0);
+						}
 					}
 				}
 			}
+			ShadowManager.log(Level.INFO, "Server startup commencing...");
+			addShutdownHook();
+			EventManager.loadCentralEventSubscribers();
+			CommandInterpreter.loadCommands();
+			ServiceManager.loadAllServices();
+			StatisticsManager.loadStatistics();
+		} catch (Exception e)
+		{
+			ShadowManager.log(Level.SEVERE, "Fatal Error: ", e);
+			exit();
 		}
-		ShadowManager.log(Level.INFO, "Server startup commencing...");
-		addShutdownHook();
-		EventManager.loadCentralEventSubscribers();
-		CommandInterpreter.loadCommands();
-		ServiceManager.loadAllServices();
-		StatisticsManager.loadStatistics();
 		writeUnlock();
 		ShadowManager.log(Level.INFO, "Server Initialization completed");
 	}
@@ -151,14 +158,13 @@ public class BridgeMPP
 					}
 				} catch (InterruptedException e)
 				{
-					ShadowManager.log(Level.SEVERE, "Waiting on Thread " + thread.getName()
-							+ " for 60 seconds did not result in exit");
+					ShadowManager.log(Level.SEVERE, "Waiting on Thread " + thread.getName() + " for 60 seconds did not result in exit");
 				}
 				syncTime += System.currentTimeMillis() - startTime;
 			}
 		}
-		ShadowManager.log(Level.INFO, "Killing Process. This was" + ((scheduledShutdown)?" ":" NOT ") + "a scheduled restart");
-		Runtime.getRuntime().halt((scheduledShutdown)?0:-1);
+		ShadowManager.log(Level.INFO, "Killing Process. This was" + ((scheduledShutdown) ? " " : " NOT ") + "a scheduled restart");
+		Runtime.getRuntime().halt((scheduledShutdown) ? 0 : -1);
 	}
 
 	public static void writeLock()
@@ -171,12 +177,12 @@ public class BridgeMPP
 		lockdown.writeLock().unlock();
 	}
 
-	public static void readLock() throws InterruptedException
+	public static void readLock()
 	{
 		lockdown.readLock().lock();
 	}
-	
-	public static void readUnlock() 
+
+	public static void readUnlock()
 	{
 		lockdown.readLock().unlock();
 	}

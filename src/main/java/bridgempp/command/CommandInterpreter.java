@@ -47,6 +47,7 @@ public class CommandInterpreter
 	// Process incomming messages and forward them to targets
 	public static synchronized void processMessage(Message message)
 	{
+		BridgeMPP.readLock();
 		for(int delivery = 0; delivery < 3; delivery++)
 		{
 			try
@@ -55,7 +56,6 @@ public class CommandInterpreter
 				{
 					return;
 				}
-				BridgeMPP.readLock();
 				StatisticsManager.processMessage(message);
 				if (isCommand(message.getPlainTextMessage()))
 				{
@@ -85,9 +85,9 @@ public class CommandInterpreter
 				{
 					ShadowManager.log(Level.SEVERE, "Process Message failure (This is final): ", e);
 				}
-				BridgeMPP.readUnlock();
 			}
 		}
+		BridgeMPP.readUnlock();
 	}
 
 	public static void loadCommands()
