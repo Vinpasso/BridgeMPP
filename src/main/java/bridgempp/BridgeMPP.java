@@ -63,23 +63,14 @@ public class BridgeMPP {
 	}
 
 	private static void startExitSync(final long parseLong) {
-		Schedule.scheduleOnce(
-				() -> {
-					System.out.println("Exit Time set to: " + parseLong);
-					try {
-						Thread.sleep(parseLong);
-						scheduledShutdown = true;
-						ShadowManager
-								.log(Level.INFO,
-										"Server will shut down due to scheduled restart");
-					} catch (InterruptedException e) {
-						ShadowManager
-								.log(Level.WARNING,
-										"Server exit sync interrupted. Shutting down BridgeMPP");
-					}
-					exit();
-				}, parseLong, TimeUnit.MILLISECONDS);
-		ShadowManager.log(Level.INFO, "Scheduled shutdown to occur in " + parseLong + " milliseconds");
+		Schedule.scheduleOnce(() -> {
+			scheduledShutdown = true;
+			ShadowManager.log(Level.INFO,
+					"Server will shut down due to scheduled restart");
+			exit();
+		}, parseLong, TimeUnit.MILLISECONDS);
+		ShadowManager.log(Level.INFO, "Scheduled shutdown to occur in "
+				+ parseLong + " milliseconds");
 	}
 
 	public static String getPathLocation() {
@@ -98,6 +89,12 @@ public class BridgeMPP {
 	}
 
 	public static void exit() {
+		Schedule.schedule(() -> executeShutdown());
+		ShadowManager.log(Level.INFO, "Scheduled a system shutdown");
+	}
+		
+	private static void executeShutdown()
+	{
 		if (shutdownCommencing || JUnitTestTest.isJUnitTest()) {
 			return;
 		}
