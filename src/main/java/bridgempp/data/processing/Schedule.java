@@ -3,6 +3,7 @@ package bridgempp.data.processing;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -15,7 +16,16 @@ public class Schedule
 	static
 	{
 		ShadowManager.log(Level.INFO, "Starting the Scheduler's schedule...");
-		executor = new ScheduledThreadPoolExecutor(2);
+		ThreadFactory factory = new ThreadFactory() {
+			private volatile int number = 0;
+			
+			@Override
+			public Thread newThread(Runnable r)
+			{
+				return new Thread(r, "BridgeMPP Schedule Executor #" + number++);
+			}
+		};
+		executor = new ScheduledThreadPoolExecutor(2, factory);
 		executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 		ShadowManager.log(Level.INFO, "Started the Scheduler's schedule...");
 	}
@@ -52,13 +62,27 @@ public class Schedule
 	
 	public static void shutdownSynchronous()
 	{
+		ShadowManager.log(Level.INFO, "Shutting down the schedule executor...");
 		executor.shutdown();
 		try
 		{
 			executor.awaitTermination(60, TimeUnit.SECONDS);
 		} catch (InterruptedException e)
 		{
-			ShadowManager.log(Level.INFO, "Failed to await termination of schedule: ", e);
+			ShadowManager.log(Level.SEVERE, "Failed to await termination of schedule: ", e);
 		}
+		ShadowManager.log(Level.INFO, "Schedule executor was shut down");
+	}
+
+	public static void shutdownAsynchronous()
+	{
+		ShadowManager.log(Level.INFO, "Shutting down the schedule executor...");
+		executor.shutdown();
+		ShadowManager.log(Level.INFO, "Schedule executor was shut down.");
+	}
+
+	public static boolean isShutdown()
+	{
+		return executor.isShutdown();
 	}
 }

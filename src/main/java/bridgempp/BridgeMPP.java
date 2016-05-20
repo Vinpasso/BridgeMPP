@@ -89,6 +89,10 @@ public class BridgeMPP {
 	}
 
 	public static void exit() {
+		if(Schedule.isShutdown())
+		{
+			return;
+		}
 		Schedule.schedule(() -> executeShutdown());
 		ShadowManager.log(Level.INFO, "Scheduled a system shutdown");
 	}
@@ -105,48 +109,66 @@ public class BridgeMPP {
 			ServiceManager.unloadAllServices();
 			StatisticsManager.saveStatistics();
 			PersistanceManager.getPersistanceManager().shutdown();
+			Schedule.shutdownAsynchronous();
 		} catch (Exception e) {
 			ShadowManager
 					.log(Level.WARNING,
 							"Clean server shutdown has failed. Will forcefully continue shutdown",
 							e);
 		}
+		writeUnlock();
 		ShadowManager.log(Level.INFO, "Server shutdown completed");
 		ShadowManager.log(Level.INFO, "Syncing System Exit (60 Seconds)");
-		long syncTime = 0;
-		for (Thread thread : Thread.getAllStackTraces().keySet()) {
-			if (syncTime > 60000) {
+		long syncTime = System.currentTimeMillis();
+		while(System.currentTimeMillis() - syncTime < 60000)
+		{
+			Thread.getAllStackTraces().forEach((t, st) -> {
+				if(t.isDaemon() || t.equals(Thread.currentThread()) || !t.isAlive())
+				{
+					return;
+				}
+				ShadowManager.log(Level.INFO, "Active thread: " + t.getName());
+			});
+			Thread.getAllStackTraces().forEach((t, st) -> {
+				if(isNonRelevantThread(t))
+				{
+					return;
+				}
+				ShadowManager.log(Level.INFO, "Waiting for: " + t.getName());
+				try
+				{
+					t.interrupt();
+					t.join(10000);
+				} catch (Exception e)
+				{
+					ShadowManager.log(Level.WARNING, "Interrupt while waiting for thread join", e);
+				}
+				if(t.isAlive())
+				{
+					ShadowManager.log(Level.INFO, t.getName() + " is still alive");
+				}
+				else
+				{
+					ShadowManager.log(Level.INFO, t.getName() + " has exited");
+				}
+			});
+			if(Thread.getAllStackTraces().entrySet().stream().allMatch(e -> isNonRelevantThread(e.getKey())))
+			{
+				ShadowManager.log(Level.INFO, "All threads have exited successfully");
 				break;
 			}
-			if (thread.equals(Thread.currentThread())) {
-				continue;
-			}
-			if (thread.isAlive()) {
-				long startTime = System.currentTimeMillis();
-				try {
-					if (!thread.isDaemon()
-							&& !thread.getName().equalsIgnoreCase(
-									"DestroyJavaVM")) {
-						ShadowManager.log(Level.INFO, "Waiting on Thread: "
-								+ thread.getName());
-						thread.interrupt();
-						thread.join(60000);
-						ShadowManager.log(Level.INFO, "Thread has exited: "
-								+ thread.getName());
-					}
-				} catch (InterruptedException e) {
-					ShadowManager.log(Level.SEVERE, "Waiting on Thread "
-							+ thread.getName()
-							+ " for 60 seconds did not result in exit");
-				}
-				syncTime += System.currentTimeMillis() - startTime;
-			}
 		}
+		ShadowManager.log(Level.INFO, "Continuing shutdown with " + Thread.activeCount() + " alive threads.");
 		ShadowManager
 				.log(Level.INFO, "Killing Process. This was"
 						+ ((scheduledShutdown) ? " " : " NOT ")
 						+ "a scheduled restart");
-		Runtime.getRuntime().halt((scheduledShutdown) ? 0 : -1);
+		Runtime.getRuntime().exit((scheduledShutdown) ? 0 : -1);
+	}
+
+	private static boolean isNonRelevantThread(Thread t)
+	{
+		return t.isDaemon() || t.equals(Thread.currentThread()) || t.getName().equals("DestroyJavaVM") || !t.isAlive();
 	}
 
 	public static void writeLock() {

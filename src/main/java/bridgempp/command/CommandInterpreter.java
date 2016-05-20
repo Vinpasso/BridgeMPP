@@ -47,15 +47,15 @@ public class CommandInterpreter
 	// Process incomming messages and forward them to targets
 	public static synchronized void processMessage(Message message)
 	{
+		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0)
+		{
+			return;
+		}
 		BridgeMPP.readLock();
 		for(int delivery = 0; delivery < 3; delivery++)
 		{
 			try
 			{
-				if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0)
-				{
-					return;
-				}
 				StatisticsManager.processMessage(message);
 				if (isCommand(message.getPlainTextMessage()))
 				{
