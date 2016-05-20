@@ -8,14 +8,16 @@ import java.util.logging.Level;
 
 import bridgempp.ShadowManager;
 
-public class DataProcessor
+public class Schedule
 {
 	private static ScheduledThreadPoolExecutor executor;
 	
 	static
 	{
+		ShadowManager.log(Level.INFO, "Starting the Scheduler's schedule...");
 		executor = new ScheduledThreadPoolExecutor(2);
 		executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+		ShadowManager.log(Level.INFO, "Started the Scheduler's schedule...");
 	}
 	
 	public static void schedule(Runnable runnable)

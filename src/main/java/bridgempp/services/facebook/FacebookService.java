@@ -22,7 +22,7 @@ import com.restfb.types.FacebookType;
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
-import bridgempp.data.processing.DataProcessor;
+import bridgempp.data.processing.Schedule;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -49,7 +49,7 @@ public class FacebookService extends BridgeService
 		ShadowManager.log(Level.INFO, "Facebook Client starting up");
 		facebook = new DefaultFacebookClient(accessToken, appSecret, Version.VERSION_2_3);
 		pollService = new SmartFacebookPollService(this);
-		DataProcessor.scheduleRepeatWithPeriod(pollService, 0, 15, TimeUnit.MINUTES);
+		Schedule.scheduleRepeatWithPeriod(pollService, 0, 15, TimeUnit.MINUTES);
 		ShadowManager.log(Level.INFO, "Facebook Client ready");
 	}
 

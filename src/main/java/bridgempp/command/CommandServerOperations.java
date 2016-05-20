@@ -15,7 +15,7 @@ import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
-import bridgempp.data.processing.DataProcessor;
+import bridgempp.data.processing.Schedule;
 
 /**
  *
@@ -31,7 +31,7 @@ public class CommandServerOperations
 	public static void cmdExit(Message message)
 	{
 		ShadowManager.logAndReply(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString(), message);
-		DataProcessor.schedule(() -> BridgeMPP.exit());
+		Schedule.schedule(() -> BridgeMPP.exit());
 	}
 
 }
