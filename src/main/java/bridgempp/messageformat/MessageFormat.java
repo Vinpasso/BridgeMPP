@@ -52,6 +52,10 @@ public abstract class MessageFormat {
 				return new AbstractMap.SimpleEntry<MessageFormat, String>(this,
 						message);
 			}
+			if(otherCollection.contains(this))
+			{
+				return new AbstractMap.SimpleEntry<MessageFormat, String>(this, message);
+			}
 			Optional<Entry<MessageFormat, Converter>> closest = conversions
 					.entrySet().stream()
 					.filter(e -> otherCollection.contains(e.getKey())).sorted()
