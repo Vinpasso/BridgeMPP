@@ -9,9 +9,11 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+
 import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
+import bridgempp.data.processing.Schedule;
 
 @Entity(name = "SingleToMultiBridgeService")
 @DiscriminatorValue("SingleToMultiBridgeService")
@@ -45,8 +47,8 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 		MultiBridgeServiceHandle<S, H> handle = getHandle(message.getDestination().getIdentifier());
 		if (handle == null)
 		{
-			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle: " + message.toString());
-			DataManager.deregisterEndpointAndUsers(message.getDestination());
+			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle (Delaying endpoint removal): " + message.toString());
+			Schedule.schedule(() -> DataManager.deregisterEndpointAndUsers(message.getDestination()));
 			return;
 		}
 		handle.sendMessage(message);
