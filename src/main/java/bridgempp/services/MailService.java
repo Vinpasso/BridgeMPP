@@ -26,6 +26,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
@@ -142,7 +143,7 @@ public class MailService extends BridgeService
 			
 			mimeMessage.setRecipients(Message.RecipientType.TO, recipientAddresses);
 			mimeMessage.setSubject(message.getDestination().getIdentifier());
-			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()));
+			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()), StandardCharsets.UTF_8.displayName());
 			Transport.send(mimeMessage, username, password);
 		} catch (Exception ex)
 		{
