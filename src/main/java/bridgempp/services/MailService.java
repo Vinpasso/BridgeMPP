@@ -236,6 +236,10 @@ public class MailService extends BridgeService
 			{
 				for (Message message : folder.getMessages())
 				{
+					if(message.getFolder().equals(folder))
+					{
+						continue;
+					}
 					processMessage(message);
 				}
 			} catch (MessagingException e1)
@@ -262,8 +266,12 @@ public class MailService extends BridgeService
 						sender = ((InternetAddress)address[i]).getAddress();
 					}
 				}
-				
-				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(message.getSubject(), MailService.this);
+				String subjectName = message.getSubject();
+				if(subjectName.length() > 50)
+				{
+					subjectName = subjectName.substring(0, 50);
+				}
+				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
 				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);
