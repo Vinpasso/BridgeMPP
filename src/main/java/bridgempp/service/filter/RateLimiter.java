@@ -12,7 +12,7 @@ public class RateLimiter implements Function<Message, Message>
 	private long messageDelay = 5000l;
 
 	@Override
-	public Message apply(Message t)
+	public synchronized Message apply(Message t)
 	{
 		if(System.currentTimeMillis() < lastMessage + messageDelay)
 		{
