@@ -20,8 +20,10 @@ import com.sun.mail.imap.protocol.IMAPProtocol;
 import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.ParseException;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -193,7 +195,7 @@ public class MailService extends BridgeService
 								return null;
 							}
 						});
-						ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP");
+						ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP. " + inboxFolder.getMessageCount() + " messages in inbox");
 					} catch (MessagingException ex)
 					{
 						ShadowManager.log(Level.SEVERE, null, ex);
@@ -283,8 +285,8 @@ public class MailService extends BridgeService
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
-				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);
-				receiveMessage(bMessage);
+				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, null, null);
+				processMessage(message, bMessage);
 				inboxFolder.copyMessages(new Message[] { message }, processedFolder);
 				inboxFolder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
 				inboxFolder.expunge();
@@ -296,23 +298,70 @@ public class MailService extends BridgeService
 			}
 		}
 
-		protected String getMessageContent(Message message) throws IOException, MessagingException
+		protected void processMessage(Message message, bridgempp.Message bMessage) throws IOException, MessagingException
 		{
 			Object messageContent = message.getContent();
 			if (messageContent instanceof Multipart)
 			{
 				Multipart container = (Multipart) messageContent;
-				for (int i = 0; i < container.getCount(); i++)
+				processMultiPartMessage(bMessage, container);
+			} else
+			{
+				bMessage.setMessage(messageContent.toString());
+				bMessage.setMessageFormat(getMessageFormatFromMimeType(message.getContentType()));
+				receiveMessage(bMessage);
+			}
+		}
+
+		protected void processMultiPartMessage(bridgempp.Message bMessage, Multipart container) throws MessagingException, IOException
+		{
+			ContentType type = new ContentType(container.getContentType());
+			for (int i = 0; i < container.getCount(); i++)
+			{
+				BodyPart part = container.getBodyPart(i);
+				bMessage.setMessageFormat(getMessageFormatFromMimeType(part.getContentType()));
+				Object content = part.getContent();
+				if (content instanceof Multipart)
 				{
-					BodyPart part = container.getBodyPart(i);
-					Object content = part.getContent();
-					if (content instanceof String)
-					{
-						return (String) content;
-					}
+					processMultiPartMessage(bMessage, (Multipart) content);
+				} else if (content instanceof String)
+				{
+					bMessage.setMessage(content.toString());
+					receiveMessage(bMessage);
+				}
+				else
+				{
+					continue;
+				}
+				
+				if(type.getSubType().equals("alternative"))
+				{
+					return;
 				}
 			}
-			return messageContent.toString();
+		}
+
+		private MessageFormat getMessageFormatFromMimeType(String contentType)
+		{
+			try
+			{
+				ContentType type = new ContentType(contentType);
+				switch (type.getBaseType())
+				{
+					case "text/plain":
+						return MessageFormat.PLAIN_TEXT;
+					case "text/html":
+						return MessageFormat.HTML;
+					case "image/jpeg":
+						return MessageFormat.STRING_EMBEDDED_IMAGE_FORMAT;
+					default:
+						return MessageFormat.PLAIN_TEXT;
+				}
+			} catch (ParseException e)
+			{
+				ShadowManager.log(Level.SEVERE, "Received invalid MIME Type in email message", e);
+			}
+			return MessageFormat.PLAIN_TEXT;
 		}
 	}
 
