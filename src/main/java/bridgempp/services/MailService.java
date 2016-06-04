@@ -9,6 +9,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.data.processing.Schedule;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -30,6 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 /**
@@ -43,7 +47,7 @@ public class MailService extends BridgeService
 
 	transient private Session session;
 	transient private Store store;
-	transient private IMAPFolder folder;
+	transient private IMAPFolder inboxFolder;
 	transient private IMAPFolder processedFolder;
 	@Column(name = "IMAP_HOST", nullable = false, length = 50)
 	private String imaphost;
@@ -69,7 +73,7 @@ public class MailService extends BridgeService
 		{
 
 			Properties mailProperties = new Properties();
-			
+
 			mailProperties.setProperty("mail.store.protocol", "imaps");
 			mailProperties.setProperty("mail.smtp.submitter", username);
 			mailProperties.setProperty("mail.smtp.auth", "true");
@@ -92,8 +96,8 @@ public class MailService extends BridgeService
 			session = Session.getDefaultInstance(mailProperties, authenticator);
 			store = session.getStore("imaps");
 			store.connect(imaphost, imapport, username, password);
-			folder = (IMAPFolder) store.getFolder("Inbox");
-			folder.open(Folder.READ_WRITE);
+			inboxFolder = (IMAPFolder) store.getFolder("Inbox");
+			inboxFolder.open(Folder.READ_WRITE);
 			processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
 			if (!processedFolder.exists())
 			{
@@ -116,7 +120,7 @@ public class MailService extends BridgeService
 	{
 		try
 		{
-			folder.close(true);
+			inboxFolder.close(true);
 			processedFolder.close(true);
 			store.close();
 		} catch (MessagingException ex)
@@ -135,12 +139,12 @@ public class MailService extends BridgeService
 			Collection<User> recipients = message.getDestination().getUsers();
 			Address[] recipientAddresses = new Address[recipients.size()];
 			Iterator<User> iterator = recipients.iterator();
-			for(int i = 0; i < recipients.size(); i++)
+			for (int i = 0; i < recipients.size(); i++)
 			{
 				User user = iterator.next();
 				recipientAddresses[i] = new InternetAddress(user.getIdentifier(), user.getName());
 			}
-			
+
 			mimeMessage.setRecipients(Message.RecipientType.TO, recipientAddresses);
 			mimeMessage.setSubject(message.getDestination().getIdentifier());
 			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()), StandardCharsets.UTF_8.displayName());
@@ -165,79 +169,81 @@ public class MailService extends BridgeService
 
 	private class MailMessageListener implements Runnable, MessageCountListener
 	{
-
-		Thread autoRenewThread;
+		private static final long KEEP_ALIVE_FREQUENCY = 1740000l;
+		private Future<?> future;
+		private ReentrantLock processingInbox;
 
 		public MailMessageListener()
 		{
-			folder.addMessageCountListener(this);
-			autoRenewThread = new Thread(new Runnable() {
-				private static final long KEEP_ALIVE_FREQUENCY = 1740000l;
-
-				@Override
-				public void run()
+			processingInbox = new ReentrantLock();
+			inboxFolder.addMessageCountListener(this);
+			future = Schedule.scheduleRepeatWithPeriod(() -> {
+				if (inboxFolder != null && inboxFolder.isOpen())
 				{
 					try
 					{
-						while (folder.isOpen())
-						{
-							try
-							{
-								ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
+						ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
 
-								folder.doCommand(new IMAPFolder.ProtocolCommand() {
+						inboxFolder.doCommand(new IMAPFolder.ProtocolCommand() {
 
-									@Override
-									public Object doCommand(IMAPProtocol protocol) throws ProtocolException
-									{
-										protocol.simpleCommand("NOOP", null);
-										return null;
-									}
-								});
-								ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP");
-								Thread.sleep(KEEP_ALIVE_FREQUENCY);
-							} catch (MessagingException ex)
+							@Override
+							public Object doCommand(IMAPProtocol protocol) throws ProtocolException
 							{
-								ShadowManager.log(Level.SEVERE, null, ex);
+								protocol.simpleCommand("NOOP", null);
+								return null;
 							}
-						}
-					} catch (InterruptedException e)
+						});
+						ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP");
+					} catch (MessagingException ex)
 					{
-						ShadowManager.log(Level.WARNING, "Mail Message Listener interrupted. Shutting down Mail Message Listener");
+						ShadowManager.log(Level.SEVERE, null, ex);
 					}
 				}
-			}, "Mail Connection Renew Thread");
-			autoRenewThread.start();
+			}, 0, KEEP_ALIVE_FREQUENCY, TimeUnit.MILLISECONDS);
 		}
 
 		@Override
 		public void run()
 		{
-			while (folder.isOpen())
+			while (inboxFolder.isOpen())
 			{
+				processingInbox.lock();
 				try
 				{
-//					for (Message message : folder.getMessages())
-//					{
-//						processMessage(message);
-//					}
-					folder.idle();
+					// Process incoming messages
+					for (Message message : inboxFolder.getMessages())
+					{
+						processMessage(message);
+					}
+
 				} catch (MessagingException ex)
 				{
-					ShadowManager.log(Level.SEVERE, null, ex);
+					ShadowManager.log(Level.SEVERE, "Error while processing messages in inbox", ex);
 				}
+				processingInbox.unlock();
+
+				try
+				{
+					inboxFolder.idle();
+				} catch (MessagingException e)
+				{
+					ShadowManager.log(Level.SEVERE, "Error while idling Inbox folder", e);
+				}
+
 			}
-			autoRenewThread.interrupt();
+			future.cancel(false);
 		}
 
 		@Override
 		public void messagesAdded(MessageCountEvent e)
 		{
+			processingInbox.lock();
+
 			try
 			{
-				for (Message message : folder.getMessages())
+				for (Message message : inboxFolder.getMessages())
 				{
-					if(message.getFolder().equals(folder))
+					if (message.getFolder().equals(inboxFolder))
 					{
 						continue;
 					}
@@ -247,6 +253,8 @@ public class MailService extends BridgeService
 			{
 				ShadowManager.log(Level.SEVERE, "Mailbox error", e1);
 			}
+
+			processingInbox.unlock();
 		}
 
 		@Override
@@ -260,15 +268,15 @@ public class MailService extends BridgeService
 			{
 				Address[] address = message.getFrom();
 				String sender = "";
-				for(int i = 0; i < address.length; i++)
+				for (int i = 0; i < address.length; i++)
 				{
-					if(address[i] != null)
+					if (address[i] != null)
 					{
-						sender = ((InternetAddress)address[i]).getAddress();
+						sender = ((InternetAddress) address[i]).getAddress();
 					}
 				}
 				String subjectName = message.getSubject();
-				if(subjectName.length() > 50)
+				if (subjectName.length() > 50)
 				{
 					subjectName = subjectName.substring(0, 50);
 				}
@@ -277,9 +285,9 @@ public class MailService extends BridgeService
 
 				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, getMessageContent(message), getSupportedMessageFormats()[0]);
 				receiveMessage(bMessage);
-				folder.copyMessages(new Message[] { message }, processedFolder);
-				folder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
-				folder.expunge();
+				inboxFolder.copyMessages(new Message[] { message }, processedFolder);
+				inboxFolder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
+				inboxFolder.expunge();
 				return;
 
 			} catch (MessagingException | IOException ex)
@@ -291,14 +299,14 @@ public class MailService extends BridgeService
 		protected String getMessageContent(Message message) throws IOException, MessagingException
 		{
 			Object messageContent = message.getContent();
-			if(messageContent instanceof Multipart)
+			if (messageContent instanceof Multipart)
 			{
 				Multipart container = (Multipart) messageContent;
-				for(int i = 0; i < container.getCount(); i++)
+				for (int i = 0; i < container.getCount(); i++)
 				{
 					BodyPart part = container.getBodyPart(i);
 					Object content = part.getContent();
-					if(content instanceof String)
+					if (content instanceof String)
 					{
 						return (String) content;
 					}
