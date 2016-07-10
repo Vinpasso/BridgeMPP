@@ -13,7 +13,7 @@ import javax.persistence.OneToOne;
 import bridgempp.Message;
 import bridgempp.data.Endpoint;
 
-@Entity(name = "MultiBridgeServiceHandle")
+@Entity(name = "MULTIBRIDGESERVICEHANDLE")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "HANDLE_TYPE", discriminatorType=DiscriminatorType.STRING, length = 50)
 public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeService<S, H>, H extends MultiBridgeServiceHandle<S, H>>

@@ -56,7 +56,7 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	@Column(name = "PORT", nullable = false)
 	int port;
 
-	@Column(name = "DOMAIN", nullable = false, length = 50)
+	@Column(name = "XMPP_DOMAIN", nullable = false, length = 50)
 	String domain;
 
 	@Column(name = "OLD_STYLE_SSL", nullable = false)
@@ -87,6 +87,7 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		{
 			ShadowManager.log(Level.INFO, "Starting XMPP Service...");
 			ConnectionConfiguration configuration = new ConnectionConfiguration(host, port, domain);
+			ShadowManager.log(Level.INFO, "Obtained XMPP Configuration: (" + host + ":" + port + ", " + domain + ", " + username + ")");
 			if (oldStyleSSL)
 			{
 				configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);

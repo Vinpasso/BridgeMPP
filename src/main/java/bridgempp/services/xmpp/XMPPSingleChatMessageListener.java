@@ -16,7 +16,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-@Entity(name = "XMPPSingleUserChat")
+@Entity(name = "XMPPSINGLEUSERCHAT")
 @DiscriminatorValue("XMPPSingleUserChatHandle")
 class XMPPSingleChatMessageListener extends XMPPHandle implements MessageListener {
 

@@ -15,7 +15,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.processing.Schedule;
 
-@Entity(name = "SingleToMultiBridgeService")
+@Entity(name = "SINGLETOMULTIBRIDGESERVICE")
 @DiscriminatorValue("SingleToMultiBridgeService")
 public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeService<S, H>, H extends MultiBridgeServiceHandle<S, H>> extends BridgeService
 {

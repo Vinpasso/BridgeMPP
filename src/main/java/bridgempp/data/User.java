@@ -12,7 +12,7 @@ import javax.persistence.Version;
 
 import bridgempp.util.StringOperations;
 
-@Entity(name = "User")
+@Entity(name = "USERS")
 public class User
 {
 	@Id

@@ -19,7 +19,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 
-@Entity(name = "XMPPMultiUserChat")
+@Entity(name = "XMPPMULTIUSERCHAT")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
 class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 {
