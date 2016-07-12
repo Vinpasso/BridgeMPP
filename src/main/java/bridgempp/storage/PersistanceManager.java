@@ -1,6 +1,8 @@
 package bridgempp.storage;
 
 import java.util.Collection;
+import java.util.logging.Level;
+
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -60,11 +62,13 @@ public class PersistanceManager {
 				} else {
 					entityManager.persist(object);
 				}
-				
+
 			}
 			saveTransaction.commit();
 		} catch (Exception e) {
-			ShadowManager.fatal("Error while writing to Database", e);
+			ShadowManager.log(Level.SEVERE, "Error while writing to database. Will attempt rollback.", e);
+			saveTransaction.rollback();
+			ShadowManager.fatal("Error while writing to database. Successfully rolled back transaction", e);
 		}
 	}
 
@@ -74,16 +78,17 @@ public class PersistanceManager {
 
 	public synchronized void executeRemoveState(Object... objects) {
 		EntityTransaction transaction = entityManager.getTransaction();
-		try
-		{
-		transaction.begin();
-		for (Object object : objects) {
-			entityManager.remove(object);
+		try {
+			transaction.begin();
+			for (Object object : objects) {
+				entityManager.remove(object);
+			}
+			transaction.commit();
+		} catch (Exception e) {
+			ShadowManager.log(Level.SEVERE, "Error while deleting from database. Will attempt rollback.", e);
+			transaction.rollback();
+			ShadowManager.fatal("Error while deleting from database. Successfully rolled back transaction", e);
 		}
-		transaction.commit();
-	} catch (Exception e) {
-		ShadowManager.fatal("Error while writing to Database", e);
-	}
 	}
 
 	public synchronized void shutdown() {

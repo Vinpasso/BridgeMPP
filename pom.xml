@@ -157,7 +157,7 @@
 	<distributionManagement>
 		<repository>
 			<id>update-site</id>
-			<url>scpexe://vinpasso@vinpasso.org/home/vinpasso/BridgeMPP</url>
+			<url>scpexe://vinpasso@v36191.1blu.de/home/vinpasso/BridgeMPP</url>
 		</repository>
 	</distributionManagement>
 	<repositories>

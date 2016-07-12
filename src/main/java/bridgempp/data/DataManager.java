@@ -1,5 +1,6 @@
 package bridgempp.data;
 
+import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -22,6 +23,15 @@ public class DataManager
 		EventManager.fireEvent(Event.ENDPOINT_CREATED, endpoint);
 		return endpoint;
 	}
+	
+	private static Endpoint registerTimedEndpoint(BridgeService service,
+			String identifier, long expiry, TemporalUnit unit) {
+		Endpoint endpoint = new TimedEndpoint(service, identifier, expiry, unit);
+		PERSISTANCE_MANAGER.updateState(endpoint);
+		EventManager.fireEvent(Event.ENDPOINT_CREATED, endpoint);
+		return endpoint;
+	}
+
 	
 	public static synchronized void deregisterEndpoint(Endpoint endpoint)
 	{
@@ -94,7 +104,17 @@ public class DataManager
 		}
 		return endpoint;
 	}
-
+	
+	public static synchronized Endpoint getOrNewTimedEndpointForIdentifier(String identifier, BridgeService service, long defaultExpire, TemporalUnit timeUnit)
+	{
+		Endpoint endpoint = getEndpointForIdentifier(identifier);
+		if(endpoint == null)
+		{
+			endpoint = registerTimedEndpoint(service, identifier, defaultExpire, timeUnit);
+		}
+		return endpoint;
+	}
+	
 	public static synchronized Collection<Endpoint> getAllEndpoints() {
 		return PERSISTANCE_MANAGER.getEndpoints();
 	}
@@ -170,5 +190,9 @@ public class DataManager
 	public static void releaseDOMWritePermission()
 	{
 		domLock.writeLock().unlock();
+	}
+
+	public static <T> Collection<T> list(Class<T> clazz) {
+		return PERSISTANCE_MANAGER.getQuery(clazz);
 	}
 }

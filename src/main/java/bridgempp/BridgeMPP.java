@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.processing.Schedule;
 import bridgempp.state.EventManager;
+import bridgempp.state.EventManager.Event;
 import bridgempp.statistics.StatisticsManager;
 import bridgempp.storage.PersistanceManager;
 import bridgempp.util.JUnitTestTest;
@@ -54,6 +55,7 @@ public class BridgeMPP {
 			CommandInterpreter.loadCommands();
 			ServiceManager.loadAllServices();
 			StatisticsManager.loadStatistics();
+			EventManager.fireEvent(Event.BRIDGEMPP_STARTUP, null);
 		} catch (Exception e) {
 			ShadowManager.log(Level.SEVERE, "Fatal Error: ", e);
 			exit();
@@ -105,6 +107,7 @@ public class BridgeMPP {
 		shutdownCommencing = true;
 		ShadowManager.log(Level.INFO, "Server shutdown commencing...");
 		writeLock();
+		EventManager.fireEvent(Event.BRIDGEMPP_SHUTDOWN, null);
 		try {
 			ServiceManager.unloadAllServices();
 			StatisticsManager.saveStatistics();

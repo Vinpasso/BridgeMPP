@@ -3,6 +3,7 @@ package bridgempp.state;
 import org.hibernate.AnnotationException;
 
 import bridgempp.state.endpoint.NonPersistantEndpointDisconnectedListener;
+import bridgempp.state.endpoint.TimedEndpointExpiryCheck;
 
 public class EventManager {
 
@@ -28,6 +29,7 @@ public class EventManager {
 	{
 		StateManager.initializeEventSystem();
 		loadEventListenerClass(new NonPersistantEndpointDisconnectedListener());
+		loadEventListenerClass(new TimedEndpointExpiryCheck());
 	}
 	
 	public enum Event
@@ -35,6 +37,8 @@ public class EventManager {
 		ENDPOINT_CREATED,
 		ENDPOINT_CONNECTED,
 		ENDPOINT_DISCONNECTED,
-		ENDPOINT_REMOVED
+		ENDPOINT_REMOVED,
+		BRIDGEMPP_STARTUP,
+		BRIDGEMPP_SHUTDOWN
 	}
 }
