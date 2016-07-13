@@ -79,6 +79,10 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 			{
 				throw new IOException("Unknown Protocol");
 			}
+			if(initialProtocol < 0)
+			{
+				throw new IOException("Connection closed");
+			}
 			protoCarry = ProtoCarry.values()[initialProtocol];
 			ShadowManager.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
 			BufferedReader bufferedReader = null;
