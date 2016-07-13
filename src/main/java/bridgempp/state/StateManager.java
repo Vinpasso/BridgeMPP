@@ -30,6 +30,10 @@ public class StateManager
 
 	public static void addListener(Event event, EventListener<?> listener)
 	{
+		if(listeners.get(event).contains(listener))
+		{
+			return;
+		}
 		listeners.get(event).add(listener);
 	}
 

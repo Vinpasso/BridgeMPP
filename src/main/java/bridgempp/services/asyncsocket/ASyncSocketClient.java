@@ -65,8 +65,8 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 	{
 		if(socketChannel == null)
 		{
-			ShadowManager.log(Level.WARNING, "Attempted to send Message to non connected Socket Handle");
-			removeHandle();
+			ShadowManager.log(Level.WARNING, "Attempted to send Message to non connected Socket Handle: " + identifier);
+			scheduleRemoveHandle();
 			return;
 		}
 		ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();

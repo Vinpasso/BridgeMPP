@@ -51,7 +51,7 @@ public class CommandServiceOperations
 	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
 	public static String removeService(int serviceID)
 	{
-		ServiceManager.unloadService(serviceID);
+		ServiceManager.removeService(serviceID);
 		return "Removed service."; 
 	}
 	

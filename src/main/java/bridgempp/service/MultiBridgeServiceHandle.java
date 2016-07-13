@@ -1,5 +1,7 @@
 package bridgempp.service;
 
+import java.util.logging.Level;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -10,8 +12,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
+import bridgempp.data.processing.Schedule;
 
 @Entity(name = "MULTIBRIDGESERVICEHANDLE")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -53,6 +58,15 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	protected void removeHandle()
 	{
 		service.removeHandle((H) this);
+	}
+	
+	protected void scheduleRemoveHandle()
+	{
+		Schedule.schedule(() -> {
+			ShadowManager.log(Level.INFO, "Removing handle previously scheduled for deletion: " + identifier);
+			removeHandle();
+			ShadowManager.log(Level.INFO, "Removed handle previously scheduled for deletion: " + identifier);
+			});
 	}
 	
 }

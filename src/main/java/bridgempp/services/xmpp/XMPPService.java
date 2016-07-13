@@ -12,6 +12,8 @@ import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
+import bridgempp.state.EventManager;
+import bridgempp.state.endpoint.XMPPPresenceEndpointRemover;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -134,6 +136,7 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 			{
 				iterator.next().onLoad();
 			}
+			EventManager.loadEventListenerClass(new XMPPPresenceEndpointRemover());
 		} catch (XMPPException | SmackException | IOException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);

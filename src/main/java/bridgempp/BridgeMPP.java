@@ -53,7 +53,7 @@ public class BridgeMPP {
 			addShutdownHook();
 			EventManager.loadCentralEventSubscribers();
 			CommandInterpreter.loadCommands();
-			ServiceManager.loadAllServices();
+			ServiceManager.connectAllServices();
 			StatisticsManager.loadStatistics();
 			EventManager.fireEvent(Event.BRIDGEMPP_STARTUP, null);
 		} catch (Exception e) {
@@ -109,7 +109,7 @@ public class BridgeMPP {
 		writeLock();
 		EventManager.fireEvent(Event.BRIDGEMPP_SHUTDOWN, null);
 		try {
-			ServiceManager.unloadAllServices();
+			ServiceManager.disconnectAllServices();
 			StatisticsManager.saveStatistics();
 			PersistanceManager.getPersistanceManager().shutdown();
 			Schedule.shutdownAsynchronous();

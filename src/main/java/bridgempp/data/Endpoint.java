@@ -10,8 +10,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -29,6 +34,9 @@ import bridgempp.util.StringOperations;
  * @author Vinpasso
  */
 @Entity(name = "ENDPOINT")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "ENDPOINT_TYPE", discriminatorType=DiscriminatorType.STRING, length = 50)
+@DiscriminatorValue("Endpoint")
 public class Endpoint {
     @Id
     @Column(name = "IDENTIFIER", nullable = false, length = 50)

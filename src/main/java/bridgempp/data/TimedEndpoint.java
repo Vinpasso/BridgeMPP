@@ -3,18 +3,16 @@ package bridgempp.data;
 import java.time.Instant;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PostLoad;
-import javax.persistence.PostUpdate;
-
 import bridgempp.ShadowManager;
 import bridgempp.service.BridgeService;
 
 @Entity(name = "TIMEDENDPOINT")
+@DiscriminatorValue("TimedEndpoint")
 public class TimedEndpoint extends Endpoint {
 
 	@Column(name = "CREATED", nullable = false)

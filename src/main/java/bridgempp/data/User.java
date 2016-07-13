@@ -2,6 +2,7 @@ package bridgempp.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -120,6 +121,15 @@ public class User
 		}
 	}
 
+	/**
+	 * Unmodifiable Endpoint collection
+	 * @return The Endpoints for this User
+	 */
+	public Collection<Endpoint> getEndpoints()
+	{
+		return Collections.unmodifiableCollection(endpoints);
+	}
+	
 	/**
 	 * NON-BIDIRECTIONAL
 	 * @param endpoint

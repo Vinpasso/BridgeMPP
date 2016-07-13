@@ -21,7 +21,7 @@ public class Converter implements Comparable<Converter>
 	/**
      * Daisy chain converters together
      * @param after
-     * @return
+     * @return The composition of converters
      */
     public Converter andThen(Converter after) {
         Objects.requireNonNull(after);
