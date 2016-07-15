@@ -48,7 +48,18 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 		if (handle == null)
 		{
 			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle (Delaying endpoint removal): " + message.toString());
-			Schedule.schedule(() -> DataManager.deregisterEndpointAndUsers(message.getDestination()));
+			Schedule.schedule(() -> {
+				ShadowManager.log(Level.INFO, "Removal of Endpoint " + message.getDestination() + " imminent, searching for handle");
+				H handle2 = getHandle(message.getDestination().getIdentifier());
+				if(handle2 != null)
+				{
+					ShadowManager.log(Level.INFO, "Found a handle, removing it.");
+					removeHandle(handle2);
+					ShadowManager.log(Level.INFO, "Successfully removed handle");
+				}
+				ShadowManager.log(Level.INFO, "Attempting to remove endpoint");
+				DataManager.deregisterEndpointAndUsers(message.getDestination());
+			});
 			return;
 		}
 		handle.sendMessage(message);

@@ -9,6 +9,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+import bridgempp.BridgeMPP;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
@@ -67,6 +68,7 @@ public class PersistanceManager {
 			saveTransaction.commit();
 		} catch (Exception e) {
 			ShadowManager.log(Level.SEVERE, "Error while writing to database. Will attempt rollback.", e);
+			transactionFailure();
 			saveTransaction.rollback();
 			ShadowManager.fatal("Error while writing to database. Successfully rolled back transaction", e);
 		}
@@ -84,12 +86,37 @@ public class PersistanceManager {
 				entityManager.remove(object);
 			}
 			transaction.commit();
+			transactionSuccess();
 		} catch (Exception e) {
 			ShadowManager.log(Level.SEVERE, "Error while deleting from database. Will attempt rollback.", e);
+			transactionFailure();
 			transaction.rollback();
 			ShadowManager.fatal("Error while deleting from database. Successfully rolled back transaction", e);
 		}
 	}
+	
+	private int transactionFailures = 0;
+	
+	private void transactionFailure()
+	{
+		transactionFailures++;
+		ShadowManager.log(Level.WARNING, "Transaction failure #" + transactionFailures);
+		if(transactionFailures >= 3)
+		{
+			ShadowManager.log(Level.SEVERE, "Transaction failure reached critical level");
+			BridgeMPP.exit();
+			//This means we are already trying to shutdown but failing
+			//Give up
+			ShadowManager.log(Level.SEVERE, "Failed to terminate gracefully, giving up.");
+			System.exit(0);
+		}
+	}
+	
+	private void transactionSuccess()
+	{
+		transactionFailures = 0;
+	}
+	
 
 	public synchronized void shutdown() {
 		entityManager.close();
