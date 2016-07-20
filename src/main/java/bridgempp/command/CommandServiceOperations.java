@@ -128,12 +128,12 @@ public class CommandServiceOperations
 	
 	@CommandName("!loadmailservice: Load a Mail Service")
 	@CommandTrigger("!loadmailservice")
-	@HelpTopic("Creates a Mail Service. Requires IMAP Host, IMAP Port, Username, Password, SMTP Host, SMTP Port.")
+	@HelpTopic("Creates a Mail Service. Requires E-Mail Address, IMAP Host, IMAP Port, Username, Password, SMTP Host, SMTP Port.")
 	@RequiredPermission(Permission.ADD_REMOVE_SERVICE)
-	public static String loadMailService(String imapHost, int imapPort, String username, String password, String smtpHost, int smtpPort)
+	public static String loadMailService(String emailAddress, String imapHost, int imapPort, String username, String password, String smtpHost, int smtpPort)
 	{
 		MailService service = new MailService();
-		service.configure(imapHost, imapPort, username, password, smtpHost, smtpPort);
+		service.configure(emailAddress, imapHost, imapPort, username, password, smtpHost, smtpPort);
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
 	}

@@ -59,6 +59,8 @@ public class MailService extends BridgeService
 	private String username;
 	@Column(name = "PASSWORD", nullable = false, length = 50)
 	private String password;
+	@Column(name = "EMAIL_ADDRESS", nullable = false, length = 255)
+	private String emailAddress;
 	@Column(name = "SMTP_HOST", nullable = false, length = 50)
 	private String smtphost;
 	@Column(name = "SMTP_PORT", nullable = false, length = 50)
@@ -137,7 +139,7 @@ public class MailService extends BridgeService
 		try
 		{
 			MimeMessage mimeMessage = new MimeMessage(session);
-			mimeMessage.setFrom(new InternetAddress(username, "BridgeMPP"));
+			mimeMessage.setFrom(new InternetAddress(emailAddress, "BridgeMPP"));
 			Collection<User> recipients = message.getDestination().getUsers();
 			Address[] recipientAddresses = new Address[recipients.size()];
 			Iterator<User> iterator = recipients.iterator();
@@ -371,11 +373,12 @@ public class MailService extends BridgeService
 		return supportedMessageFormats;
 	}
 
-	public void configure(String imaphost, int imapport, String username, String password, String smtphost, int smtpport)
+	public void configure(String emailAddress, String imaphost, int imapport, String username, String password, String smtphost, int smtpport)
 	{
 		this.imaphost = imaphost;
 		this.imapport = imapport;
 		this.username = username;
+		this.emailAddress = emailAddress;
 		this.password = password;
 		this.smtphost = smtphost;
 		this.smtpport = smtpport;

@@ -29,6 +29,8 @@ import bridgempp.data.User;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
+import bridgempp.state.EventManager;
+import bridgempp.state.handle.ASyncSocketHandleRemover;
 
 @Entity(name = "ASYNC_SOCKET_SERVICE")
 @DiscriminatorValue(value = "ASYNC_SOCKET_SERVICE")
@@ -99,6 +101,7 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 		{
 			ShadowManager.log(Level.SEVERE, "Failed to bind Server Bootstrap", e);
 		}
+		EventManager.loadEventListenerClass(new ASyncSocketHandleRemover());
 	}
 
 	@Override
