@@ -5,11 +5,12 @@ Project Status
 BridgeMPP: 
 
 [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP)
+[![Dependency Status](https://www.versioneye.com/user/projects/57937d61ad95290045bef8f9/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57937d61ad95290045bef8f9)
 
 BridgeMPP-Bots: 
 
 [![Build Status](https://travis-ci.org/Vinpasso/BridgeMPP-Bot.svg?branch=master)](https://travis-ci.org/Vinpasso/BridgeMPP-Bot)
-
+[![Dependency Status](https://www.versioneye.com/user/projects/57937ddaad9529003cef16b7/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57937ddaad9529003cef16b7)
 
 About BridgeMPP:
 =========
