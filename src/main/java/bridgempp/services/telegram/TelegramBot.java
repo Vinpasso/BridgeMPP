@@ -1,11 +1,17 @@
 package bridgempp.services.telegram;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import org.apache.commons.io.IOUtils;
+import org.glassfish.grizzly.http.util.UTF8Decoder;
 import org.telegram.telegrambots.TelegramApiException;
+import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.PhotoSize;
@@ -40,7 +46,7 @@ public class TelegramBot extends TelegramLongPollingBot
 	public void onUpdateReceived(Update update)
 	{
 		org.telegram.telegrambots.api.objects.Message message = update.getMessage();
-		if (message != null && message.hasText())
+		if (message != null)
 		{
 			handleIncomingMessage(message);
 		}
@@ -77,7 +83,17 @@ public class TelegramBot extends TelegramLongPollingBot
 			}).findFirst();
 			if(photo.isPresent())
 			{
-				Message bridgeMessage = new Message(user, endpoint, photo.get().getFilePath(), MessageFormat.FILE_BACKED_IMAGE_FORMAT);
+				Message bridgeMessage = new Message(user, endpoint, null, MessageFormat.FILE_BACKED_IMAGE_FORMAT);
+				GetFile getFile = new GetFile();
+				getFile.setFileId(photo.get().getFileId());
+				try {
+					org.telegram.telegrambots.api.objects.File file = getFile(getFile);
+					String stringembeddedimage = IOUtils.toString(new URL("https://api.telegram.org/bot" + getBotToken() + "/" + file.getFilePath()), StandardCharsets.UTF_8);
+					bridgeMessage.setMessage(stringembeddedimage);
+				} catch (TelegramApiException | IOException e) {
+					ShadowManager.log(Level.SEVERE, "Failed to generate Telegram file request", e);
+					bridgeMessage.setMessage("Failed to decode Telegram image");
+				}
 				service.receiveMessage(bridgeMessage);
 			}
 		}
