@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -46,9 +47,11 @@ class WhatsappMessageListener implements Runnable {
 			ShadowManager.log(Level.INFO, "Starting Yowsup Process...");
 			String pythonCommand = System.getProperty("os.name").toLowerCase().contains("win") ? "C:\\python27\\python.exe"
 					: "python3";
-			ProcessBuilder builder = new ProcessBuilder(pythonCommand, "-u", BridgeMPP.getPathLocation()
+			String[] launchCommand = {pythonCommand, "-u", BridgeMPP.getPathLocation()
 					+ "/yowsup/src/yowsup-cli", "demos", "-l", this.whatsappService.phone + ":"
-					+ this.whatsappService.password, "--yowsup");
+					+ this.whatsappService.password, "--yowsup"};
+			ShadowManager.log(Level.INFO, "Yowsup launch command: " + Arrays.stream(launchCommand).reduce("", (a, v) -> a + " " + v));
+			ProcessBuilder builder = new ProcessBuilder(launchCommand);
 			builder.directory(new File(BridgeMPP.getPathLocation() + "/yowsup/src/"));
 			builder.environment().put("PYTHONPATH", BridgeMPP.getPathLocation() + "/yowsup/src/");
 			this.whatsappService.yowsup = builder.start();
