@@ -24,6 +24,7 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.ParseException;
+import javax.mail.search.MessageIDTerm;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -51,6 +52,7 @@ public class MailService extends BridgeService
 	transient private Store store;
 	transient private IMAPFolder inboxFolder;
 	transient private IMAPFolder processedFolder;
+	transient private IMAPFolder sentItemsFolder;
 	@Column(name = "IMAP_HOST", nullable = false, length = 50)
 	private String imaphost;
 	@Column(name = "IMAP_PORT", nullable = false)
@@ -108,6 +110,8 @@ public class MailService extends BridgeService
 				processedFolder.create(Folder.HOLDS_MESSAGES);
 			}
 			processedFolder.open(Folder.READ_WRITE);
+			sentItemsFolder = (IMAPFolder) store.getFolder("Sent");
+			sentItemsFolder.open(Folder.READ_ONLY);
 			new Thread(new MailMessageListener(), "Mail Message Listener").start();
 		} catch (NoSuchProviderException ex)
 		{
@@ -279,11 +283,26 @@ public class MailService extends BridgeService
 						sender = ((InternetAddress) address[i]).getAddress();
 					}
 				}
+
+				// Get Subject by Mail Subject
 				String subjectName = message.getSubject();
 				if (subjectName.length() > 50)
 				{
 					subjectName = subjectName.substring(0, 50);
 				}
+
+				// Get Subject by In-Reply-To Field
+				String[] inReplyTo = message.getHeader("In-Reply-To");
+				if (inReplyTo != null && inReplyTo.length > 0)
+				{
+					Message[] replyMessages = sentItemsFolder.search(new MessageIDTerm(inReplyTo[0]));
+					if (replyMessages != null && replyMessages.length > 0)
+					{
+						subjectName = replyMessages[0].getSubject();
+						ShadowManager.log(Level.INFO, "Extracted Subject from In-Reply-To Header: " + subjectName);
+					}
+				}
+
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
@@ -330,13 +349,12 @@ public class MailService extends BridgeService
 				{
 					bMessage.setMessage(content.toString());
 					receiveMessage(bMessage);
-				}
-				else
+				} else
 				{
 					continue;
 				}
-				
-				if(type.getSubType().equals("alternative"))
+
+				if (type.getSubType().equals("alternative"))
 				{
 					return;
 				}
