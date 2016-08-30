@@ -1,12 +1,12 @@
 package bridgempp.messageformat.converters;
 
 import java.io.IOException;
-import java.nio.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
+import java.util.logging.Level;
 
+import bridgempp.ShadowManager;
 import bridgempp.messageformat.Converter;
 
 public class EmbeddedToHTTPBacked extends Converter {
@@ -18,7 +18,14 @@ public class EmbeddedToHTTPBacked extends Converter {
 		super(t -> {
 			Path oldFile = Paths.get("file:/" + t);
 			Path file = Paths.get("file:/" + httpLocalPath + "/" + oldFile.getFileName());
-			Files.copy(oldFile, file);
+			try
+			{
+				Files.copy(oldFile, file);
+			} catch (IOException e)
+			{
+				ShadowManager.log(Level.WARNING, "Failed to copy into HTTP Folder", e);
+				return "FAILURE";
+			}
 			return httpRemotePath + "/" + file.getFileName();
 		});
 	}

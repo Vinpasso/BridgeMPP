@@ -52,6 +52,10 @@ public class GroupManager {
     public static synchronized void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
         Endpoint endpoint = message.getOrigin();
         Collection<Group> groups = endpoint.getGroups();
+        if(groups.size() == 0)
+        {
+        	endpoint.sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
+        }
 		for(Group group : groups)
         {
         	group.sendMessageWithoutLoopback(message);
