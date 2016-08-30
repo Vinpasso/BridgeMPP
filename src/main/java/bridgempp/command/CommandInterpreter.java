@@ -56,6 +56,7 @@ public class CommandInterpreter
 		{
 			try
 			{
+				ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 				StatisticsManager.processMessage(message);
 				if (isCommand(message.getPlainTextMessage()))
 				{
@@ -64,7 +65,6 @@ public class CommandInterpreter
 					interpretCommand(message);
 				} else
 				{
-					ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 					for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++)
 					{
 						ShadowManager.shadowEndpoints.get(i).sendMessage(message);
