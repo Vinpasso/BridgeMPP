@@ -111,7 +111,7 @@ public class MailService extends BridgeService
 			}
 			processedFolder.open(Folder.READ_WRITE);
 			sentItemsFolder = (IMAPFolder) store.getFolder("Sent");
-			sentItemsFolder.open(Folder.READ_ONLY);
+			sentItemsFolder.open(Folder.READ_WRITE);
 			new Thread(new MailMessageListener(), "Mail Message Listener").start();
 		} catch (NoSuchProviderException ex)
 		{
@@ -130,6 +130,7 @@ public class MailService extends BridgeService
 		{
 			inboxFolder.close(true);
 			processedFolder.close(true);
+			sentItemsFolder.close(true);
 			store.close();
 		} catch (MessagingException ex)
 		{
@@ -157,6 +158,10 @@ public class MailService extends BridgeService
 			mimeMessage.setSubject(message.getDestination().getIdentifier());
 			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()), StandardCharsets.UTF_8.displayName());
 			Transport.send(mimeMessage, username, password);
+			ShadowManager.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
+			
+			sentItemsFolder.addMessages(new Message[] { mimeMessage });
+			ShadowManager.log(Level.INFO, "Stored sent message in sent items IMAP folder");
 		} catch (Exception ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);
@@ -301,6 +306,14 @@ public class MailService extends BridgeService
 						subjectName = replyMessages[0].getSubject();
 						ShadowManager.log(Level.INFO, "Extracted Subject from In-Reply-To Header: " + subjectName);
 					}
+					else
+					{
+						ShadowManager.log(Level.INFO, "Could not find original In-Reply-To message");
+					}
+				}
+				else
+				{
+					ShadowManager.log(Level.INFO, "In-Reply-To Header not set");
 				}
 
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
