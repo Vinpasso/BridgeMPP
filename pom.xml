@@ -15,17 +15,22 @@
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-core</artifactId>
-			<version>4.0.7</version>
+			<version>4.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-tcp</artifactId>
-			<version>4.0.7</version>
+			<version>4.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-extensions</artifactId>
-			<version>4.0.7</version>
+			<version>4.1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack-im</artifactId>
+			<version>4.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.taksan</groupId>
@@ -35,12 +40,12 @@
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
-			<version>1.5.5</version>
+			<version>1.5.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>imap</artifactId>
-			<version>1.5.5</version>
+			<version>1.5.6</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-configuration</groupId>
@@ -60,7 +65,7 @@
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
-			<version>1.29.0</version>
+			<version>1.30.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
