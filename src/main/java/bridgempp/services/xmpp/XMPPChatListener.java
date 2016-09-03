@@ -1,7 +1,7 @@
 package bridgempp.services.xmpp;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManagerListener;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManagerListener;
 
 class XMPPChatListener implements ChatManagerListener {
 

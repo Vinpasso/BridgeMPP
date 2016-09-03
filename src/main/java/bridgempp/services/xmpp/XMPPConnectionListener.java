@@ -39,7 +39,7 @@ final class XMPPConnectionListener implements ConnectionListener {
 	}
 
 	@Override
-	public void authenticated(XMPPConnection connection) {
-		ShadowManager.info("XMPP Service has logged in");
+	public void authenticated(XMPPConnection connection, boolean resumed) {
+		ShadowManager.info("XMPP Service has logged in. " + (resumed?"Resumed connection.":""));
 	}
 }

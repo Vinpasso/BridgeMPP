@@ -26,10 +26,9 @@ class XMPPMultiUserChatListener implements InvitationListener {
 	}
 
 	@Override
-	public void invitationReceived(XMPPConnection conn, String room, String inviter, String reason,
+	public void invitationReceived(XMPPConnection conn, MultiUserChat multiUserChat, String inviter, String reason,
 			String password, Message message) {
 		try {
-			MultiUserChat multiUserChat = new MultiUserChat(conn, room);
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", password, discussionHistory, conn.getPacketReplyTimeout());

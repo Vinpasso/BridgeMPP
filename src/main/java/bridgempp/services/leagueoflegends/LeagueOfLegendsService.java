@@ -5,6 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
+import org.jivesoftware.smack.roster.Roster;
+
 import bridgempp.data.Endpoint;
 import bridgempp.services.xmpp.XMPPService;
 
@@ -19,7 +21,7 @@ public class LeagueOfLegendsService extends XMPPService
 	public void connect()
 	{
 		super.connect();
-		connection.getRoster().addRosterListener(new LeagueOfLegendsStatusListener(this, statusFilter));
+		Roster.getInstanceFor(connection).addRosterListener(new LeagueOfLegendsStatusListener(this, statusFilter));
 	}
 	
 	public void importFromEndpoint(Endpoint endpoint)

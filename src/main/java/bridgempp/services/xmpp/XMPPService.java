@@ -17,13 +17,17 @@ import bridgempp.state.endpoint.XMPPPresenceEndpointRemover;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration.Builder;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.spark.util.DummySSLSocketFactory;
 
@@ -88,22 +92,21 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		try
 		{
 			ShadowManager.log(Level.INFO, "Starting XMPP Service...");
-			ConnectionConfiguration configuration = new ConnectionConfiguration(host, port, domain);
+			Builder configurationBuilder = XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port).setServiceName(domain);
 			ShadowManager.log(Level.INFO, "Obtained XMPP Configuration: (" + host + ":" + port + ", " + domain + ", " + username + ")");
 			if (oldStyleSSL)
 			{
-				configuration.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-				configuration.setSocketFactory(new DummySSLSocketFactory());
+				configurationBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.required).setSocketFactory(new DummySSLSocketFactory());
 			}
-			connection = new XMPPTCPConnection(configuration);
+			connection = new XMPPTCPConnection(configurationBuilder.build());
 			connection.connect();
 			connection.login(username, password);
 			sendPresenceUpdate();
 			connection.addConnectionListener(new XMPPConnectionListener());
-			connection.addPacketListener(new XMPPRosterListener(this), new PacketFilter() {
+			connection.addAsyncStanzaListener(new XMPPRosterListener(this), new StanzaFilter() {
 
 				@Override
-				public boolean accept(Packet packet)
+				public boolean accept(Stanza packet)
 				{
 					if (packet instanceof Presence)
 					{
@@ -116,17 +119,19 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 				}
 
 			});
-			connection.getRoster().setSubscriptionMode(Roster.SubscriptionMode.accept_all);
-			connection.getRoster().addRosterListener(new XMPPStatusListener(this));
+			Roster roster = Roster.getInstanceFor(connection);
+			roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
+			roster.addRosterListener(new XMPPStatusListener(this));
 			chatmanager = ChatManager.getInstanceFor(connection);
 			chatmanager.addChatListener(new XMPPChatListener(this));
-			MultiUserChat.addInvitationListener(connection, new XMPPMultiUserChatListener(this));
+			
+			MultiUserChatManager.getInstanceFor(connection).addInvitationListener(new XMPPMultiUserChatListener(this));
 			ShadowManager.log(Level.INFO, "Started XMPP Service");
 			ProviderManager.addIQProvider("data", "urn:xmpp:bob", new BOB());
-			connection.addPacketListener(new XMPPIQPacketListener(this), new PacketFilter() {
+			connection.addAsyncStanzaListener(new XMPPIQPacketListener(this), new StanzaFilter() {
 
 				@Override
-				public boolean accept(Packet packet)
+				public boolean accept(Stanza packet)
 				{
 					return packet instanceof BOBIQ;
 				}
@@ -147,23 +152,17 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	{
 		Presence presence = new Presence(Presence.Type.available);
 		presence.setStatus(statusMessage);
-		connection.sendPacket(presence);
+		connection.sendStanza(presence);
 	}
 
 	@Override
 	public void disconnect()
 	{
-		try
-		{
-			ShadowManager.log(Level.INFO, "Stopping XMPP Service...");
-			connection.disconnect();
-			// Prevent Executor services from idling in the background
-			connection = null;
-			ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
-		} catch (SmackException.NotConnectedException ex)
-		{
-			ShadowManager.log(Level.SEVERE, null, ex);
-		}
+		ShadowManager.log(Level.INFO, "Stopping XMPP Service...");
+		connection.disconnect();
+		// Prevent Executor services from idling in the background
+		connection = null;
+		ShadowManager.log(Level.INFO, "Stopped XMPP Service...");
 	}
 
 	@Override
@@ -209,7 +208,7 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	{
 		if (XHTMLManager.isXHTMLMessage(message))
 		{
-			receiveMessage(new bridgempp.Message(user, endpoint, XHTMLManager.getBodies(message).get(0), MessageFormat.XHTML));
+			receiveMessage(new bridgempp.Message(user, endpoint, XHTMLManager.getBodies(message).get(0).toString(), MessageFormat.XHTML));
 		} else
 		{
 			receiveMessage(new bridgempp.Message(user, endpoint, message.getBody(), MessageFormat.PLAIN_TEXT));
@@ -231,7 +230,8 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 			{
 			} else
 			{
-				XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(this, new MultiUserChat(connection, endpoint.getIdentifier()));
+				MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+				XMPPMultiUserMessageListener listener = new XMPPMultiUserMessageListener(this, manager.getMultiUserChat(endpoint.getIdentifier()));
 				listener.multiUserChat.addMessageListener(listener);
 			}
 			ShadowManager.log(Level.INFO, "Loaded Endpoint: " + endpoint.toString());

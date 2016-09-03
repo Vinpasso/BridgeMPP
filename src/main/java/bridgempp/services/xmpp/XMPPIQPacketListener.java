@@ -1,11 +1,11 @@
 package bridgempp.services.xmpp;
 
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Stanza;
 
-public class XMPPIQPacketListener implements PacketListener {
+public class XMPPIQPacketListener implements StanzaListener {
 
 	/**
 	 * 
@@ -20,18 +20,18 @@ public class XMPPIQPacketListener implements PacketListener {
 	}
 
 	@Override
-	public void processPacket(Packet packet) throws NotConnectedException {
+	public void processPacket(Stanza packet) throws NotConnectedException {
 		BOB.BOBIQ iq = (BOB.BOBIQ) packet;
 		String hash = iq.hash;
 		String data = this.xmppService.cachedObjects.get(hash);
 		BOB.BOBIQ reply = new BOB.BOBIQ();
 		reply.hash = hash;
 		reply.data = data;
-		reply.setType(IQ.Type.RESULT);
+		reply.setType(IQ.Type.result);
 		reply.setTo(iq.getFrom());
-		reply.setPacketID(iq.getPacketID());
+		reply.setStanzaId(iq.getStanzaId());
 		reply.setFrom(iq.getTo());
-		this.xmppService.connection.sendPacket(reply);
+		this.xmppService.connection.sendStanza(reply);
 	}
 
 }

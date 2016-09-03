@@ -4,15 +4,17 @@ import java.util.logging.Level;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import org.jivesoftware.smack.PacketListener;
+
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
+import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
@@ -21,7 +23,7 @@ import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "XMPPMULTIUSERCHAT")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
-class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
+class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 {
 
 	/**
@@ -47,7 +49,8 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 		ShadowManager.log(Level.INFO, "Resumed XMPP Multi User Chat from Handle: " + endpoint.getIdentifier());
 		try
 		{
-			multiUserChat = new MultiUserChat(service.connection, endpoint.getIdentifier());
+			MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(service.connection);
+			multiUserChat = manager.getMultiUserChat(endpoint.getIdentifier());
 			DiscussionHistory discussionHistory = new DiscussionHistory();
 			discussionHistory.setMaxStanzas(0);
 			multiUserChat.join("BridgeMPP", "", discussionHistory, service.connection.getPacketReplyTimeout());
@@ -69,20 +72,19 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements PacketListener
 			{
 				String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
 				messageContents = service.cacheEmbeddedBase64Image(messageContents);
-				XHTMLManager.addBody(sendMessage, "<body xmlns=\"http://www.w3.org/1999/xhtml\">" + messageContents + "</body>");
+				XHTMLManager.addBody(sendMessage, new XHTMLText(messageContents, "en"));
 			}
 			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
 			multiUserChat.sendMessage(sendMessage);
-		} catch (XMPPException | SmackException.NotConnectedException ex)
+		} catch (SmackException.NotConnectedException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}
 	}
 
 	@Override
-	public void processPacket(Packet packet) throws SmackException.NotConnectedException
+	public void processMessage(Message message)
 	{
-		Message message = (Message) packet;
 		if (message.getType() != Message.Type.groupchat || message.getBody() == null || !message.getFrom().contains(multiUserChat.getRoom() + "/")
 				|| message.getFrom().contains(multiUserChat.getRoom() + "/" + multiUserChat.getNickname()))
 		{
