@@ -1,24 +1,14 @@
 package bridgempp.message;
 
-import java.util.HashMap;
+import java.util.List;
 
-public class Message {
+import bridgempp.data.Endpoint;
+import bridgempp.message.messagebody.MessageBody;
+
+public class Message {	
 	
-	private HashMap<MessageFormat, MessageInstance> formats;
-	private MessageInstance original;
+	private Endpoint origin;
+	private List<Endpoint> destinations;
+	private MessageBody messageBody;
 	
-	public MessageInstance getMessage(MessageFormat format)
-	{
-		if(formats.containsKey(format))
-		{
-			return formats.get(format);
-		}
-		
-		MessageInstance converted = ConversionEngine.convert(formats, format);
-		if(converted != null)
-		{
-			formats.put(format, converted);
-		}
-		return converted;
-	}
 }
