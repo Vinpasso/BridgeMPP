@@ -28,6 +28,11 @@ class XMPPRosterListener implements StanzaListener {
 	public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
 		try {
 			Presence presence = (Presence) packet;
+			if(!presence.getType().equals(Presence.Type.subscribe))
+			{
+				return;
+			}
+			
 			Presence subscribed = new Presence(Presence.Type.subscribed);
 			subscribed.setTo(packet.getFrom());
 			xmppService.connection.sendStanza(subscribed);

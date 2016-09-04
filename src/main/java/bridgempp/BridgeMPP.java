@@ -66,10 +66,7 @@ public class BridgeMPP {
 
 	private static void startExitSync(final long parseLong) {
 		Schedule.scheduleOnce(() -> {
-			scheduledShutdown = true;
-			ShadowManager.log(Level.INFO,
-					"Server will shut down due to scheduled restart");
-			exit();
+			executeScheduledShutdown();
 		}, parseLong, TimeUnit.MILLISECONDS);
 		ShadowManager.log(Level.INFO, "Scheduled shutdown to occur in "
 				+ parseLong + " milliseconds");
@@ -97,6 +94,13 @@ public class BridgeMPP {
 		}
 		Schedule.schedule(() -> executeShutdown());
 		ShadowManager.log(Level.INFO, "Scheduled a system shutdown");
+	}
+	
+	public static void executeScheduledShutdown()
+	{
+		ShadowManager.log(Level.INFO, "Server will shut down due to scheduled restart");
+		scheduledShutdown = true;
+		exit();
 	}
 		
 	private static void executeShutdown()

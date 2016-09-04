@@ -43,7 +43,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 	@Override
 	public void presenceChanged(Presence presence)
 	{
-		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier("League_of_Legends_Status", service);
+		Endpoint endpoint = service.getXMPPPresenceEndpoint();
 		User user = DataManager.getOrNewUserForIdentifier(presence.getFrom(), endpoint);
 		String presenceNotification = presence.getStatus();
 		if(presenceNotification == null)

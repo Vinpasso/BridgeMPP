@@ -33,6 +33,11 @@
 			<version>4.1.8</version>
 		</dependency>
 		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack-java7</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.taksan</groupId>
 			<artifactId>skype-java-api</artifactId>
 			<version>1.7</version>

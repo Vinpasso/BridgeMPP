@@ -17,8 +17,8 @@ import bridgempp.state.EventManager.Event;
 public class ASyncSocketHandleRemover extends EventListener<BridgeService> {
 
 	@Override
-	public void onEvent(BridgeService eventMessage) {
-		if(eventMessage.getClass().equals(ASyncSocketService.class))
+	public void onEvent(BridgeService service) {
+		if(service instanceof ASyncSocketService)
 		{
 			Collection<ASyncSocketClient> collection = DataManager.list(ASyncSocketClient.class);
 			Iterator<ASyncSocketClient> iterator = collection.iterator();

@@ -16,15 +16,15 @@ import bridgempp.state.EventManager.Event;
 public class XMPPPresenceEndpointRemover extends EventListener<BridgeService> {
 
 	@Override
-	public void onEvent(BridgeService eventMessage) {
-		if(eventMessage.getClass().equals(XMPPService.class))
+	public void onEvent(BridgeService service) {
+		if(service instanceof XMPPService)
 		{
-			Endpoint xmppPresence = DataManager.getOrNewEndpointForIdentifier("XMPP_Presence", eventMessage);
+			Endpoint xmppPresence = ((XMPPService)service).getXMPPPresenceEndpoint();
 			//Clear User Database
 			while(!xmppPresence.getUsers().isEmpty())
 			{
 				User user = xmppPresence.getUsers().iterator().next();
-				ShadowManager.log(Level.INFO, "Removing User from XMPP_Presence: " + user.toString());
+				ShadowManager.log(Level.INFO, "Removing User from XMPP Presence: " + user.toString());
 				xmppPresence.removeUser(user);
 				DataManager.deregisterUser(user);
 			}
