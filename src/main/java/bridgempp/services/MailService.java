@@ -164,7 +164,7 @@ public class MailService extends BridgeService
 			ShadowManager.log(Level.INFO, "Stored sent message in sent items IMAP folder");
 		} catch (Exception ex)
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			ShadowManager.log(Level.SEVERE, "Failed to send Message", ex);
 		}
 	}
 
@@ -197,7 +197,7 @@ public class MailService extends BridgeService
 					{
 						ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
 
-						inboxFolder.doCommand(new IMAPFolder.ProtocolCommand() {
+						IMAPFolder.ProtocolCommand noopCommand = new IMAPFolder.ProtocolCommand() {
 
 							@Override
 							public Object doCommand(IMAPProtocol protocol) throws ProtocolException
@@ -205,7 +205,11 @@ public class MailService extends BridgeService
 								protocol.simpleCommand("NOOP", null);
 								return null;
 							}
-						});
+						};
+						
+						inboxFolder.doCommand(noopCommand);
+						processedFolder.doCommand(noopCommand);
+						sentItemsFolder.doCommand(noopCommand);
 						ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP. " + inboxFolder.getMessageCount() + " messages in inbox");
 					} catch (MessagingException ex)
 					{
