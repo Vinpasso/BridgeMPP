@@ -37,8 +37,9 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 			String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
 			messageContents = service.cacheEmbeddedBase64Image(messageContents);
 			
-			XHTMLText xhtmlText = new XHTMLText("", "en");
+			XHTMLText xhtmlText = new XHTMLText(null, "en");
 			xhtmlText.toXML().append(messageContents);
+			xhtmlText.appendCloseBodyTag();
 			XHTMLManager.addBody(sendMessage, xhtmlText);
 			
 		}
