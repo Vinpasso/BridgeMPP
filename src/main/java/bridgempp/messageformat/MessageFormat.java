@@ -27,6 +27,8 @@ public abstract class MessageFormat {
 	public abstract String getName();
 
 	public abstract void registerConversions();
+	
+	public abstract String encodeMetaInformationTag(String metaInformation, String message);
 
 	private HashMap<MessageFormat, Converter> conversions;
 

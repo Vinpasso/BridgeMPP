@@ -22,7 +22,9 @@ import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.ParseException;
 import javax.mail.search.MessageIDTerm;
 import javax.persistence.Column;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -156,7 +159,21 @@ public class MailService extends BridgeService
 
 			mimeMessage.setRecipients(Message.RecipientType.TO, recipientAddresses);
 			mimeMessage.setSubject(message.getDestination().getIdentifier());
-			mimeMessage.setText(message.toSimpleString(getSupportedMessageFormats()), StandardCharsets.UTF_8.displayName());
+			Entry<MessageFormat, String> convertedMessage = message.getClosestConversion(getSupportedMessageFormats());
+			MimeMultipart multiPart = new MimeMultipart("alternative");
+			if(convertedMessage.getKey().equals(MessageFormat.HTML))
+			{
+				MimeBodyPart htmlMimeBodyPart = new MimeBodyPart();
+				htmlMimeBodyPart.setText(convertedMessage.getValue(), StandardCharsets.UTF_8.name(), "html");
+				multiPart.addBodyPart(htmlMimeBodyPart);
+			}
+
+			MimeBodyPart plaintextMimeBodyPart = new MimeBodyPart();
+			plaintextMimeBodyPart.setText(message.toSimpleString(MessageFormat.PLAIN_TEXT_ONLY), StandardCharsets.UTF_8.name());
+			multiPart.addBodyPart(plaintextMimeBodyPart);
+			
+			mimeMessage.setContent(multiPart);
+			
 			Transport.send(mimeMessage, username, password);
 			ShadowManager.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
 			

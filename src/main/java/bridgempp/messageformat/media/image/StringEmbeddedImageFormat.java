@@ -25,4 +25,10 @@ public class StringEmbeddedImageFormat extends MessageFormat
 		addConversion(FILE_BACKED_IMAGE_FORMAT, new EmbeddedToFileBacked());
 	}
 
+	@Override
+	public String encodeMetaInformationTag(String metaInformation, String message)
+	{
+		return message;
+	}
+
 }

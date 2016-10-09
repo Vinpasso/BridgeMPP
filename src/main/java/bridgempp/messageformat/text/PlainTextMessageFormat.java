@@ -20,4 +20,10 @@ public class PlainTextMessageFormat extends MessageFormat {
 	public void registerConversions() {
 		addConversion(BASE_64_PLAIN_TEXT, new PlainTextToBase64());	
 	}
+
+	@Override
+	public String encodeMetaInformationTag(String senderTag, String message)
+	{
+		return senderTag + ": " + message;
+	}
 }

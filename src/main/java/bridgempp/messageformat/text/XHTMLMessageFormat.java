@@ -1,9 +1,8 @@
 package bridgempp.messageformat.text;
 
 import bridgempp.messageformat.Converter;
-import bridgempp.messageformat.MessageFormat;
 
-public class XHTMLMessageFormat extends MessageFormat {
+public class XHTMLMessageFormat extends HTMLMessageFormat {
 
 	public XHTMLMessageFormat() {
 		super();

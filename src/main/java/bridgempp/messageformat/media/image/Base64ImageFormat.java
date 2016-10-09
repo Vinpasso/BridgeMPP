@@ -1,9 +1,8 @@
 package bridgempp.messageformat.media.image;
 
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.messageformat.converters.Base64ToPlainText;
 
-public class Base64ImageFormat extends MessageFormat
+public class Base64ImageFormat extends StringEmbeddedImageFormat
 {
 	//contents
 	//optional url

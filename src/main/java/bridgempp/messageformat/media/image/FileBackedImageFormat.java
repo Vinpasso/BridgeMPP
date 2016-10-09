@@ -1,9 +1,8 @@
 package bridgempp.messageformat.media.image;
 
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.messageformat.converters.FileBackedToEmbedded;
 
-public class FileBackedImageFormat extends MessageFormat
+public class FileBackedImageFormat extends StringEmbeddedImageFormat
 {
 
 	public FileBackedImageFormat()

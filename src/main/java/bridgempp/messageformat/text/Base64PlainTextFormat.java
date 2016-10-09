@@ -1,9 +1,8 @@
 package bridgempp.messageformat.text;
 
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.messageformat.converters.Base64ToPlainText;
 
-public class Base64PlainTextFormat extends MessageFormat
+public class Base64PlainTextFormat extends PlainTextMessageFormat
 {
 
 

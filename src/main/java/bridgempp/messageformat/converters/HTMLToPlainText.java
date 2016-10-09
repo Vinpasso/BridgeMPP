@@ -9,7 +9,11 @@ public class HTMLToPlainText extends Converter
 
 	public HTMLToPlainText()
 	{
-		super(t -> StringEscapeUtils.unescapeHtml(t.replaceAll("<p\\/?>", "\n").replaceAll("<.+?>", "")));
+		super(t -> StringEscapeUtils.unescapeHtml(
+				t.replaceAll("<p\\/?>", "\n")
+				.replaceAll("<br\\/?>", "\n")
+				.replaceAll("<.+?>", "")
+				));
 	}
 
 }
