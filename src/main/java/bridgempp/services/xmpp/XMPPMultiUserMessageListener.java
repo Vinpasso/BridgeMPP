@@ -63,19 +63,11 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 
 
 	@Override
-	public void sendMessage(bridgempp.Message message)
+	public void sendXMPPMessage(Message message)
 	{
 		try
 		{
-			Message sendMessage = new Message(multiUserChat.getRoom(), Message.Type.groupchat);
-			if (message.chooseMessageFormat(XMPPService.supportedMessageFormats).equals(MessageFormat.XHTML))
-			{
-				String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
-				messageContents = service.cacheEmbeddedBase64Image(messageContents);
-				XHTMLManager.addBody(sendMessage, new XHTMLText(messageContents, "en"));
-			}
-			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
-			multiUserChat.sendMessage(sendMessage);
+			multiUserChat.sendMessage(message);
 		} catch (SmackException.NotConnectedException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);

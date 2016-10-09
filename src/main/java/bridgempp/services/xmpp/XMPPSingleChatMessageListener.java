@@ -50,17 +50,9 @@ class XMPPSingleChatMessageListener extends XMPPHandle implements ChatMessageLis
 	}
 
 	@Override
-	public void sendMessage(bridgempp.Message message) {
+	public void sendXMPPMessage(Message message) {
 		try {
-			Message sendMessage = new Message();
-			if (message.chooseMessageFormat(XMPPService.supportedMessageFormats).equals(MessageFormat.XHTML)) {
-				String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
-				messageContents = service.cacheEmbeddedBase64Image(messageContents);
-				XHTMLManager.addBody(sendMessage, new XHTMLText(messageContents, "en-us"));
-			}
-
-			sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
-			chat.sendMessage(sendMessage);
+			chat.sendMessage(message);
 		} catch (SmackException.NotConnectedException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}

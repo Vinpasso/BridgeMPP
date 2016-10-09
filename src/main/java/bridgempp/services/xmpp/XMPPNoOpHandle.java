@@ -5,7 +5,8 @@ import java.util.logging.Level;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.Message;
+import org.jivesoftware.smack.packet.Message;
+
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 
@@ -34,9 +35,9 @@ public class XMPPNoOpHandle extends XMPPHandle
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendXMPPMessage(Message message)
 	{
-		ShadowManager.log(Level.INFO, "Rejected message to NO-OP Handle: " + message.getPlainTextMessage());
+		ShadowManager.log(Level.INFO, "Rejected message to NO-OP Handle: " + message.toString());
 	}
 
 }
