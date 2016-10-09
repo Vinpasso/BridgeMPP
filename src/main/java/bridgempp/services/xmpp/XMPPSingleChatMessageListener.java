@@ -9,13 +9,9 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
-import org.jivesoftware.smackx.xhtmlim.XHTMLText;
-
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
-import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "XMPPSINGLEUSERCHAT")
 @DiscriminatorValue("XMPPSingleUserChatHandle")

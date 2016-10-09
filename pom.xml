@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack-java7</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.taksan</groupId>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.0.0</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.restfb</groupId>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.4.Final</version>
+			<version>4.1.5.Final</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -112,7 +112,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>6.0.3</version>
+			<version>6.0.4</version>
 		</dependency>
 	</dependencies>
 	<build>

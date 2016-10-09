@@ -13,13 +13,9 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.Occupant;
-import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
-import org.jivesoftware.smackx.xhtmlim.XHTMLText;
-
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
-import bridgempp.messageformat.MessageFormat;
 
 @Entity(name = "XMPPMULTIUSERCHAT")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
