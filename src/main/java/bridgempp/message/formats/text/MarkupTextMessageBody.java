@@ -1,4 +1,4 @@
-package bridgempp.message.formats;
+package bridgempp.message.formats.text;
 
 import bridgempp.message.MessageBody;
 
