@@ -1,6 +1,7 @@
 package bridgempp.message;
 
 import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
 import bridgempp.data.User;
 import bridgempp.message.formats.text.PlainTextMessageBody;
 
@@ -29,6 +30,18 @@ public class MessageBuilder
 	public MessageBuilder addMessageBody(MessageBody messageBody)
 	{
 		message.addMessageBody(messageBody);
+		return this;
+	}
+	
+	public MessageBuilder addMessageDestination(Endpoint destination)
+	{
+		message.addDestinationEndpoint(destination);
+		return this;
+	}
+	
+	public MessageBuilder addDestinationsFromGroupNoLoopback(Group group)
+	{
+		group.getEndpoints().stream().filter(e -> !e.equals(message.getOrigin())).forEach(e -> message.addDestinationEndpoint(e));
 		return this;
 	}
 }

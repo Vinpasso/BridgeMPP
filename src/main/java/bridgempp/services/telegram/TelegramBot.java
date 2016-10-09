@@ -107,13 +107,13 @@ public class TelegramBot extends TelegramLongPollingBot
 			if (converted.getKey().equals(MessageFormat.PLAIN_TEXT))
 			{
 				SendMessage message = new SendMessage();
-				message.setChatId(bridgeMessage.getDestination().getPartOneIdentifier());
-				message.setText(bridgeMessage.toSimpleString(MessageFormat.PLAIN_TEXT));
+				message.setChatId(endpoint.getPartOneIdentifier());
+				message.setText(bridgeMessage.getPlainTextMessageBody());
 				sendMessage(message);
 			} else if (converted.getKey().equals(MessageFormat.FILE_BACKED_IMAGE_FORMAT))
 			{
 				SendPhoto message = new SendPhoto();
-				message.setChatId(bridgeMessage.getDestination().getPartOneIdentifier());
+				message.setChatId(endpoint.getPartOneIdentifier());
 				message.setPhoto(converted.getValue());
 				sendPhoto(message);
 			}

@@ -124,4 +124,9 @@ public class Message
 		//TODO: Conversion
 	}
 	
+	public void send()
+	{
+		getDeliveryGoals().stream().filter(e -> e.getStatus() != DeliveryStatus.DELIVERED).forEach(e -> e.getTarget().sendMessage(this, e));
+	}
+	
 }

@@ -44,7 +44,6 @@ public class Group
 	// Send message to all recipients in this group
 	public void sendMessage(Message message)
 	{
-		message.setGroup(this);
 		Iterator<Endpoint> iterator = endpoints.iterator();
 		while (iterator.hasNext())
 		{
@@ -68,7 +67,6 @@ public class Group
 	// Send message without Loopback to sender
 	public void sendMessageWithoutLoopback(Message message)
 	{
-		message.setGroup(this);
 		Iterator<Endpoint> iterator = endpoints.iterator();
 		while (iterator.hasNext())
 		{
@@ -179,7 +177,7 @@ public class Group
 	/**
 	 * @return the endpoints
 	 */
-	private Collection<Endpoint> getEndpoints()
+	public Collection<Endpoint> getEndpoints()
 	{
 		return endpoints;
 	}

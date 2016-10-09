@@ -100,7 +100,7 @@ public class CommandWrapper {
 		}
 		if (Pattern
 				.compile(triggerDefinition.value(), Pattern.CASE_INSENSITIVE)
-				.matcher(message.getPlainTextMessage()).find()) {
+				.matcher(message.getPlainTextMessageBody()).find()) {
 			return true;
 		}
 		return false;
@@ -116,7 +116,7 @@ public class CommandWrapper {
 			return new Object[] { bridgemppMessage };
 		}
 		String[] splittedString = splitCommandLine(bridgemppMessage
-				.getPlainTextMessage());
+				.getPlainTextMessageBody());
 		Object[] parameterObjects = new Object[parameters.length];
 		int splittedStringCounter = 1;
 		for (int i = 0; i < parameterObjects.length; i++) {

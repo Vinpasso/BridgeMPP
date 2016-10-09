@@ -24,7 +24,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.util.StringOperations;
@@ -78,18 +80,17 @@ public class Endpoint {
     }
 
     //Send this endpoint a Message (convenience)
-    public void sendMessage(Message message) {
-        message.setDestination(this);
+    public void sendMessage(Message message, DeliveryGoal deliveryGoal) {
         if(!service.isEnabled())
         {
         	return;
         }
-        service.processMessage(message);
+        service.processMessage(message, deliveryGoal);
     }
 
     public void sendOperatorMessage(String message) {
     	//TODO: This message needs a Sender
-        sendMessage(new Message(null, this, this, null, "BridgeMPP: " + message, MessageFormat.PLAIN_TEXT));
+        new MessageBuilder(null, this).addPlainTextBody("BridgeMPP: " + message).addMessageDestination(this).build().send();
     }
 
     //Get this endpoints Carrier Service
