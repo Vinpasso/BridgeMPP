@@ -7,8 +7,10 @@ package bridgempp.services.whatsapp;
 
 import bridgempp.*;
 import bridgempp.data.Endpoint;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
+import bridgempp.messageformat.text.Base64PlainTextFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;
 import bridgempp.service.filter.RateLimiter;
@@ -33,9 +35,12 @@ public class WhatsappService extends BridgeService {
 	
 	transient Process yowsup;
 	transient BufferedReader bufferedReader;
-	// private PrintStream printStream;
 	transient LinkedBlockingQueue<String> senderQueue;
 	transient Thread senderThread;
+	transient PrintStream printStream;
+	private transient long lastMessageTimestamp = 0l;
+	transient volatile boolean messageConfirmed = false;
+
 	
 	@Column(name = "Phone_Number", nullable = false, length = 50)
 	String phone;
@@ -56,19 +61,40 @@ public class WhatsappService extends BridgeService {
 		senderThread.interrupt();
 		yowsup.destroy();
 	}
+	
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint) {
-		try {
-			senderQueue.add("/message send "
+	public synchronized void sendMessage(Message message, DeliveryGoal deliveryGoal) {
+		Endpoint endpoint = deliveryGoal.getTarget();
+		if(System.currentTimeMillis() - 10000 < lastMessageTimestamp)
+		{
+			try
+			{
+				Thread.sleep(Math.max(0, System.currentTimeMillis() - 10000 - lastMessageTimestamp));
+			} catch (InterruptedException e)
+			{
+				ShadowManager.log(Level.WARNING, "Whatsapp send message interrupted");
+				return;
+			}
+		}
+		printStream.println("/message send "
 					+ endpoint.getIdentifier().substring(0, endpoint.getIdentifier().indexOf("@"))
 					+ " \""
-					+ Base64.getEncoder().encodeToString(
-							message.getPlainTextMessageBody()
-									.getBytes("UTF-8")) + "\"");
-		} catch (UnsupportedEncodingException e) {
-			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
+					+ message.getMessageBody(Base64PlainTextFormat.class) + "\"");
+		lastMessageTimestamp = System.currentTimeMillis();
+		try
+		{
+			printStream.wait(10000);
+		} catch (InterruptedException e)
+		{
+			ShadowManager.log(Level.WARNING, "Whatsapp send message confirmation interrupted");
 		}
+		if(messageConfirmed)
+		{
+			deliveryGoal.setDelivered();
+			messageConfirmed = false;
+		}
+		
 	}
 
 	@Override

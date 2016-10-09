@@ -20,6 +20,7 @@ import com.restfb.types.FacebookType;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.service.BridgeService;
 
@@ -57,9 +58,11 @@ public class FacebookService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint destination)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
+		Endpoint destination = deliveryGoal.getTarget();
 		facebook.publish(destination.getPartOneIdentifier(), FacebookType.class, Parameter.with("message", message.getPlainTextMessageBody()));
+		deliveryGoal.setDelivered();
 	}
 
 	@Override

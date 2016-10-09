@@ -10,6 +10,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.MessageBody;
 import bridgempp.message.formats.text.HTMLMessageBody;
 import bridgempp.message.formats.text.PlainTextMessageBody;
@@ -143,8 +144,9 @@ public class MailService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(bridgempp.message.Message message, Endpoint destination)
+	public void sendMessage(bridgempp.message.Message message, DeliveryGoal deliveryGoal)
 	{
+		Endpoint destination = deliveryGoal.getTarget();
 		try
 		{
 			MimeMessage mimeMessage = new MimeMessage(session);
@@ -174,6 +176,7 @@ public class MailService extends BridgeService
 			mimeMessage.setContent(multiPart);
 			
 			Transport.send(mimeMessage, username, password);
+			deliveryGoal.setDelivered();
 			ShadowManager.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
 			
 			sentItemsFolder.addMessages(new Message[] { mimeMessage });

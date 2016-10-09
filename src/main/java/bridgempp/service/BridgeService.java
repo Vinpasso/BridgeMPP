@@ -26,6 +26,7 @@ import javax.persistence.OneToMany;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 
@@ -57,7 +58,7 @@ public abstract class BridgeService {
     public abstract void disconnect() throws Exception;
     
     //Send message bridged from other Messages
-    public abstract void sendMessage(Message message, Endpoint endpoint);
+    public abstract void sendMessage(Message message, DeliveryGoal deliveryGoal);
     
     /**
      * Method to process the Messages received by this Service
@@ -83,7 +84,7 @@ public abstract class BridgeService {
 		}
 	}
 	
-	public final void processMessage(Message message, Endpoint endpoint)
+	public final void processMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		Iterator<Function<Message, Message>> iterator = filters.iterator();
 		while(iterator.hasNext())
@@ -94,7 +95,7 @@ public abstract class BridgeService {
 				return;
 			}
 		}
-		sendMessage(message, endpoint);
+		sendMessage(message, deliveryGoal);
 	}
 	
 	protected void addFilter(Function<Message, Message> filter)

@@ -46,4 +46,10 @@ public class DeliveryGoal
 	{
 		return target;
 	}
+
+
+	public void setDelivered()
+	{
+		setStatus(DeliveryStatus.DELIVERED);
+	}
 }

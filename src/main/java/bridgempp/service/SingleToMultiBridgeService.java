@@ -14,6 +14,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 
 @Entity(name = "SINGLETOMULTIBRIDGESERVICE")
@@ -43,8 +44,9 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
+		Endpoint endpoint = deliveryGoal.getTarget();
 		MultiBridgeServiceHandle<S, H> handle = getHandle(endpoint.getIdentifier());
 		if (handle == null)
 		{

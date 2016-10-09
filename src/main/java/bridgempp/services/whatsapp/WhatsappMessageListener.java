@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -17,12 +18,12 @@ import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
 
 class WhatsappMessageListener implements Runnable {
 
 	private static final Pattern REGEX_MESSAGE = Pattern
 			.compile("\\[([\\d]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)");
+	private static final Pattern MESSAGE_SENT_CONFIRMATION = Pattern.compile("message sent");
 	/**
 	 * 
 	 */
@@ -63,8 +64,7 @@ class WhatsappMessageListener implements Runnable {
 			// LOGIN
 			this.whatsappService.yowsup.getOutputStream().flush();
 			// Make sure Login actually happens
-			this.whatsappService.senderThread = new Thread(new WhatsappSender(this.whatsappService,
-					this.whatsappService.yowsup.getOutputStream()), "Whatsapp Sender");
+			whatsappService.printStream = new PrintStream(whatsappService.yowsup.getOutputStream(), true);
 			this.whatsappService.senderThread.start();
 			this.whatsappService.bufferedReader = new BufferedReader(new InputStreamReader(
 					this.whatsappService.yowsup.getInputStream(), "UTF-8"));
@@ -87,6 +87,11 @@ class WhatsappMessageListener implements Runnable {
 					User user = DataManager.getOrNewUserForIdentifier(author, endpoint);
 					Message parsedMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message).build();
 					whatsappService.receiveMessage(parsedMessage);
+				}
+				if(MESSAGE_SENT_CONFIRMATION.matcher(buffer).find())
+				{
+					whatsappService.messageConfirmed = true;
+					whatsappService.printStream.notify();
 				}
 			}
 		} catch (UnsupportedOperationException | IOException ex) {

@@ -12,6 +12,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
@@ -80,7 +81,8 @@ public class BridgeChat extends BridgeService {
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint) {
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
+	{
 		try {
 			BridgeChatProtoBuf.UserEvent
 					.newBuilder()
@@ -88,7 +90,7 @@ public class BridgeChat extends BridgeService {
 					.setChatMessage(
 							message.toString())
 					.build().writeTo(socket.getOutputStream());
-			;
+			deliveryGoal.setDelivered();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

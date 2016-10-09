@@ -9,6 +9,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
@@ -55,8 +56,9 @@ public class SkypeService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint destination)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
+		Endpoint destination = deliveryGoal.getTarget();
 		try
 		{
 			Chat[] chats = Skype.getAllChats();
@@ -65,6 +67,7 @@ public class SkypeService extends BridgeService
 				if (chats[i].getId().equals(destination.getIdentifier()))
 				{
 					chats[i].send(message.getPlainTextMessageBody());
+					deliveryGoal.setDelivered();
 					return;
 				}
 			}

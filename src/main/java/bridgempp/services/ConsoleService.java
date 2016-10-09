@@ -16,6 +16,7 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.message.formats.text.PlainTextMessageBody;
@@ -54,9 +55,10 @@ public class ConsoleService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		System.out.println(message.getPlainTextMessageBody());
+		deliveryGoal.setDelivered();
 	}
 
 	@Override

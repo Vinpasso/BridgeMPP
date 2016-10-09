@@ -12,6 +12,7 @@ import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
@@ -71,7 +72,7 @@ public class TeamspeakService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		// TODO Auto-generated method stub
 
