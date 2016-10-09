@@ -5,7 +5,7 @@ import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 import bridgempp.data.Endpoint;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.service.MultiBridgeServiceHandle;
 
 public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, XMPPHandle>
@@ -32,9 +32,9 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 	public void sendMessage(bridgempp.message.Message message)
 	{
 		Message sendMessage = new Message();
-		if (message.chooseMessageFormat(XMPPService.supportedMessageFormats).equals(MessageFormat.XHTML))
+		if (message.hasMessageBody(XHTMLXMPPMessageBody.class))
 		{
-			String messageContents = message.toSimpleString(XMPPService.supportedMessageFormats);
+			String messageContents = message.getMessageBody(XHTMLXMPPMessageBody.class).getText();
 			messageContents = service.cacheEmbeddedBase64Image(messageContents);
 			
 			XHTMLText xhtmlText = new XHTMLText(null, "en");
@@ -43,7 +43,7 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 			XHTMLManager.addBody(sendMessage, xhtmlText);
 			
 		}
-		sendMessage.addBody(null, message.toSimpleString(MessageFormat.PLAIN_TEXT));
+		sendMessage.addBody(null, message.getPlainTextMessageBody());
 		sendXMPPMessage(sendMessage);
 	}
 

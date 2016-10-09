@@ -13,6 +13,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -36,8 +37,6 @@ public class BridgeChat extends BridgeService {
 	transient private Socket socket;
 	transient private Endpoint endpoint;
 	transient private User user;
-	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] {
-			MessageFormat.HTML, MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect() {
@@ -54,11 +53,10 @@ public class BridgeChat extends BridgeService {
 				public void run() {
 					try {
 						while (true) {
-							receiveMessage(new Message(user, 
-									endpoint, BridgeChatProtoBuf.UserEvent
-											.parseFrom(socket.getInputStream())
-											.getChatMessage(),
-									getSupportedMessageFormats()[0]));
+							String protoMessage = BridgeChatProtoBuf.UserEvent
+									.parseFrom(socket.getInputStream())
+									.getChatMessage();
+							receiveMessage(new MessageBuilder(user, endpoint).addPlainTextBody(protoMessage).build());
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -82,13 +80,13 @@ public class BridgeChat extends BridgeService {
 	}
 
 	@Override
-	public void sendMessage(Message message) {
+	public void sendMessage(Message message, Endpoint endpoint) {
 		try {
 			BridgeChatProtoBuf.UserEvent
 					.newBuilder()
 					.setUsername(message.getOrigin().toString())
 					.setChatMessage(
-							message.toComplexString(getSupportedMessageFormats()))
+							message.toString())
 					.build().writeTo(socket.getOutputStream());
 			;
 		} catch (IOException e) {
@@ -104,11 +102,6 @@ public class BridgeChat extends BridgeService {
 	@Override
 	public boolean isPersistent() {
 		return false;
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
-		return supportedMessageFormats;
 	}
 	
 

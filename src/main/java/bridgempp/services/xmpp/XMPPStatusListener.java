@@ -11,6 +11,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 
 public class XMPPStatusListener implements RosterListener
@@ -46,7 +47,7 @@ public class XMPPStatusListener implements RosterListener
 	{
 		Endpoint endpoint = service.getXMPPPresenceEndpoint();
 		User user = DataManager.getOrNewUserForIdentifier(presence.getFrom(), endpoint);
-		Message message = new Message(user, endpoint, presence.getStatus(), MessageFormat.PLAIN_TEXT);
+		Message message = new MessageBuilder(user, endpoint).addPlainTextBody(presence.getStatus()).build();
 		service.receiveMessage(message);
 	}
 

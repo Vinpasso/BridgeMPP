@@ -57,7 +57,7 @@ public abstract class BridgeService {
     public abstract void disconnect() throws Exception;
     
     //Send message bridged from other Messages
-    public abstract void sendMessage(Message message);
+    public abstract void sendMessage(Message message, Endpoint endpoint);
     
     /**
      * Method to process the Messages received by this Service
@@ -83,7 +83,7 @@ public abstract class BridgeService {
 		}
 	}
 	
-	public final void processMessage(Message message)
+	public final void processMessage(Message message, Endpoint endpoint)
 	{
 		Iterator<Function<Message, Message>> iterator = filters.iterator();
 		while(iterator.hasNext())
@@ -94,7 +94,7 @@ public abstract class BridgeService {
 				return;
 			}
 		}
-		sendMessage(message);
+		sendMessage(message, endpoint);
 	}
 	
 	protected void addFilter(Function<Message, Message> filter)
@@ -132,5 +132,4 @@ public abstract class BridgeService {
 		this.isEnabled = enable;
 	}
 	
-	public abstract MessageFormat[] getSupportedMessageFormats();
 }

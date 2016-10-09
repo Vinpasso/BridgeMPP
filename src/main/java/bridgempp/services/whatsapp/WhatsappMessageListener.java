@@ -16,6 +16,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 
 class WhatsappMessageListener implements Runnable {
@@ -84,7 +85,7 @@ class WhatsappMessageListener implements Runnable {
 					String message = new String(Base64.getDecoder().decode(matcher.group(5)), "UTF-8");
 					Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(group, whatsappService);
 					User user = DataManager.getOrNewUserForIdentifier(author, endpoint);
-					Message parsedMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
+					Message parsedMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message).build();
 					whatsappService.receiveMessage(parsedMessage);
 				}
 			}

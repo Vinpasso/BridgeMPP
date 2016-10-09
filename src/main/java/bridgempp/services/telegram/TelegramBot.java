@@ -22,6 +22,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 
 public class TelegramBot extends TelegramLongPollingBot
@@ -66,7 +67,7 @@ public class TelegramBot extends TelegramLongPollingBot
 		}
 		if (message.hasText())
 		{
-			Message bridgeMessage = new Message(user, endpoint, message.getText(), MessageFormat.PLAIN_TEXT);
+			Message bridgeMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message.getText()).build();
 			service.receiveMessage(bridgeMessage);
 		}
 		if(message.getPhoto() != null)
@@ -98,7 +99,7 @@ public class TelegramBot extends TelegramLongPollingBot
 		}
 	}
 
-	public void sendMessage(Message bridgeMessage)
+	public void sendMessage(Message bridgeMessage, Endpoint endpoint)
 	{
 		try
 		{

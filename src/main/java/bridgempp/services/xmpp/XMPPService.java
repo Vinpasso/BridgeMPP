@@ -9,6 +9,8 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.MessageBuilder;
+import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
@@ -165,11 +167,6 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		return true;
 	}
 
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return supportedMessageFormats;
-	}
 
 	String cacheEmbeddedBase64Image(String messageContents)
 	{
@@ -196,10 +193,13 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	{
 		if (XHTMLManager.isXHTMLMessage(message))
 		{
-			receiveMessage(new bridgempp.message.Message(user, endpoint, XHTMLManager.getBodies(message).get(0).toString(), MessageFormat.XHTML));
+			receiveMessage(new MessageBuilder(user, endpoint)
+					.addPlainTextBody(message.getBody())
+					.addMessageBody(new XHTMLXMPPMessageBody(XHTMLManager.getBodies(message).get(0).toString()))
+					.build());
 		} else
 		{
-			receiveMessage(new bridgempp.message.Message(user, endpoint, message.getBody(), MessageFormat.PLAIN_TEXT));
+			receiveMessage(new MessageBuilder(user, endpoint).addPlainTextBody(message.getBody()).build());
 		}
 	}
 

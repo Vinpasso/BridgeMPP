@@ -10,6 +10,7 @@ import bridgempp.data.Endpoint;
 
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 
 import com.restfb.Connection;
@@ -45,7 +46,7 @@ public class SmartFacebookPollService implements Runnable
 					{
 						user.setName(post.getFrom().getName());
 					}
-					service.receiveMessage(new Message(user, e, post.getMessage(), MessageFormat.PLAIN_TEXT));
+					service.receiveMessage(new MessageBuilder(user, e).addPlainTextBody(post.getMessage()).build());
 				} else
 				{
 					ShadowManager.log(Level.WARNING, "Encountered unknown Facebook Type: " + post.getType());

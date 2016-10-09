@@ -13,6 +13,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.xmpp.XMPPStatusListener;
 
@@ -85,7 +86,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 				default:
 					message = "Unknown Status: " + matcher.group(1);
 			}
-			Message bridgeMessage = new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT);
+			Message bridgeMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message).build();
 			service.receiveMessage(bridgeMessage);
 		}
 		else

@@ -10,8 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
@@ -23,7 +21,6 @@ import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
 @Entity(name = "FACEBOOK_SERVICE")
@@ -32,7 +29,6 @@ public class FacebookService extends BridgeService
 {
 
 	transient private FacebookClient facebook;
-	transient private static final MessageFormat[] supportedMessageFormats = MessageFormat.PLAIN_TEXT_ONLY;
 	transient private SmartFacebookPollService pollService;
 	@Column(name = "ACCESS_TOKEN", nullable = false, length = 50)
 	private String accessToken;
@@ -61,15 +57,9 @@ public class FacebookService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, Endpoint destination)
 	{
-		if (message.getMessageFormat().canConvertToFormat(MessageFormat.PLAIN_TEXT))
-		{
-			facebook.publish(message.getDestination().getPartOneIdentifier(), FacebookType.class, Parameter.with("message", message.toSimpleString(getSupportedMessageFormats())));
-		} else
-		{
-			throw new NotImplementedException("Can not currently Post non Plain Text-able Messages");
-		}
+		facebook.publish(destination.getPartOneIdentifier(), FacebookType.class, Parameter.with("message", message.getPlainTextMessageBody()));
 	}
 
 	@Override
@@ -82,12 +72,6 @@ public class FacebookService extends BridgeService
 	public boolean isPersistent()
 	{
 		return true;
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return supportedMessageFormats;
 	}
 
 	public FacebookClient getFacebook()
@@ -131,16 +115,18 @@ public class FacebookService extends BridgeService
 		this.accessToken = accessToken;
 	}
 
-	public Date getLastUpdate() {
+	public Date getLastUpdate()
+	{
 		return lastUpdate;
 	}
-	
+
 	public Collection<Endpoint> getEndpoints()
 	{
 		return endpoints;
 	}
 
-	public void setLastUpdate() {
+	public void setLastUpdate()
+	{
 		lastUpdate = Date.from(Instant.now());
 	}
 

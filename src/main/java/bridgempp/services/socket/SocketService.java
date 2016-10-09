@@ -39,8 +39,6 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 	private transient ServerListener serverListener;
 	protected transient boolean pendingShutdown = false;
 
-	private transient static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
-
 	@Override
 	public void connect()
 	{
@@ -96,11 +94,6 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 		return false;
 	}
 
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return supportedMessageFormats;
-	}
 
 	public enum ProtoCarry
 	{

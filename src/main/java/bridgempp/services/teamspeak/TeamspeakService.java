@@ -13,6 +13,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -56,7 +57,7 @@ public class TeamspeakService extends BridgeService
 			{
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(e.get("channel"), TeamspeakService.this);
 				User user = DataManager.getOrNewUserForIdentifier(e.getInvokerUniqueId(), endpoint);
-				Message message = new Message(user, endpoint, e.getMessage(), MessageFormat.PLAIN_TEXT);
+				Message message = new MessageBuilder(user, endpoint).addPlainTextBody(e.getMessage()).build();
 				receiveMessage(message);
 			}
 		});
@@ -70,7 +71,7 @@ public class TeamspeakService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, Endpoint endpoint)
 	{
 		// TODO Auto-generated method stub
 
@@ -90,11 +91,5 @@ public class TeamspeakService extends BridgeService
 		return false;
 	}
 
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

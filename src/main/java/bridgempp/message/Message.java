@@ -6,20 +6,24 @@
 package bridgempp.message;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.formats.text.PlainTextMessageBody;
+import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 
 /**
  *
  * @author Vincent Bode
  */
-public abstract class Message
+public class Message
 {
 	private User sender;
 	private Endpoint origin;
 	private List<DeliveryGoal> destinations;
+	private HashMap<Class<? extends MessageBody>, MessageBody> messageBodies;
 
 	public Message()
 	{
@@ -77,11 +81,9 @@ public abstract class Message
 		return destinations;
 	}
 	
-	public abstract String getFormatName();
-
 	public String getMetadataInfo()
 	{
-		String messageFormat = getFormatName() + ": ";
+		String messageFormat = (messageBodies.isEmpty()?"Empty":messageBodies.get(0).getFormatName()) + ": ";
 		String sender = (getSender() != null) ? getSender().toString() : "Unknown";
 		String origin = (getOrigin() != null) ? getOrigin().toString() : "Unknown";
 		String target = getDeliveryGoals().stream().filter(e -> e.getStatus().equals(DeliveryStatus.DELIVERED)).count() + "/" + getDeliveryGoals().size();
@@ -94,4 +96,32 @@ public abstract class Message
 		return getMetadataInfo();
 	}
 
+	public void addMessageBody(MessageBody messageBody)
+	{
+		messageBodies.put(messageBody.getClass(), messageBody);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getMessageBody(Class<T> messageBodyClass)
+	{
+		MessageBody messageBody = messageBodies.get(messageBodyClass);
+		if(messageBody != null)
+		{
+			return (T) messageBody;
+		}
+		//TODO: Conversion
+		return null;
+	}
+
+	public String getPlainTextMessageBody()
+	{
+		return getMessageBody(PlainTextMessageBody.class).getText();
+	}
+
+	public boolean hasMessageBody(Class<XHTMLXMPPMessageBody> class1)
+	{
+		return messageBodies.containsKey(class1);
+		//TODO: Conversion
+	}
+	
 }

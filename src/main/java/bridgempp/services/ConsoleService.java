@@ -17,6 +17,8 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
+import bridgempp.message.formats.text.PlainTextMessageBody;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -32,8 +34,6 @@ public class ConsoleService extends BridgeService
 	transient Scanner scanner;
 	transient ConsoleReader reader;
 	transient Thread consoleThread;
-
-	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
 
 	@Override
 	public void connect()
@@ -54,9 +54,9 @@ public class ConsoleService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, Endpoint endpoint)
 	{
-		System.out.println(message.toComplexString(getSupportedMessageFormats()));
+		System.out.println(message.getPlainTextMessageBody());
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class ConsoleService extends BridgeService
 					{
 						Endpoint origin = DataManager.getOrNewEndpointForIdentifier("Console", ConsoleService.this);
 						User user = DataManager.getOrNewUserForIdentifier("Console", origin);
-						Message message = new Message(user, origin, scanner.nextLine(), getSupportedMessageFormats()[0]);
+						Message message = new MessageBuilder(user, origin).addPlainTextBody(getName()).build();
 						receiveMessage(message);
 					} else
 					{
@@ -106,12 +106,6 @@ public class ConsoleService extends BridgeService
 			ShadowManager.log(Level.FINE, "Console reader has closed");
 		}
 
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return supportedMessageFormats;
 	}
 
 }

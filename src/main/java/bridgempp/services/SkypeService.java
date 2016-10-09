@@ -10,6 +10,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
+import bridgempp.message.MessageBuilder;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
@@ -33,8 +34,6 @@ import com.skype.SkypeException;
 public class SkypeService extends BridgeService
 {
 
-	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
-
 	@Override
 	public void connect()
 	{
@@ -56,16 +55,16 @@ public class SkypeService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, Endpoint destination)
 	{
 		try
 		{
 			Chat[] chats = Skype.getAllChats();
 			for (int i = 0; i < chats.length; i++)
 			{
-				if (chats[i].getId().equals(message.getDestination().getIdentifier()))
+				if (chats[i].getId().equals(destination.getIdentifier()))
 				{
-					chats[i].send(message.toSimpleString(getSupportedMessageFormats()));
+					chats[i].send(message.getPlainTextMessageBody());
 					return;
 				}
 			}
@@ -102,7 +101,7 @@ public class SkypeService extends BridgeService
 			String sender = receivedChatMessage.getSenderDisplayName();
 			Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(chatID, SkypeService.this);
 			User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
-			Message bMessage = new Message(user, endpoint, message, getSupportedMessageFormats()[0]);
+			Message bMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message).build();
 			receiveMessage(bMessage);
 		}
 
@@ -110,12 +109,6 @@ public class SkypeService extends BridgeService
 		public void chatMessageSent(ChatMessage sentChatMessage) throws SkypeException
 		{
 		}
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return supportedMessageFormats;
 	}
 
 	public void configure()

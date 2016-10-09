@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
+import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
 import bridgempp.message.Message;
 
@@ -42,15 +43,15 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, Endpoint endpoint)
 	{
-		MultiBridgeServiceHandle<S, H> handle = getHandle(message.getDestination().getIdentifier());
+		MultiBridgeServiceHandle<S, H> handle = getHandle(endpoint.getIdentifier());
 		if (handle == null)
 		{
 			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle (Delaying endpoint removal): " + message.toString());
 			Schedule.schedule(() -> {
-				ShadowManager.log(Level.INFO, "Removal of Endpoint " + message.getDestination() + " imminent, searching for handle");
-				H handle2 = getHandle(message.getDestination().getIdentifier());
+				ShadowManager.log(Level.INFO, "Removal of Endpoint " + endpoint.toString() + " imminent, searching for handle");
+				H handle2 = getHandle(endpoint.getIdentifier());
 				if(handle2 != null)
 				{
 					ShadowManager.log(Level.INFO, "Found a handle, removing it.");
@@ -58,7 +59,7 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 					ShadowManager.log(Level.INFO, "Successfully removed handle");
 				}
 				ShadowManager.log(Level.INFO, "Attempting to remove endpoint");
-				DataManager.deregisterEndpointAndUsers(message.getDestination());
+				DataManager.deregisterEndpointAndUsers(endpoint);
 			});
 			return;
 		}

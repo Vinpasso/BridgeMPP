@@ -6,6 +6,7 @@
 package bridgempp.services.whatsapp;
 
 import bridgempp.*;
+import bridgempp.data.Endpoint;
 import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
@@ -42,8 +43,6 @@ public class WhatsappService extends BridgeService {
 	@Column(name = "Password", nullable = false, length = 50) 
 	String password;
 
-	transient private static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.PLAIN_TEXT };
-
 	@Override
 	public void connect() {
 		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
@@ -59,13 +58,13 @@ public class WhatsappService extends BridgeService {
 	}
 
 	@Override
-	public void sendMessage(Message message) {
+	public void sendMessage(Message message, Endpoint endpoint) {
 		try {
 			senderQueue.add("/message send "
-					+ message.getDestination().getIdentifier().substring(0, message.getDestination().getIdentifier().indexOf("@"))
+					+ endpoint.getIdentifier().substring(0, endpoint.getIdentifier().indexOf("@"))
 					+ " \""
 					+ Base64.getEncoder().encodeToString(
-							message.toSimpleString(getSupportedMessageFormats())
+							message.getPlainTextMessageBody()
 									.getBytes("UTF-8")) + "\"");
 		} catch (UnsupportedEncodingException e) {
 			ShadowManager.log(Level.SEVERE, "Base64 Encode: No such UTF-8", e);
@@ -80,11 +79,6 @@ public class WhatsappService extends BridgeService {
 	@Override
 	public boolean isPersistent() {
 		return true;
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats() {
-		return supportedMessageFormats;
 	}
 
 	public void configure(String phone, String password)
