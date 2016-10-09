@@ -1,9 +1,9 @@
 package bridgempp.command;
 
-import bridgempp.Message;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
+import bridgempp.message.Message;
 import bridgempp.statistics.StatisticsManager;
 
 public class CommandStatisticsOperations {

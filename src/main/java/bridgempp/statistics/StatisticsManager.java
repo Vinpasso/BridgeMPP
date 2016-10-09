@@ -3,8 +3,8 @@ package bridgempp.statistics;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.message.Message;
 import bridgempp.storage.PersistanceManager;
 import bridgempp.util.TimeUtil;
 

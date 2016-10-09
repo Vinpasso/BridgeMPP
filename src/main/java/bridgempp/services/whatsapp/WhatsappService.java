@@ -6,6 +6,7 @@
 package bridgempp.services.whatsapp;
 
 import bridgempp.*;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;

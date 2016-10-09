@@ -142,7 +142,7 @@ public class MailService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(bridgempp.Message message)
+	public void sendMessage(bridgempp.message.Message message)
 	{
 		try
 		{
@@ -340,7 +340,7 @@ public class MailService extends BridgeService
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
 				User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
 
-				bridgempp.Message bMessage = new bridgempp.Message(user, endpoint, null, null);
+				bridgempp.message.Message bMessage = new bridgempp.message.Message(user, endpoint, null, null);
 				processMessage(message, bMessage);
 				inboxFolder.copyMessages(new Message[] { message }, processedFolder);
 				inboxFolder.setFlags(new Message[] { message }, new Flags(Flags.Flag.DELETED), true);
@@ -353,7 +353,7 @@ public class MailService extends BridgeService
 			}
 		}
 
-		protected void processMessage(Message message, bridgempp.Message bMessage) throws IOException, MessagingException
+		protected void processMessage(Message message, bridgempp.message.Message bMessage) throws IOException, MessagingException
 		{
 			Object messageContent = message.getContent();
 			if (messageContent instanceof Multipart)
@@ -368,7 +368,7 @@ public class MailService extends BridgeService
 			}
 		}
 
-		protected void processMultiPartMessage(bridgempp.Message bMessage, Multipart container) throws MessagingException, IOException
+		protected void processMultiPartMessage(bridgempp.message.Message bMessage, Multipart container) throws MessagingException, IOException
 		{
 			ContentType type = new ContentType(container.getContentType());
 			for (int i = 0; i < container.getCount(); i++)

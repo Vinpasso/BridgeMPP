@@ -13,10 +13,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.Message;
 
 @Entity(name = "MULTIBRIDGESERVICEHANDLE")
 @Inheritance(strategy = InheritanceType.JOINED)

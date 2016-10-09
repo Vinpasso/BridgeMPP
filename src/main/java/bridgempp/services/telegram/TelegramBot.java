@@ -17,11 +17,11 @@ import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 
 public class TelegramBot extends TelegramLongPollingBot

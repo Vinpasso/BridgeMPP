@@ -24,7 +24,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PreRemove;
 import javax.persistence.Version;
 
-import bridgempp.Message;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.util.StringOperations;

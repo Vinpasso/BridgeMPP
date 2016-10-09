@@ -10,10 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.Message;
 
 @Entity(name = "SINGLETOMULTIBRIDGESERVICE")
 @DiscriminatorValue("SingleToMultiBridgeService")

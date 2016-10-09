@@ -1,7 +1,7 @@
 package bridgempp.servicecomponent;
 
-import bridgempp.Message;
 import bridgempp.data.MessageNodeIO;
+import bridgempp.message.Message;
 
 public class MessageToFormattedString extends MessageNodeIO<Message, String>
 {

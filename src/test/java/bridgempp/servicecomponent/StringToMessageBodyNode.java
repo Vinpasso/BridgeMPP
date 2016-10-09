@@ -1,10 +1,10 @@
 package bridgempp.servicecomponent;
 
-import bridgempp.Message;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.data.MessageNodeIO;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 
 public class StringToMessageBodyNode extends MessageNodeIO<String, Message>

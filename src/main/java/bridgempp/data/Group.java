@@ -18,8 +18,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Version;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.message.Message;
 
 /**
  *

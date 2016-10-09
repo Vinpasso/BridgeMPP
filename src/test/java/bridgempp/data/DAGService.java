@@ -1,7 +1,7 @@
 package bridgempp.data;
 
-import bridgempp.Message;
 import bridgempp.command.CommandInterpreter;
+import bridgempp.message.Message;
 import bridgempp.service.BridgeService;
 
 public abstract class DAGService extends BridgeService

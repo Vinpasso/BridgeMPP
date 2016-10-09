@@ -8,11 +8,11 @@ import java.util.regex.Pattern;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Presence;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.xmpp.XMPPStatusListener;
 

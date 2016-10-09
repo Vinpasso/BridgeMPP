@@ -9,10 +9,10 @@ import com.github.theholywaffle.teamspeak3.api.event.TS3EventAdapter;
 import com.github.theholywaffle.teamspeak3.api.event.TS3EventType;
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
 
-import bridgempp.Message;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 

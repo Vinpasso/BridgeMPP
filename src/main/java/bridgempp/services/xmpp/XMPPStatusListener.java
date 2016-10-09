@@ -6,11 +6,11 @@ import java.util.logging.Level;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.RosterListener;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 
 public class XMPPStatusListener implements RosterListener

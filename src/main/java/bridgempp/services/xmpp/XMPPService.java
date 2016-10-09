@@ -196,10 +196,10 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	{
 		if (XHTMLManager.isXHTMLMessage(message))
 		{
-			receiveMessage(new bridgempp.Message(user, endpoint, XHTMLManager.getBodies(message).get(0).toString(), MessageFormat.XHTML));
+			receiveMessage(new bridgempp.message.Message(user, endpoint, XHTMLManager.getBodies(message).get(0).toString(), MessageFormat.XHTML));
 		} else
 		{
-			receiveMessage(new bridgempp.Message(user, endpoint, message.getBody(), MessageFormat.PLAIN_TEXT));
+			receiveMessage(new bridgempp.message.Message(user, endpoint, message.getBody(), MessageFormat.PLAIN_TEXT));
 		}
 	}
 

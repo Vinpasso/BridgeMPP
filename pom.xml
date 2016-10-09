@@ -114,6 +114,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>6.0.4</version>
 		</dependency>
+		<dependency>
+			<!-- jsoup HTML parser library @ http://jsoup.org/ -->
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.9.2</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -2,6 +2,7 @@ package bridgempp;
 
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 
 public class TrackedMessage extends Message

@@ -8,6 +8,7 @@ package bridgempp;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
+import bridgempp.message.Message;
 
 import java.util.Collection;
 import java.util.Iterator;

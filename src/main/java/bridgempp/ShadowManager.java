@@ -12,6 +12,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import bridgempp.data.Endpoint;
+import bridgempp.message.Message;
 
 /**
  *

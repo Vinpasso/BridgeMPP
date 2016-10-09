@@ -19,10 +19,10 @@ import com.restfb.Version;
 import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.FacebookType;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 

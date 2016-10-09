@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.PermissionsManager.Permissions;
+import bridgempp.message.Message;
 import bridgempp.ShadowManager;
 
 public class CommandWrapper {

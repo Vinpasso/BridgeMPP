@@ -1,6 +1,5 @@
 package bridgempp.command;
 
-import bridgempp.Message;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
@@ -8,6 +7,7 @@ import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 
 public class CommandUserOperations {
 	@CommandName("!removeuser: Remove a User")

@@ -29,7 +29,7 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 		super();
 	}
 	
-	public void sendMessage(bridgempp.Message message)
+	public void sendMessage(bridgempp.message.Message message)
 	{
 		Message sendMessage = new Message();
 		if (message.chooseMessageFormat(XMPPService.supportedMessageFormats).equals(MessageFormat.XHTML))

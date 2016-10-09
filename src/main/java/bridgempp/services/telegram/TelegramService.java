@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.BotSession;
 
-import bridgempp.Message;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;

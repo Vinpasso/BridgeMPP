@@ -2,7 +2,6 @@ package bridgempp.command;
 
 import java.util.Iterator;
 
-import bridgempp.Message;
 import bridgempp.ServiceManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
@@ -11,6 +10,7 @@ import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.message.Message;
 import bridgempp.services.xmpp.XMPPService;
 
 public class CommandEndpointOperations {

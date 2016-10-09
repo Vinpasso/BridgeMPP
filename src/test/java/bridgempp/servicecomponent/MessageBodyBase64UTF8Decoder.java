@@ -2,9 +2,10 @@ package bridgempp.servicecomponent;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import bridgempp.Message;
+
 import bridgempp.ShadowManager;
 import bridgempp.data.MessageNodeIO;
+import bridgempp.message.Message;
 
 public class MessageBodyBase64UTF8Decoder extends MessageNodeIO<Message, Message>
 {

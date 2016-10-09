@@ -6,7 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.function.Function;
-import bridgempp.Message;
+
+import bridgempp.message.Message;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

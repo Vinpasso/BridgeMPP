@@ -9,7 +9,6 @@ import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
 import bridgempp.GroupManager;
-import bridgempp.Message;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
@@ -18,6 +17,7 @@ import bridgempp.command.wrapper.CommandHelp;
 import bridgempp.command.wrapper.CommandWrapper;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.message.Message;
 import bridgempp.statistics.StatisticsManager;
 
 /**

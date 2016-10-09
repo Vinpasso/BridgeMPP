@@ -3,8 +3,8 @@ package bridgempp.service.filter;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import bridgempp.Message;
 import bridgempp.ShadowManager;
+import bridgempp.message.Message;
 
 public class RateLimiter implements Function<Message, Message>
 {

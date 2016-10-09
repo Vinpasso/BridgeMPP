@@ -8,7 +8,6 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.GroupManager;
-import bridgempp.Message;
 import bridgempp.ServiceManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
@@ -19,6 +18,7 @@ import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 

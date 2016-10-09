@@ -7,10 +7,10 @@ import javax.persistence.Entity;
 
 import io.netty.channel.socket.SocketChannel;
 import bridgempp.GroupManager;
-import bridgempp.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.Message;
 import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.services.socketservice.protobuf.ProtoBuf;
