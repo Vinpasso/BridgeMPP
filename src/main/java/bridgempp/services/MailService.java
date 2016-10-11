@@ -12,15 +12,17 @@ import bridgempp.data.User;
 import bridgempp.data.processing.Schedule;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.MessageBody;
+import bridgempp.message.formats.media.ImageMessageBody;
 import bridgempp.message.formats.text.HTMLMessageBody;
 import bridgempp.message.formats.text.PlainTextMessageBody;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.protocol.IMAPProtocol;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
@@ -29,7 +31,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.ParseException;
 import javax.mail.search.MessageIDTerm;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -39,7 +40,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -165,20 +165,19 @@ public class MailService extends BridgeService
 			MimeMultipart multiPart = new MimeMultipart("alternative");
 
 			MimeBodyPart htmlMimeBodyPart = new MimeBodyPart();
-				htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(), StandardCharsets.UTF_8.name(), "html");
-				multiPart.addBodyPart(htmlMimeBodyPart);
-
+			htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(), StandardCharsets.UTF_8.name(), "html");
+			multiPart.addBodyPart(htmlMimeBodyPart);
 
 			MimeBodyPart plaintextMimeBodyPart = new MimeBodyPart();
 			plaintextMimeBodyPart.setText(message.getPlainTextMessageBody(), StandardCharsets.UTF_8.name());
 			multiPart.addBodyPart(plaintextMimeBodyPart);
-			
+
 			mimeMessage.setContent(multiPart);
-			
+
 			Transport.send(mimeMessage, username, password);
 			deliveryGoal.setDelivered();
 			ShadowManager.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
-			
+
 			sentItemsFolder.addMessages(new Message[] { mimeMessage });
 			ShadowManager.log(Level.INFO, "Stored sent message in sent items IMAP folder");
 		} catch (Exception ex)
@@ -225,7 +224,7 @@ public class MailService extends BridgeService
 								return null;
 							}
 						};
-						
+
 						inboxFolder.doCommand(noopCommand);
 						processedFolder.doCommand(noopCommand);
 						sentItemsFolder.doCommand(noopCommand);
@@ -328,13 +327,11 @@ public class MailService extends BridgeService
 					{
 						subjectName = replyMessages[0].getSubject();
 						ShadowManager.log(Level.INFO, "Extracted Subject from In-Reply-To Header: " + subjectName);
-					}
-					else
+					} else
 					{
 						ShadowManager.log(Level.INFO, "Could not find original In-Reply-To message");
 					}
-				}
-				else
+				} else
 				{
 					ShadowManager.log(Level.INFO, "In-Reply-To Header not set");
 				}
@@ -362,9 +359,14 @@ public class MailService extends BridgeService
 			{
 				Multipart container = (Multipart) messageContent;
 				processMultiPartMessage(bMessage, container);
+				//Receive Message handled in process multipart
+			} else if(messageContent instanceof MimeBodyPart)
+			{
+				bMessage.addMessageBody(getMessageFormatFromMimeType(message.getContentType(), (MimeBodyPart) messageContent));
+				receiveMessage(bMessage);
 			} else
 			{
-				bMessage.addMessageBody(getMessageFormatFromMimeType(message.getContentType(), messageContent.toString()));
+				bMessage.addMessageBody(new PlainTextMessageBody(message.getContent().toString()));
 				receiveMessage(bMessage);
 			}
 		}
@@ -379,9 +381,9 @@ public class MailService extends BridgeService
 				if (content instanceof Multipart)
 				{
 					processMultiPartMessage(bMessage, (Multipart) content);
-				} else if (content instanceof String)
+				} else if (content instanceof MimeBodyPart)
 				{
-					bMessage.addMessageBody(getMessageFormatFromMimeType(part.getContentType(), content.toString()));
+					bMessage.addMessageBody(getMessageFormatFromMimeType(part.getContentType(), (MimeBodyPart) content));
 					receiveMessage(bMessage);
 				} else
 				{
@@ -395,7 +397,7 @@ public class MailService extends BridgeService
 			}
 		}
 
-		private MessageBody getMessageFormatFromMimeType(String contentType, String content)
+		private MessageBody getMessageFormatFromMimeType(String contentType, MimeBodyPart content)
 		{
 			try
 			{
@@ -403,23 +405,21 @@ public class MailService extends BridgeService
 				switch (type.getBaseType())
 				{
 					case "text/plain":
-						return new PlainTextMessageBody(content);
+						return new PlainTextMessageBody(content.getContent().toString());
 					case "text/html":
-						return new HTMLMessageBody(content);
-					case "image/jpeg":
-						return new 
-								//TODO: IMAGE
+						return new HTMLMessageBody(content.getContent().toString());
+					case "image/*":
+						return new ImageMessageBody(new MimeType(contentType), content.getFileName(), content.getInputStream());
 					default:
-						return new PlainTextMessageBody(content);
+						return new PlainTextMessageBody(content.getContent().toString());
 				}
-			} catch (ParseException e)
+			} catch (IOException | MimeTypeParseException | MessagingException e)
 			{
-				ShadowManager.log(Level.SEVERE, "Received invalid MIME Type in email message", e);
+				ShadowManager.log(Level.SEVERE, "Error in multipart e-mail message", e);
 			}
-			return new PlainTextMessageBody(content);
+			return new PlainTextMessageBody(content.toString());
 		}
 	}
-
 
 	public void configure(String emailAddress, String imaphost, int imapport, String username, String password, String smtphost, int smtpport)
 	{

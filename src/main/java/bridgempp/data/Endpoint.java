@@ -27,7 +27,6 @@ import javax.persistence.Version;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.util.StringOperations;
 

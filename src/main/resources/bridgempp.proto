@@ -1,8 +1,55 @@
-message Message
-{
-	required string messageFormat = 1;
-	required string message = 2;
-	optional string sender = 10;
-	optional string target = 11;
-	optional string group = 12;
+
+syntax = "proto3";
+
+package bridgempp;
+
+option java_multiple_files = true;
+option java_package = "bridgempp.services.socket.protobuf";
+option java_outer_classname = "BridgeProtoBuf";
+
+message Message {
+	User sender = 1;
+	Endpoint origin = 2;
+	repeated Endpoint destinations = 3;
+	repeated Group destinationGroups = 4;
+	repeated MessageBody messageBodies = 5;
+}
+
+message Endpoint {
+	string identifier = 1;
+	Service service = 2;
+}
+
+message User {
+	string identifier = 1;
+	string name = 2;
+}
+
+message Service {
+	int32 identifier = 1;
+}
+
+message Group {
+	string name = 1;
+}
+
+message MessageBody {
+	enum MessageType
+	{
+		PLAIN_TEXT = 0;
+		HTML = 1;
+		XHTML = 2;
+		IMAGE_URL = 3;
+	}
+	
+	MessageType messageType = 1;
+	string contents = 2;
+}
+
+service BridgeMPPDataResolver {
+
+	rpc GetUsersFromEndpoint(Endpoint) returns (stream User) {}
+	rpc GetEndpointsFromGroup(Group) returns (stream Endpoint) {}
+	
+
 }

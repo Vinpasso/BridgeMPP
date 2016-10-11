@@ -15,7 +15,6 @@ import bridgempp.data.User;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
 @Entity(name = "BRIDGE_CHAT_SERVICE")

@@ -14,7 +14,6 @@ import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.services.xmpp.XMPPStatusListener;
 
 public class LeagueOfLegendsStatusListener extends XMPPStatusListener

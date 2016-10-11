@@ -28,7 +28,6 @@ import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
 
 
 /**

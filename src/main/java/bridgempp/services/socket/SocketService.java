@@ -15,8 +15,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import bridgempp.ShadowManager;
-import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.MessageBuilder;
 import bridgempp.service.SingleToMultiBridgeService;
 
 /**
@@ -68,7 +67,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 			while (iterator.hasNext())
 			{
 				SocketClient handle = iterator.next();
-				handle.sendMessage(new Message(null, null, null, null, "", MessageFormat.PLAIN_TEXT));
+				handle.sendMessage(new MessageBuilder(null, null).addPlainTextBody("").build());
 //				sent++;
 			}
 		} catch (ConcurrentModificationException e)
@@ -97,7 +96,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 
 	public enum ProtoCarry
 	{
-		Plain_Text, XML_Embedded, ProtoBuf, None
+		Plain_Text, ProtoBuf, None
 	}
 
 	public void configure(String listenAddress, int listenPort)

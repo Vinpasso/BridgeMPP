@@ -7,9 +7,8 @@ import javax.persistence.Entity;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.BotSession;
 
-import bridgempp.data.Endpoint;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;
 import bridgempp.service.filter.RateLimiter;
@@ -44,9 +43,9 @@ public class TelegramService extends BridgeService
 	}
 
 	@Override
-	public void sendMessage(Message message, Endpoint endpoint)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
-		bot.sendMessage(message, endpoint);
+		bot.sendMessage(message, deliveryGoal);
 	}
 
 	@Override

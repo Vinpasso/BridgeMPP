@@ -5,22 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.GroupManager;
 import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.MessageBuilder;
 import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.services.socket.SocketService.ProtoCarry;
-import bridgempp.services.socketservice.protobuf.ProtoBuf;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 
@@ -29,7 +24,6 @@ import bridgempp.state.EventManager.Event;
 class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient> implements Runnable
 {
 
-	
 	transient User user;
 
 	/**
@@ -46,8 +40,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 		this.socket = socket;
 		this.user = user;
 	}
-	
-	
+
 	/**
 	 * JPA Constructor
 	 */
@@ -62,7 +55,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 		thread = new Thread(this, "Socket TCP Connection " + endpoint.getIdentifier());
 		thread.start();
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -79,7 +72,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 			{
 				throw new IOException("Unknown Protocol");
 			}
-			if(initialProtocol < 0)
+			if (initialProtocol < 0)
 			{
 				throw new IOException("Connection closed");
 			}
@@ -98,45 +91,15 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 				switch (protoCarry)
 				{
 					case ProtoBuf:
-						ProtoBuf.Message protoMessage = ProtoBuf.Message.parseDelimitedFrom(socket.getInputStream());
+						bridgempp.services.socket.protobuf.Message protoMessage = bridgempp.services.socket.protobuf.Message.parseDelimitedFrom(socket.getInputStream());
 						if (protoMessage == null)
 						{
 							throw new IOException("Failed to decode next ProtoBuf Message");
 						}
-						Message bridgeMessage = new Message(user, endpoint, protoMessage.getMessage(), MessageFormat.parseMessageFormat(protoMessage.getMessageFormat()));
-						if (bridgeMessage.getMessageRaw() == null || bridgeMessage.getMessageRaw().length() == 0)
-						{
-							break;
-						}
-						if (protoMessage.hasGroup())
-						{
-							bridgeMessage.setGroup(GroupManager.findGroup(protoMessage.getGroup()));
-						}
-						if (bridgeMessage.getMessageFormat() == null)
-						{
-							bridgeMessage.setMessageFormat(MessageFormat.PLAIN_TEXT);
-						}
-						service.receiveMessage(bridgeMessage);
-						break;
-					case XML_Embedded:
-						String buffer = "";
-						do
-						{
-							String line = bufferedReader.readLine();
-							if (line == null)
-							{
-								throw new IOException("End of Stream");
-							}
-							buffer += line + "\n";
-						} while (bufferedReader.ready());
-						buffer = buffer.trim();
-						Matcher matcher = Pattern.compile("(?<=<message>).+?(?=<\\/message>)", Pattern.DOTALL).matcher(buffer);
-						while (matcher.find())
-						{
-							Message message = Message.parseMessage(matcher.group());
-							message.setOrigin(endpoint);
-							CommandInterpreter.processMessage(message);
-						}
+						MessageBuilder messageBuilder = new MessageBuilder(user, endpoint);
+
+						ProtoBufUtils.parseMessage(protoMessage, messageBuilder);
+						service.receiveMessage(messageBuilder.build());
 						break;
 					case Plain_Text:
 						String messageLine = bufferedReader.readLine();
@@ -145,7 +108,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 							disconnect();
 							break;
 						}
-						CommandInterpreter.processMessage(new Message(user, endpoint, messageLine, MessageFormat.PLAIN_TEXT));
+						CommandInterpreter.processMessage(new MessageBuilder(user, endpoint).addPlainTextBody(messageLine).build());
 						break;
 					case None:
 						ShadowManager.log(Level.SEVERE, "Established Socket has Protocol None, aborting");
@@ -188,33 +151,15 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 			switch (protoCarry)
 			{
 				case Plain_Text:
-					socket.getOutputStream().write((message.toComplexString(service.getSupportedMessageFormats()) + "\n").getBytes("UTF-8"));
-					break;
-				case XML_Embedded:
-					socket.getOutputStream().write(("<message>" + message.toComplexString(service.getSupportedMessageFormats()) + "</message>\n").getBytes("UTF-8"));
+					socket.getOutputStream().write((message.getPlainTextMessageBody() + "\n").getBytes("UTF-8"));
 					break;
 				case ProtoBuf:
-					ProtoBuf.Message.Builder protoMessageBuilder = ProtoBuf.Message.newBuilder();
-					protoMessageBuilder.setMessageFormat(message.getMessageFormat().getName());
-					protoMessageBuilder.setMessage(message.getMessage(message.getMessageFormat()));
-					if (message.getGroup() != null)
-					{
-						protoMessageBuilder.setGroup(message.getGroup().getName());
-					}
-					if (message.getSender() != null)
-					{
-						protoMessageBuilder.setSender(message.getSender().toString());
-					}
-					if (message.getDestination() != null)
-					{
-						protoMessageBuilder.setTarget(message.getDestination().toString());
-					}
-					ProtoBuf.Message protoMessage = protoMessageBuilder.build();
+					bridgempp.services.socket.protobuf.Message protoMessage = ProtoBufUtils.serializeMessage(message);
 					protoMessage.writeDelimitedTo(socket.getOutputStream());
 					break;
 				case None:
 					ShadowManager.log(Level.WARNING, "Message not delivered due to Protocol None: " + message.toString());
-					if(thread == null || !thread.isAlive())
+					if (thread == null || !thread.isAlive())
 					{
 						ShadowManager.log(Level.WARNING, "Found dead Socket Connection. Will disconnect.");
 						disconnect();

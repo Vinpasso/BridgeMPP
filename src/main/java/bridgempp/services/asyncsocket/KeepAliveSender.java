@@ -10,8 +10,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 import java.util.logging.Level;
 
 import bridgempp.ShadowManager;
-import bridgempp.messageformat.MessageFormat;
-import bridgempp.services.socketservice.protobuf.ProtoBuf;
+import bridgempp.services.socket.protobuf.Message;
 
 public class KeepAliveSender extends ChannelDuplexHandler {
 	
@@ -41,10 +40,7 @@ public class KeepAliveSender extends ChannelDuplexHandler {
 	}
 
 	private void sendPing(ChannelHandlerContext context) {
-		ProtoBuf.Message protoMessage = ProtoBuf.Message.newBuilder()
-				.setMessageFormat(MessageFormat.PLAIN_TEXT.getName())
-				.setMessage("").setSender("").setTarget("")
-				.setGroup("").build();
+		Message protoMessage = Message.newBuilder().build();
 		ChannelFuture future = context.writeAndFlush(protoMessage);
 		future.addListener(new ChannelFutureListener() {
 

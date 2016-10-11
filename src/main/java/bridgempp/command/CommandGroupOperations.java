@@ -19,7 +19,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
 
 /**
@@ -55,8 +55,10 @@ public class CommandGroupOperations
 		if (group != null)
 		{
 			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
-			group.sendMessage(new Message(message.getSender(), message.getOrigin(), null, group, "BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been added to Group: "
-					+ group.getName(), MessageFormat.PLAIN_TEXT));
+			new MessageBuilder(message.getSender(), message.getOrigin())
+			.addDestinationsFromGroupNoLoopback(group)
+			.addPlainTextBody("BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been added to Group: " + group.getName())
+			.build().send();
 			message.getOrigin().sendOperatorMessage("Group has been subscribed");
 		} else
 		{
@@ -132,8 +134,10 @@ public class CommandGroupOperations
 		if (group != null)
 		{
 			ShadowManager.logAndReply(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName(), message);
-			group.sendMessage(new Message(message.getSender(), message.getOrigin(), null, group, "BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been removed from Group: "
-					+ group.getName(), MessageFormat.PLAIN_TEXT));
+			new MessageBuilder(message.getSender(), message.getOrigin())
+			.addDestinationsFromGroupNoLoopback(group)
+			.addPlainTextBody("BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been removed from Group: " + group.getName())
+			.build().send();
 		} else
 		{
 			message.getOrigin().sendOperatorMessage("Error: Group not found");

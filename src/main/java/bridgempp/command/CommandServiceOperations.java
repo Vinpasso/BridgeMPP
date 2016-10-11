@@ -13,8 +13,7 @@ import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
-import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
 import bridgempp.services.BridgeChat;
 import bridgempp.services.ConsoleService;
@@ -216,7 +215,7 @@ public class CommandServiceOperations
 		ShadowManager.log(Level.WARNING, "Remote sending Message from: " + service.toString() + " endpoint: " + endpointID + " message: " + message);
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpointID, service);
 		User user = DataManager.getOrNewUserForIdentifier(userID, endpoint);
-		CommandInterpreter.processMessage(new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT));
+		new MessageBuilder(user, endpoint).addPlainTextBody(message).build().send();
 		return "Remotely sent message: " + message; 
 	}
 	

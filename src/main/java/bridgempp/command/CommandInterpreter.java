@@ -8,7 +8,6 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
-import bridgempp.GroupManager;
 import bridgempp.PermissionsManager;
 import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
@@ -47,7 +46,7 @@ public class CommandInterpreter
 	// Process incomming messages and forward them to targets
 	public static synchronized void processMessage(Message message)
 	{
-		if (message.getPlainTextMessage() == null || message.getMessageRaw().length() == 0)
+		if (message.getMessageBodies().size() == 0)
 		{
 			return;
 		}
@@ -58,23 +57,27 @@ public class CommandInterpreter
 			{
 				ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 				StatisticsManager.processMessage(message);
-				if (isCommand(message.getPlainTextMessage()))
+				if (message.isPlainTextMessage() && isCommand(message.getPlainTextMessageBody()))
 				{
 					//Never repeat a Command
 					delivery = 2;
 					interpretCommand(message);
 				} else
 				{
-					for (int i = 0; i < ShadowManager.shadowEndpoints.size(); i++)
+					ShadowManager.shadowEndpoints.forEach(endpoint -> message.addDestinationEndpoint(endpoint));
+					
+					if(message.getDestinations().size() == 0)
 					{
-						ShadowManager.shadowEndpoints.get(i).sendMessage(message);
+						message.getOrigin().getGroups().forEach(group -> {
+							message.addDestinationsFromGroupNoLoopback(group);
+						});
 					}
-					if (message.getGroup() != null)
+					
+					message.deliver();
+					
+					if(message.getDestinations().size() == 0)
 					{
-						message.getGroup().sendMessageWithoutLoopback(message);
-					} else
-					{
-						GroupManager.sendMessageToAllSubscribedGroupsWithoutLoopback(message);
+			        	message.getOrigin().sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
 					}
 				}
 				break;

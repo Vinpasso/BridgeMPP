@@ -19,8 +19,6 @@ import bridgempp.data.User;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.message.formats.text.PlainTextMessageBody;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.BridgeService;
 
 /**

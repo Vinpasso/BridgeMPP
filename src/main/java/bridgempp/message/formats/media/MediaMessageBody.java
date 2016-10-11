@@ -8,8 +8,8 @@ import bridgempp.message.MessageBody;
 
 public abstract class MediaMessageBody extends MessageBody
 {
-	
-	public abstract URL getLocation();
+	public abstract String getIdentifier();
+	public abstract URL getURL();
 	
 	public abstract MimeType getMimeType();
 	

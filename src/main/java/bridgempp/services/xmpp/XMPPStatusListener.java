@@ -12,7 +12,6 @@ import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
 
 public class XMPPStatusListener implements RosterListener
 {

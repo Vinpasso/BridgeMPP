@@ -6,11 +6,7 @@
 package bridgempp;
 
 import bridgempp.data.DataManager;
-import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
-import bridgempp.message.Message;
-
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -35,32 +31,6 @@ public class GroupManager {
     //Find Group, finds the First Group with name IGNORES CASE!
     public static Group findGroup(String name) {
         return DataManager.getGroup(name);
-    }
-
-    public static synchronized void sendMessageToAllSubscribedGroups(final Message message) {
-        Endpoint endpoint = message.getOrigin();
-        Collection<Group> groups = endpoint.getGroups();
-        if(groups == null)
-        {
-        	return;
-        }
-        for(Group group : groups)
-        {
-        	group.sendMessage(message);
-        }
-    }
-
-    public static synchronized void sendMessageToAllSubscribedGroupsWithoutLoopback(final Message message) {
-        Endpoint endpoint = message.getOrigin();
-        Collection<Group> groups = endpoint.getGroups();
-        if(groups.size() == 0)
-        {
-        	endpoint.sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
-        }
-		for(Group group : groups)
-        {
-        	group.sendMessageWithoutLoopback(message);
-        }
     }
 
     public static String listGroups() {

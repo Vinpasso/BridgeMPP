@@ -41,7 +41,7 @@ public class MessageBuilder
 	
 	public MessageBuilder addDestinationsFromGroupNoLoopback(Group group)
 	{
-		group.getEndpoints().stream().filter(e -> !e.equals(message.getOrigin())).forEach(e -> message.addDestinationEndpoint(e));
+		message.addDestinationsFromGroupNoLoopback(group);
 		return this;
 	}
 }

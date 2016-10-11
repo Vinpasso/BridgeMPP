@@ -2,28 +2,28 @@ package bridgempp.services.telegram;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import org.apache.commons.io.IOUtils;
-import org.telegram.telegrambots.TelegramApiException;
+import javax.activation.MimeTypeParseException;
+
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
+import bridgempp.message.formats.media.ImageMessageBody;
 
 public class TelegramBot extends TelegramLongPollingBot
 {
@@ -70,7 +70,7 @@ public class TelegramBot extends TelegramLongPollingBot
 			Message bridgeMessage = new MessageBuilder(user, endpoint).addPlainTextBody(message.getText()).build();
 			service.receiveMessage(bridgeMessage);
 		}
-		if(message.getPhoto() != null)
+		if (message.getPhoto() != null)
 		{
 			Optional<PhotoSize> photo = message.getPhoto().stream().sorted(new Comparator<PhotoSize>() {
 
@@ -79,45 +79,61 @@ public class TelegramBot extends TelegramLongPollingBot
 				{
 					return (o1.getWidth() * o1.getHeight()) - (o2.getWidth() - o2.getHeight());
 				}
-				
+
 			}).findFirst();
-			if(photo.isPresent())
+			if (photo.isPresent())
 			{
-				Message bridgeMessage = new Message(user, endpoint, null, MessageFormat.FILE_BACKED_IMAGE_FORMAT);
+				Message bridgeMessage = new MessageBuilder(user, endpoint).build();
 				GetFile getFile = new GetFile();
 				getFile.setFileId(photo.get().getFileId());
-				try {
+				try
+				{
 					org.telegram.telegrambots.api.objects.File file = getFile(getFile);
-					String stringembeddedimage = IOUtils.toString(new URL("https://api.telegram.org/bot" + getBotToken() + "/" + file.getFilePath()), StandardCharsets.UTF_8);
-					bridgeMessage.setMessage(stringembeddedimage);
-				} catch (TelegramApiException | IOException e) {
+					URL imageURL = new URL("https://api.telegram.org/bot" + getBotToken() + "/" + file.getFilePath());
+					ImageMessageBody body = new ImageMessageBody(imageURL.openConnection());
+					bridgeMessage.addMessageBody(body);
+					if (message.getCaption() != null)
+					{
+						body.setCaption(message.getCaption());
+					}
+					service.receiveMessage(bridgeMessage);
+				} catch (TelegramApiException | IOException | MimeTypeParseException e)
+				{
 					ShadowManager.log(Level.SEVERE, "Failed to generate Telegram file request", e);
-					bridgeMessage.setMessage("Failed to decode Telegram image");
 				}
-				service.receiveMessage(bridgeMessage);
 			}
 		}
 	}
 
-	public void sendMessage(Message bridgeMessage, Endpoint endpoint)
+	public void sendMessage(Message bridgeMessage, DeliveryGoal deliveryGoal)
 	{
+		Endpoint endpoint = deliveryGoal.getTarget();
 		try
 		{
-			Entry<MessageFormat, String> converted = bridgeMessage.getClosestConversion(MessageFormat.PLAIN_TEXT, MessageFormat.FILE_BACKED_IMAGE_FORMAT);
-			if (converted.getKey().equals(MessageFormat.PLAIN_TEXT))
+			if (bridgeMessage.isTextMessage())
 			{
 				SendMessage message = new SendMessage();
 				message.setChatId(endpoint.getPartOneIdentifier());
 				message.setText(bridgeMessage.getPlainTextMessageBody());
 				sendMessage(message);
-			} else if (converted.getKey().equals(MessageFormat.FILE_BACKED_IMAGE_FORMAT))
+			} else if (bridgeMessage.isMediaMessage())
 			{
+				ImageMessageBody body = bridgeMessage.getMessageBody(ImageMessageBody.class);
+				if (body == null)
+				{
+					return;
+				}
 				SendPhoto message = new SendPhoto();
 				message.setChatId(endpoint.getPartOneIdentifier());
-				message.setPhoto(converted.getValue());
+				message.setNewPhoto(body.getIdentifier(), body.getURL().openStream());
+				if (body.hasCaption())
+				{
+					message.setCaption(body.getCaption());
+				}
 				sendPhoto(message);
 			}
-		} catch (TelegramApiException e)
+			deliveryGoal.setDelivered();
+		} catch (TelegramApiException | IOException e)
 		{
 			ShadowManager.log(Level.SEVERE, "Telegram Api Error", e);
 		}

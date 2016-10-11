@@ -9,14 +9,12 @@ import bridgempp.*;
 import bridgempp.data.Endpoint;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.messageformat.text.Base64PlainTextFormat;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;
 import bridgempp.service.filter.RateLimiter;
 
 import java.io.*;
-import java.util.Base64;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 

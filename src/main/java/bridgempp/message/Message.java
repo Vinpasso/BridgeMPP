@@ -6,11 +6,16 @@
 package bridgempp.message;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
+import bridgempp.data.Group;
 import bridgempp.data.User;
+import bridgempp.message.formats.media.MediaMessageBody;
+import bridgempp.message.formats.text.MarkupTextMessageBody;
 import bridgempp.message.formats.text.PlainTextMessageBody;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 
@@ -23,7 +28,9 @@ public class Message
 	private User sender;
 	private Endpoint origin;
 	private List<DeliveryGoal> destinations;
+	private List<Group> groups;
 	private HashMap<Class<? extends MessageBody>, MessageBody> messageBodies;
+	private MessageBody originalMessageBody;
 
 	public Message()
 	{
@@ -35,6 +42,7 @@ public class Message
 		this.sender = sender;
 		this.origin = origin;
 		this.destinations = new ArrayList<>();
+		this.groups = new ArrayList<>();
 	}
 
 	/**
@@ -99,6 +107,10 @@ public class Message
 	public void addMessageBody(MessageBody messageBody)
 	{
 		messageBodies.put(messageBody.getClass(), messageBody);
+		if(originalMessageBody == null)
+		{
+			originalMessageBody = messageBody;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -124,7 +136,58 @@ public class Message
 		//TODO: Conversion
 	}
 	
+	public MessageBody getOriginalMessageBody()
+	{
+		return originalMessageBody;
+	}
+	
+	public boolean isPlainTextMessage()
+	{
+		return originalMessageBody instanceof PlainTextMessageBody;
+	}
+	
+	public boolean isMarkupTextMessage()
+	{
+		return originalMessageBody instanceof MarkupTextMessageBody;
+	}
+	
+	public boolean isMediaMessage()
+	{
+		return originalMessageBody instanceof MediaMessageBody;
+	}
+	
+	public boolean isTextMessage()
+	{
+		return isPlainTextMessage() || isMarkupTextMessage();
+	}
+	
 	public void send()
+	{
+		CommandInterpreter.processMessage(this);
+	}
+
+	public void addDestinationsFromGroupNoLoopback(Group group)
+	{
+		group.getEndpoints().stream().filter(e -> !e.equals(getOrigin())).forEach(e -> addDestinationEndpoint(e));
+		groups.add(group);
+	}
+
+	public List<Group> getGroups()
+	{
+		return groups;
+	}
+
+	public List<DeliveryGoal> getDestinations()
+	{
+		return destinations;
+	}
+
+	public Collection<MessageBody> getMessageBodies()
+	{
+		return messageBodies.values();
+	}
+
+	public void deliver()
 	{
 		getDeliveryGoals().stream().filter(e -> e.getStatus() != DeliveryStatus.DELIVERED).forEach(e -> e.getTarget().sendMessage(this, e));
 	}

@@ -8,8 +8,6 @@ package bridgempp.data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,9 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Version;
-
-import bridgempp.ShadowManager;
-import bridgempp.message.Message;
 
 /**
  *
@@ -40,51 +35,6 @@ public class Group
 	@Version
 	@Column(name = "VERSION", nullable = false)
 	private long version;
-
-	// Send message to all recipients in this group
-	public void sendMessage(Message message)
-	{
-		Iterator<Endpoint> iterator = endpoints.iterator();
-		while (iterator.hasNext())
-		{
-			Endpoint endpoint = iterator.next();
-			try
-			{
-				endpoint.sendMessage(message);
-			} catch (Exception e)
-			{
-				ShadowManager.log(Level.WARNING, "Delivery failed! Message could not be delivered to " + endpoint.toString(), e);
-				message.getOrigin().sendOperatorMessage("Delivery failed! Message could not be delivered to " + endpoint.toString());
-			}
-		}
-	}
-
-	// public void sendOperatorMessage(String message)
-	// {
-	// sendMessage(new Message(null, null, this, message));
-	// }
-
-	// Send message without Loopback to sender
-	public void sendMessageWithoutLoopback(Message message)
-	{
-		Iterator<Endpoint> iterator = endpoints.iterator();
-		while (iterator.hasNext())
-		{
-			Endpoint endpoint = iterator.next();
-			// Check that Sender does not get the Message sent back to him
-			if (!endpoint.equals(message.getOrigin()))
-			{
-				try
-				{
-					endpoint.sendMessage(message);
-				} catch (Exception e)
-				{
-					ShadowManager.log(Level.WARNING, "Delivery failed! Message could not be delivered to " + endpoint.toString(), e);
-					message.getOrigin().sendOperatorMessage("Delivery failed! Message could not be delivered to " + endpoint.toString());
-				}
-			}
-		}
-	}
 
 	/**
 	 * Add a user/group to this groups recipients

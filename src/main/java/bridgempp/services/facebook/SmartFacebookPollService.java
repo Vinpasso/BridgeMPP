@@ -9,10 +9,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 
 import bridgempp.data.User;
-import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
-import bridgempp.messageformat.MessageFormat;
-
 import com.restfb.Connection;
 import com.restfb.Parameter;
 import com.restfb.types.Post;

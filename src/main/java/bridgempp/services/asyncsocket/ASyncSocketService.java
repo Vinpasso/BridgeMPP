@@ -26,9 +26,8 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.SingleToMultiBridgeService;
-import bridgempp.services.socketservice.protobuf.ProtoBuf;
+import bridgempp.services.socket.protobuf.Message;
 import bridgempp.state.EventManager;
 import bridgempp.state.handle.ASyncSocketHandleRemover;
 
@@ -37,7 +36,6 @@ import bridgempp.state.handle.ASyncSocketHandleRemover;
 public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketService, ASyncSocketClient>
 {
 
-	private transient static final MessageFormat[] SUPPORTED_MESSAGE_FORMATS = new MessageFormat[] { MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
 	private transient EventLoopGroup serverGroup;
 	private transient EventLoopGroup clientGroup;
 
@@ -77,15 +75,15 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 						120));
 				pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
 				pipeline.addLast("protobufDecoder", new ProtobufDecoder(
-						ProtoBuf.Message.getDefaultInstance()));
+						Message.getDefaultInstance()));
 				pipeline.addLast("frameEncoder",
 						new ProtobufVarint32LengthFieldPrepender());
 				pipeline.addLast("protobufEncoder", new ProtobufEncoder());
 				pipeline.addLast("keepAliveSender", new KeepAliveSender(handle));
-				pipeline.addLast(new SimpleChannelInboundHandler<ProtoBuf.Message>() {
+				pipeline.addLast(new SimpleChannelInboundHandler<Message>() {
 
 					@Override
-					protected void channelRead0(ChannelHandlerContext ctx, bridgempp.services.socketservice.protobuf.ProtoBuf.Message msg) throws Exception
+					protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception
 					{
 						handle.messageReceived(msg);
 					}
@@ -133,12 +131,6 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 	public boolean isPersistent()
 	{
 		return false;
-	}
-
-	@Override
-	public MessageFormat[] getSupportedMessageFormats()
-	{
-		return SUPPORTED_MESSAGE_FORMATS;
 	}
 
 	public void configure(String listenAddress, int listenPort, int serverThreads, int clientThreads)
