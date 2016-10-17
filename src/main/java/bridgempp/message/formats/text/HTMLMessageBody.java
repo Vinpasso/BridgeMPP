@@ -1,7 +1,9 @@
 package bridgempp.message.formats.text;
 
 import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
 import org.jsoup.nodes.Document;
+
 
 public class HTMLMessageBody extends MarkupTextMessageBody
 {
@@ -23,6 +25,13 @@ public class HTMLMessageBody extends MarkupTextMessageBody
 	public String getFormatName()
 	{
 		return "HTML";
+	}
+
+	private static HtmlToPlainText converter = new HtmlToPlainText();
+	
+	public String formatToPlainText()
+	{
+		return converter.getPlainText(htmlDocument);
 	}
 
 }

@@ -9,7 +9,7 @@ import bridgempp.*;
 import bridgempp.data.Endpoint;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
-import bridgempp.messageformat.text.Base64PlainTextFormat;
+import bridgempp.message.formats.text.Base64EncodedMessageBody;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceFilter;
 import bridgempp.service.filter.RateLimiter;
@@ -78,7 +78,7 @@ public class WhatsappService extends BridgeService {
 		printStream.println("/message send "
 					+ endpoint.getIdentifier().substring(0, endpoint.getIdentifier().indexOf("@"))
 					+ " \""
-					+ message.getMessageBody(Base64PlainTextFormat.class) + "\"");
+					+ message.getMessageBody(Base64EncodedMessageBody.class) + "\"");
 		lastMessageTimestamp = System.currentTimeMillis();
 		try
 		{

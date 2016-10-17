@@ -11,7 +11,6 @@ import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.MessageBuilder;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
-import bridgempp.messageformat.MessageFormat;
 import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
 import bridgempp.state.EventManager;
@@ -34,8 +33,8 @@ import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,8 +76,6 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 
 	@Column(name = "STATUS_MESSAGE", nullable = false, length = 500)
 	String statusMessage;
-
-	static MessageFormat[] supportedMessageFormats = new MessageFormat[] { MessageFormat.XHTML, MessageFormat.PLAIN_TEXT };
 
 	public XMPPService()
 	{
@@ -170,20 +167,23 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 
 	String cacheEmbeddedBase64Image(String messageContents)
 	{
-		Matcher matcher = Pattern.compile("<img src=\"data:image\\/jpeg;base64,(.*?)\".*?\\/>").matcher(messageContents);
-		// cachedObjects.clear();
-		for (String key : new HashSet<String>(cachedObjects.keySet()))
+		Matcher matcher = Pattern.compile("<img src=\"data:([^;]*);base64,[^\"]\".*?\\/?>").matcher(messageContents);
+
+		Iterator<Entry<String, String>> iterator = cachedObjects.entrySet().iterator();
+		while(iterator.hasNext())
 		{
+			String key = iterator.next().getKey();
 			if (System.currentTimeMillis() - Long.parseLong(key.substring(0, key.indexOf('@'))) > 3600000l)
 			{
-				cachedObjects.remove(key);
+				iterator.remove();
 			}
 		}
 		while (matcher.find())
 		{
-			String data = matcher.group(1);
+			String type = matcher.group(1);
+			String data = matcher.group(2);
 			String identifier = System.currentTimeMillis() + "@bob.xmpp.org";
-			messageContents = messageContents.replace("data:image/jpeg;base64," + data, "cid:" + identifier);
+			messageContents = messageContents.replace("data:" + type + ";base64," + data, "cid:" + identifier);
 			cachedObjects.put(identifier, data);
 		}
 		return messageContents;
