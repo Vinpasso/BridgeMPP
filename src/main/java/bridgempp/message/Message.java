@@ -17,7 +17,6 @@ import bridgempp.data.User;
 import bridgempp.message.formats.media.MediaMessageBody;
 import bridgempp.message.formats.text.MarkupTextMessageBody;
 import bridgempp.message.formats.text.PlainTextMessageBody;
-import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 
 /**
  *
@@ -133,18 +132,28 @@ public class Message
 
 	public String getPlainTextMessageBody()
 	{
-		return getMessageBody(PlainTextMessageBody.class).getText();
+		String result = getMessageBody(PlainTextMessageBody.class).getText();
+		return (result!=null)?result:"";
 	}
 
-	public boolean hasMessageBody(Class<XHTMLXMPPMessageBody> class1)
+	/**
+	 * Includes conversions
+	 * @param bodyClass The target body class
+	 * @return Whether the message is available or can be converted
+	 */
+	public boolean hasMessageBody(Class<? extends MessageBody> bodyClass)
 	{
-		return messageBodies.containsKey(class1);
-		//TODO: Conversion
+		return messageBodies.containsKey(bodyClass) || MessageBodyRegister.canConvert(originalMessageBody, bodyClass);
 	}
 	
-	public MessageBody getOriginalMessageBody()
+	private MessageBody getOriginalMessageBody()
 	{
 		return originalMessageBody;
+	}
+	
+	public boolean hasOriginalMessageBody(Class<? extends MessageBody> bodyClass)
+	{
+		return bodyClass.isAssignableFrom(getOriginalMessageBody().getClass());
 	}
 	
 	public boolean isPlainTextMessage()

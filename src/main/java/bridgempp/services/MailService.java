@@ -164,9 +164,12 @@ public class MailService extends BridgeService
 			mimeMessage.setSubject(destination.getIdentifier());
 			MimeMultipart multiPart = new MimeMultipart("alternative");
 
-			MimeBodyPart htmlMimeBodyPart = new MimeBodyPart();
-			htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(), StandardCharsets.UTF_8.name(), "html");
-			multiPart.addBodyPart(htmlMimeBodyPart);
+			if (message.hasMessageBody(HTMLMessageBody.class)) {
+				MimeBodyPart htmlMimeBodyPart = new MimeBodyPart();
+				htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(),
+						StandardCharsets.UTF_8.name(), "html");
+				multiPart.addBodyPart(htmlMimeBodyPart);
+			}
 
 			MimeBodyPart plaintextMimeBodyPart = new MimeBodyPart();
 			plaintextMimeBodyPart.setText(message.getPlainTextMessageBody(), StandardCharsets.UTF_8.name());

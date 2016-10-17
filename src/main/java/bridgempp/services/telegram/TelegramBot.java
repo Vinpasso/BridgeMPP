@@ -116,7 +116,7 @@ public class TelegramBot extends TelegramLongPollingBot
 				message.setChatId(endpoint.getPartOneIdentifier());
 				message.setText(bridgeMessage.getPlainTextMessageBody());
 				sendMessage(message);
-			} else if (bridgeMessage.isMediaMessage())
+			} else if (bridgeMessage.hasOriginalMessageBody(ImageMessageBody.class))
 			{
 				ImageMessageBody body = bridgeMessage.getMessageBody(ImageMessageBody.class);
 				if (body == null)
