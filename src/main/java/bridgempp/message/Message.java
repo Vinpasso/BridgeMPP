@@ -114,14 +114,20 @@ public class Message
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T getMessageBody(Class<T> messageBodyClass)
+	public <T extends MessageBody> T getMessageBody(Class<T> messageBodyClass)
 	{
 		MessageBody messageBody = messageBodies.get(messageBodyClass);
 		if(messageBody != null)
 		{
 			return (T) messageBody;
 		}
-		//TODO: Conversion
+		
+		T convertedMessageBody = MessageBodyRegister.convert(originalMessageBody, messageBodyClass);
+		if(convertedMessageBody != null)
+		{
+			messageBodies.put(messageBodyClass, convertedMessageBody);
+			return convertedMessageBody;
+		}
 		return null;
 	}
 
