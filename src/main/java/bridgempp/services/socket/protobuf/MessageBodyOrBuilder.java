@@ -8,13 +8,13 @@ public interface MessageBodyOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+   * <code>optional .bridgempp.MessageType messageType = 1;</code>
    */
   int getMessageTypeValue();
   /**
-   * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+   * <code>optional .bridgempp.MessageType messageType = 1;</code>
    */
-  bridgempp.services.socket.protobuf.MessageBody.MessageType getMessageType();
+  bridgempp.services.socket.protobuf.MessageType getMessageType();
 
   /**
    * <code>optional string contents = 2;</code>

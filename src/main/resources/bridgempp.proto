@@ -34,22 +34,39 @@ message Group {
 }
 
 message MessageBody {
-	enum MessageType
-	{
-		PLAIN_TEXT = 0;
-		HTML = 1;
-		XHTML = 2;
-		IMAGE_URL = 3;
-	}
-	
 	MessageType messageType = 1;
 	string contents = 2;
+}
+
+message MessageTypeSelection {
+	repeated MessageType messageType = 1;
+}
+
+message BridgeMPPRequestStatus
+{
+	RequestStatus requestStatus = 1;
+}
+
+enum MessageType
+{
+	PLAIN_TEXT = 0;
+	HTML = 1;
+	XHTML = 2;
+	XHTMLXMPP = 3;
+	IMAGE_URL = 4;
+	IMAGE_INLINE = 5;
+}
+
+enum RequestStatus
+{
+	SUCCESS = 0;
+	FAILED = 1;
+	FAILED_RETRY = 2;
 }
 
 service BridgeMPPDataResolver {
 
 	rpc GetUsersFromEndpoint(Endpoint) returns (stream User) {}
 	rpc GetEndpointsFromGroup(Group) returns (stream Endpoint) {}
-	
-
+	rpc SetSupportedMessageFormats(MessageTypeSelection) returns (BridgeMPPRequestStatus) {}
 }

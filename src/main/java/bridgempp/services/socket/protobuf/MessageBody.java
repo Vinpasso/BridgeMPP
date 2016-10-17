@@ -24,8 +24,7 @@ public  final class MessageBody extends
   getUnknownFields() {
     return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
   }
-  @SuppressWarnings("unused")
-private MessageBody(
+  private MessageBody(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -80,136 +79,20 @@ private MessageBody(
             bridgempp.services.socket.protobuf.MessageBody.class, bridgempp.services.socket.protobuf.MessageBody.Builder.class);
   }
 
-  /**
-   * Protobuf enum {@code bridgempp.MessageBody.MessageType}
-   */
-  public enum MessageType
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>PLAIN_TEXT = 0;</code>
-     */
-    PLAIN_TEXT(0),
-    /**
-     * <code>HTML = 1;</code>
-     */
-    HTML(1),
-    /**
-     * <code>XHTML = 2;</code>
-     */
-    XHTML(2),
-    /**
-     * <code>IMAGE_URL = 3;</code>
-     */
-    IMAGE_URL(3),
-    UNRECOGNIZED(-1),
-    ;
-
-    /**
-     * <code>PLAIN_TEXT = 0;</code>
-     */
-    public static final int PLAIN_TEXT_VALUE = 0;
-    /**
-     * <code>HTML = 1;</code>
-     */
-    public static final int HTML_VALUE = 1;
-    /**
-     * <code>XHTML = 2;</code>
-     */
-    public static final int XHTML_VALUE = 2;
-    /**
-     * <code>IMAGE_URL = 3;</code>
-     */
-    public static final int IMAGE_URL_VALUE = 3;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static MessageType valueOf(int value) {
-      return forNumber(value);
-    }
-
-    public static MessageType forNumber(int value) {
-      switch (value) {
-        case 0: return PLAIN_TEXT;
-        case 1: return HTML;
-        case 2: return XHTML;
-        case 3: return IMAGE_URL;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<MessageType>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        MessageType> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<MessageType>() {
-            public MessageType findValueByNumber(int number) {
-              return MessageType.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return bridgempp.services.socket.protobuf.MessageBody.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final MessageType[] VALUES = values();
-
-    public static MessageType valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private MessageType(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:bridgempp.MessageBody.MessageType)
-  }
-
   public static final int MESSAGETYPE_FIELD_NUMBER = 1;
   private int messageType_;
   /**
-   * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+   * <code>optional .bridgempp.MessageType messageType = 1;</code>
    */
   public int getMessageTypeValue() {
     return messageType_;
   }
   /**
-   * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+   * <code>optional .bridgempp.MessageType messageType = 1;</code>
    */
-  public bridgempp.services.socket.protobuf.MessageBody.MessageType getMessageType() {
-    bridgempp.services.socket.protobuf.MessageBody.MessageType result = bridgempp.services.socket.protobuf.MessageBody.MessageType.valueOf(messageType_);
-    return result == null ? bridgempp.services.socket.protobuf.MessageBody.MessageType.UNRECOGNIZED : result;
+  public bridgempp.services.socket.protobuf.MessageType getMessageType() {
+    bridgempp.services.socket.protobuf.MessageType result = bridgempp.services.socket.protobuf.MessageType.valueOf(messageType_);
+    return result == null ? bridgempp.services.socket.protobuf.MessageType.UNRECOGNIZED : result;
   }
 
   public static final int CONTENTS_FIELD_NUMBER = 2;
@@ -258,7 +141,7 @@ private MessageBody(
 
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (messageType_ != bridgempp.services.socket.protobuf.MessageBody.MessageType.PLAIN_TEXT.getNumber()) {
+    if (messageType_ != bridgempp.services.socket.protobuf.MessageType.PLAIN_TEXT.getNumber()) {
       output.writeEnum(1, messageType_);
     }
     if (!getContentsBytes().isEmpty()) {
@@ -271,7 +154,7 @@ private MessageBody(
     if (size != -1) return size;
 
     size = 0;
-    if (messageType_ != bridgempp.services.socket.protobuf.MessageBody.MessageType.PLAIN_TEXT.getNumber()) {
+    if (messageType_ != bridgempp.services.socket.protobuf.MessageType.PLAIN_TEXT.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(1, messageType_);
     }
@@ -300,8 +183,7 @@ private MessageBody(
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-@java.lang.Override
+  @java.lang.Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
       return memoizedHashCode;
@@ -534,13 +416,13 @@ private MessageBody(
 
     private int messageType_ = 0;
     /**
-     * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+     * <code>optional .bridgempp.MessageType messageType = 1;</code>
      */
     public int getMessageTypeValue() {
       return messageType_;
     }
     /**
-     * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+     * <code>optional .bridgempp.MessageType messageType = 1;</code>
      */
     public Builder setMessageTypeValue(int value) {
       messageType_ = value;
@@ -548,16 +430,16 @@ private MessageBody(
       return this;
     }
     /**
-     * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+     * <code>optional .bridgempp.MessageType messageType = 1;</code>
      */
-    public bridgempp.services.socket.protobuf.MessageBody.MessageType getMessageType() {
-      bridgempp.services.socket.protobuf.MessageBody.MessageType result = bridgempp.services.socket.protobuf.MessageBody.MessageType.valueOf(messageType_);
-      return result == null ? bridgempp.services.socket.protobuf.MessageBody.MessageType.UNRECOGNIZED : result;
+    public bridgempp.services.socket.protobuf.MessageType getMessageType() {
+      bridgempp.services.socket.protobuf.MessageType result = bridgempp.services.socket.protobuf.MessageType.valueOf(messageType_);
+      return result == null ? bridgempp.services.socket.protobuf.MessageType.UNRECOGNIZED : result;
     }
     /**
-     * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+     * <code>optional .bridgempp.MessageType messageType = 1;</code>
      */
-    public Builder setMessageType(bridgempp.services.socket.protobuf.MessageBody.MessageType value) {
+    public Builder setMessageType(bridgempp.services.socket.protobuf.MessageType value) {
       if (value == null) {
         throw new NullPointerException();
       }
@@ -567,7 +449,7 @@ private MessageBody(
       return this;
     }
     /**
-     * <code>optional .bridgempp.MessageBody.MessageType messageType = 1;</code>
+     * <code>optional .bridgempp.MessageType messageType = 1;</code>
      */
     public Builder clearMessageType() {
       

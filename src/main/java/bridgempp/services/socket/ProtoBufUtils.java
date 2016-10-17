@@ -17,7 +17,7 @@ import bridgempp.service.BridgeService;
 import bridgempp.services.socket.protobuf.Group;
 import bridgempp.services.socket.protobuf.Message.Builder;
 import bridgempp.services.socket.protobuf.MessageBody;
-import bridgempp.services.socket.protobuf.MessageBody.MessageType;
+import bridgempp.services.socket.protobuf.MessageType;
 
 public class ProtoBufUtils
 {
@@ -42,15 +42,17 @@ public class ProtoBufUtils
 						ShadowManager.log(Level.WARNING, "Could not decode Image URL");
 					}
 					break;
+					
+				case IMAGE_INLINE:
+					messageBuilder.addMessageBody(new ImageMessageBody(mimeType, fileName, inputStream));
 				case PLAIN_TEXT:
 					messageBuilder.addPlainTextBody(messageBody.getContents());
-					break;
-				case UNRECOGNIZED:
-					ShadowManager.log(Level.WARNING, "Got unrecognized Message Type!");
 					break;
 				case XHTML:
 					messageBuilder.addMessageBody(new XHTMLMessageBody(messageBody.getContents()));
 					break;
+					
+				case UNRECOGNIZED:
 				default:
 					ShadowManager.log(Level.WARNING, "Got unrecognized Message Type!");
 					break;

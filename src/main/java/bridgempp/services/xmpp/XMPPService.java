@@ -10,6 +10,7 @@ import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.MessageBuilder;
+import bridgempp.message.formats.media.ImageMessageBody;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.service.SingleToMultiBridgeService;
 import bridgempp.services.xmpp.BOB.BOBIQ;
@@ -91,11 +92,11 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		try
 		{
 			ShadowManager.log(Level.INFO, "Starting XMPP Service...");
-			if(!handles.containsKey(getXMPPPresenceEndpoint().getIdentifier()))
+			if (!handles.containsKey(getXMPPPresenceEndpoint().getIdentifier()))
 			{
 				addHandle(new XMPPNoOpHandle(getXMPPPresenceEndpoint(), this));
 			}
-			
+
 			Builder configurationBuilder = XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port).setServiceName(domain);
 			configurationBuilder.setHostnameVerifier(new DefaultHostnameVerifier());
 			ShadowManager.log(Level.INFO, "Obtained XMPP Configuration: (" + host + ":" + port + ", " + domain + ", " + username + ")");
@@ -103,7 +104,8 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 			{
 				ShadowManager.log(Level.INFO, "Connecting XMPP to " + host + " using old-style SSL");
 				configurationBuilder.setSocketFactory(SSLSocketFactory.getDefault());
-				//configurationBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.required).setSocketFactory(new DummySSLSocketFactory());
+				// configurationBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.required).setSocketFactory(new
+				// DummySSLSocketFactory());
 			}
 			connection = new XMPPTCPConnection(configurationBuilder.build());
 			connection.connect();
@@ -111,20 +113,20 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 			sendPresenceUpdate();
 			connection.addConnectionListener(new XMPPConnectionListener());
 			connection.addAsyncStanzaListener(new XMPPRosterListener(this), new StanzaTypeFilter(Presence.class));
-			
+
 			Roster roster = Roster.getInstanceFor(connection);
 			roster.setSubscriptionMode(Roster.SubscriptionMode.accept_all);
 			roster.addRosterListener(new XMPPStatusListener(this));
 			chatmanager = ChatManager.getInstanceFor(connection);
 			chatmanager.addChatListener(new XMPPChatListener(this));
-			
+
 			MultiUserChatManager.getInstanceFor(connection).addInvitationListener(new XMPPMultiUserChatListener(this));
 			ShadowManager.log(Level.INFO, "Started XMPP Service");
 			ProviderManager.addIQProvider("data", "urn:xmpp:bob", new BOB());
 			connection.addAsyncStanzaListener(new XMPPIQPacketListener(this), new StanzaTypeFilter(BOBIQ.class));
-			
+
 			Iterator<XMPPHandle> iterator = handles.values().iterator();
-			while(iterator.hasNext())
+			while (iterator.hasNext())
 			{
 				iterator.next().onLoad();
 			}
@@ -164,13 +166,10 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		return true;
 	}
 
-
-	String cacheEmbeddedBase64Image(String messageContents)
+	String cacheEmbeddedBase64Image(ImageMessageBody imageMessageBody)
 	{
-		Matcher matcher = Pattern.compile("<img src=\"data:([^;]*);base64,[^\"]\".*?\\/?>").matcher(messageContents);
-
 		Iterator<Entry<String, String>> iterator = cachedObjects.entrySet().iterator();
-		while(iterator.hasNext())
+		while (iterator.hasNext())
 		{
 			String key = iterator.next().getKey();
 			if (System.currentTimeMillis() - Long.parseLong(key.substring(0, key.indexOf('@'))) > 3600000l)
@@ -178,25 +177,25 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 				iterator.remove();
 			}
 		}
-		while (matcher.find())
+
+		try
 		{
-			String type = matcher.group(1);
-			String data = matcher.group(2);
+			String data = imageMessageBody.getDataAsBase64();
 			String identifier = System.currentTimeMillis() + "@bob.xmpp.org";
-			messageContents = messageContents.replace("data:" + type + ";base64," + data, "cid:" + identifier);
 			cachedObjects.put(identifier, data);
+			return imageMessageBody.getCaption() + "<p/><img src=\"cid:" + identifier + "\"/>";
+
+		} catch (IOException e)
+		{
+			return imageMessageBody.getCaption() + "<p/><img src=\"" + imageMessageBody.getURL() + "\"/>";
 		}
-		return messageContents;
 	}
 
 	void interpretXMPPMessage(User user, Endpoint endpoint, Message message)
 	{
 		if (XHTMLManager.isXHTMLMessage(message))
 		{
-			receiveMessage(new MessageBuilder(user, endpoint)
-					.addPlainTextBody(message.getBody())
-					.addMessageBody(new XHTMLXMPPMessageBody(XHTMLManager.getBodies(message).get(0).toString()))
-					.build());
+			receiveMessage(new MessageBuilder(user, endpoint).addPlainTextBody(message.getBody()).addMessageBody(new XHTMLXMPPMessageBody(XHTMLManager.getBodies(message).get(0).toString())).build());
 		} else
 		{
 			receiveMessage(new MessageBuilder(user, endpoint).addPlainTextBody(message.getBody()).build());
@@ -209,7 +208,7 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 	{
 		for (Endpoint endpoint : DataManager.getAllEndpoints())
 		{
-			if(!endpoint.getService().equals(this))
+			if (!endpoint.getService().equals(this))
 			{
 				continue;
 			}
@@ -232,12 +231,11 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 		User user = DataManager.getUserForIdentifier(endpoint.getIdentifier());
 		return user != null || endpoint.getUsers().contains(user);
 	}
-	
+
 	public Endpoint getXMPPPresenceEndpoint()
 	{
 		return DataManager.getOrNewEndpointForIdentifier(host + "@XMPP_Presence", this);
 	}
-	
 
 	public void configure(String host, int port, String domain, boolean oldStyleSSL, String username, String password, String statusMessage)
 	{

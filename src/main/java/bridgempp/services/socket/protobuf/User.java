@@ -24,8 +24,7 @@ public  final class User extends
   getUnknownFields() {
     return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
   }
-  @SuppressWarnings("unused")
-private User(
+  private User(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -202,8 +201,7 @@ private User(
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-@java.lang.Override
+  @java.lang.Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
       return memoizedHashCode;

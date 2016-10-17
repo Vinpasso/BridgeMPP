@@ -5,6 +5,7 @@ import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 import bridgempp.data.Endpoint;
+import bridgempp.message.formats.media.ImageMessageBody;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.service.MultiBridgeServiceHandle;
 
@@ -13,6 +14,7 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 
 	/**
 	 * Create a handle with endpoint and service
+	 * 
 	 * @param endpoint
 	 * @param service
 	 */
@@ -20,7 +22,7 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 	{
 		super(endpoint, service);
 	}
-	
+
 	/**
 	 * JPA-ONLY
 	 */
@@ -28,26 +30,33 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 	{
 		super();
 	}
-	
+
 	public void sendMessage(bridgempp.message.Message message)
 	{
 		Message sendMessage = new Message();
+		String xhtmlMessageContents = null;
 		if (message.hasMessageBody(XHTMLXMPPMessageBody.class))
 		{
-			String messageContents = message.getMessageBody(XHTMLXMPPMessageBody.class).getText();
-			messageContents = service.cacheEmbeddedBase64Image(messageContents);
-			
+			xhtmlMessageContents = message.getMessageBody(XHTMLXMPPMessageBody.class).getText();
+		}
+		if (message.hasMessageBody(ImageMessageBody.class))
+		{
+			xhtmlMessageContents = service.cacheEmbeddedBase64Image(message.getMessageBody(ImageMessageBody.class));
+		}
+		if (xhtmlMessageContents != null)
+		{
 			XHTMLText xhtmlText = new XHTMLText(null, "en");
-			xhtmlText.toXML().append(messageContents);
+			xhtmlText.toXML().append(xhtmlMessageContents);
 			xhtmlText.appendCloseBodyTag();
 			XHTMLManager.addBody(sendMessage, xhtmlText);
-			
 		}
+
 		sendMessage.addBody(null, message.getPlainTextMessageBody());
 		sendXMPPMessage(sendMessage);
 	}
 
 	public abstract void onLoad();
+
 	public abstract void sendXMPPMessage(Message message);
 
 }

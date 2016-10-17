@@ -44,6 +44,16 @@ public final class BridgeProtoBuf {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_bridgempp_MessageBody_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_bridgempp_MessageTypeSelection_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_bridgempp_MessageTypeSelection_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_bridgempp_BridgeMPPRequestStatus_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_bridgempp_BridgeMPPRequestStatus_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -63,16 +73,24 @@ public final class BridgeProtoBuf {
       "\007service\030\002 \001(\0132\022.bridgempp.Service\"(\n\004Us" +
       "er\022\022\n\nidentifier\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\035\n\007" +
       "Service\022\022\n\nidentifier\030\001 \001(\005\"\025\n\005Group\022\014\n\004",
-      "name\030\001 \001(\t\"\233\001\n\013MessageBody\0227\n\013messageTyp" +
-      "e\030\001 \001(\0162\".bridgempp.MessageBody.MessageT" +
-      "ype\022\020\n\010contents\030\002 \001(\t\"A\n\013MessageType\022\016\n\n" +
-      "PLAIN_TEXT\020\000\022\010\n\004HTML\020\001\022\t\n\005XHTML\020\002\022\r\n\tIMA" +
-      "GE_URL\020\0032\235\001\n\025BridgeMPPDataResolver\022@\n\024Ge" +
-      "tUsersFromEndpoint\022\023.bridgempp.Endpoint\032" +
-      "\017.bridgempp.User\"\0000\001\022B\n\025GetEndpointsFrom" +
-      "Group\022\020.bridgempp.Group\032\023.bridgempp.Endp" +
-      "oint\"\0000\001B6\n\"bridgempp.services.socket.pr" +
-      "otobufB\016BridgeProtoBufP\001b\006proto3"
+      "name\030\001 \001(\t\"L\n\013MessageBody\022+\n\013messageType" +
+      "\030\001 \001(\0162\026.bridgempp.MessageType\022\020\n\010conten" +
+      "ts\030\002 \001(\t\"C\n\024MessageTypeSelection\022+\n\013mess" +
+      "ageType\030\001 \003(\0162\026.bridgempp.MessageType\"I\n" +
+      "\026BridgeMPPRequestStatus\022/\n\rrequestStatus" +
+      "\030\001 \001(\0162\030.bridgempp.RequestStatus*b\n\013Mess" +
+      "ageType\022\016\n\nPLAIN_TEXT\020\000\022\010\n\004HTML\020\001\022\t\n\005XHT" +
+      "ML\020\002\022\r\n\tXHTMLXMPP\020\003\022\r\n\tIMAGE_URL\020\004\022\020\n\014IM" +
+      "AGE_INLINE\020\005*:\n\rRequestStatus\022\013\n\007SUCCESS" +
+      "\020\000\022\n\n\006FAILED\020\001\022\020\n\014FAILED_RETRY\020\0022\201\002\n\025Bri",
+      "dgeMPPDataResolver\022@\n\024GetUsersFromEndpoi" +
+      "nt\022\023.bridgempp.Endpoint\032\017.bridgempp.User" +
+      "\"\0000\001\022B\n\025GetEndpointsFromGroup\022\020.bridgemp" +
+      "p.Group\032\023.bridgempp.Endpoint\"\0000\001\022b\n\032SetS" +
+      "upportedMessageFormats\022\037.bridgempp.Messa" +
+      "geTypeSelection\032!.bridgempp.BridgeMPPReq" +
+      "uestStatus\"\000B6\n\"bridgempp.services.socke" +
+      "t.protobufB\016BridgeProtoBufP\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -122,6 +140,18 @@ public final class BridgeProtoBuf {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_bridgempp_MessageBody_descriptor,
         new java.lang.String[] { "MessageType", "Contents", });
+    internal_static_bridgempp_MessageTypeSelection_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_bridgempp_MessageTypeSelection_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_bridgempp_MessageTypeSelection_descriptor,
+        new java.lang.String[] { "MessageType", });
+    internal_static_bridgempp_BridgeMPPRequestStatus_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_bridgempp_BridgeMPPRequestStatus_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_bridgempp_BridgeMPPRequestStatus_descriptor,
+        new java.lang.String[] { "RequestStatus", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

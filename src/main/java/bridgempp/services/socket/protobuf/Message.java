@@ -130,8 +130,7 @@ public  final class Message extends
             bridgempp.services.socket.protobuf.Message.class, bridgempp.services.socket.protobuf.Message.Builder.class);
   }
 
-  @SuppressWarnings("unused")
-private int bitField0_;
+  private int bitField0_;
   public static final int SENDER_FIELD_NUMBER = 1;
   private bridgempp.services.socket.protobuf.User sender_;
   /**
@@ -368,8 +367,7 @@ private int bitField0_;
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-@java.lang.Override
+  @java.lang.Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
       return memoizedHashCode;
@@ -567,8 +565,7 @@ private int bitField0_;
       return result;
     }
 
-    @SuppressWarnings("unused")
-	public bridgempp.services.socket.protobuf.Message buildPartial() {
+    public bridgempp.services.socket.protobuf.Message buildPartial() {
       bridgempp.services.socket.protobuf.Message result = new bridgempp.services.socket.protobuf.Message(this);
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
