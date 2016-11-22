@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,16 +18,19 @@ import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.data.processing.Schedule;
 import bridgempp.messageformat.MessageFormat;
 
 class WhatsappMessageListener implements Runnable {
 
 	private static final Pattern REGEX_MESSAGE = Pattern
 			.compile("\\[([\\d]*?)\\/([^\\(]*?)\\(([^()]*?)\\)\\]:\\[([^()]*?)]\\s*?(\\S+)");
+	private static final long READ_TIMEOUT = 300000l;
 	/**
 	 * 
 	 */
 	final WhatsappService whatsappService;
+	private long lastRead;
 
 	/**
 	 * @param whatsappService
@@ -37,7 +42,9 @@ class WhatsappMessageListener implements Runnable {
 	@Override
 	public void run() {
 		ShadowManager.log(Level.INFO, "Whatsapp Message Listener starting up");
+		Future<?> keepAlive = Schedule.scheduleRepeatWithPeriod(() -> checkLastSuccessfulRead(), READ_TIMEOUT, READ_TIMEOUT, TimeUnit.MILLISECONDS);
 		process();
+		keepAlive.cancel(false);
 		ShadowManager.log(Level.INFO, "Whatsapp Message Listener shutting down");
 		ShadowManager.fatal("Whatsapp Message Listener offline");
 	}
@@ -77,6 +84,7 @@ class WhatsappMessageListener implements Runnable {
 					break;
 				}
 				ShadowManager.log(Level.INFO, "YOWSUP Buffer: " + buffer);
+				lastRead = System.currentTimeMillis();
 				Matcher matcher = REGEX_MESSAGE.matcher(buffer);
 				while (matcher.find()) {
 					String author = matcher.group(1) + "@s.whatsapp.net";
@@ -100,5 +108,17 @@ class WhatsappMessageListener implements Runnable {
 			this.whatsappService.yowsup.destroyForcibly();
 		}
 		ShadowManager.log(Level.INFO, "Stopped Yowsup Process");
+	}
+	
+	private void checkLastSuccessfulRead()
+	{
+		long differenceToLastRead = System.currentTimeMillis() - lastRead;
+		if(differenceToLastRead > READ_TIMEOUT)
+		{
+			ShadowManager.fatal("Last successful Yowsup read surpassed timeout of " + READ_TIMEOUT + "ms (Last read was " + (differenceToLastRead /1000) + "s ago)." );
+		} else
+		{
+			ShadowManager.info("Yowsup read timeout OK. Last read was " + (differenceToLastRead / 1000) + "s ago.");
+		}
 	}
 }
