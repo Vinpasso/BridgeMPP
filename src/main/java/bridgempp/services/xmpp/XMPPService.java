@@ -37,9 +37,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.net.ssl.SSLSocketFactory;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;

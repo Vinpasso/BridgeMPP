@@ -10,8 +10,6 @@ import java.net.URLConnection;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
-import org.apache.commons.io.IOUtils;
-
 import bridgempp.binarydistribution.BinaryDistributionManager;
 
 public class ImageMessageBody extends MediaMessageBody

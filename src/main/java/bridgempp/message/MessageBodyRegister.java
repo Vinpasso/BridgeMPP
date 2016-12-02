@@ -1,9 +1,6 @@
 package bridgempp.message;
 
-import java.io.IOException;
-import java.net.URLConnection;
 import java.util.AbstractMap;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,8 +8,6 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-
-import org.apache.commons.io.IOUtils;
 
 import bridgempp.ShadowManager;
 import bridgempp.message.formats.media.ImageMessageBody;

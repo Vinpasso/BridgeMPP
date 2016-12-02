@@ -3,6 +3,8 @@ package bridgempp.services.socket;
 import java.net.URL;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import bridgempp.GroupManager;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
@@ -44,7 +46,9 @@ public class ProtoBufUtils
 					break;
 					
 				case IMAGE_INLINE:
-					messageBuilder.addMessageBody(new ImageMessageBody(mimeType, fileName, inputStream));
+					//messageBuilder.addMessageBody(new ImageMessageBody(mimeType, fileName, inputStream));
+					// TODO: Inline imagess
+					throw new NotImplementedException("TODO");
 				case PLAIN_TEXT:
 					messageBuilder.addPlainTextBody(messageBody.getContents());
 					break;
