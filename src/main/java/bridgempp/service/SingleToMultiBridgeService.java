@@ -65,7 +65,7 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 			});
 			return;
 		}
-		handle.sendMessage(message);
+		handle.sendMessage(message, deliveryGoal);
 	}
 
 	private H getHandle(String identifier)

@@ -12,6 +12,7 @@ import org.jivesoftware.smack.packet.Message;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 
 @Entity(name = "XMPPSINGLEUSERCHAT")
 @DiscriminatorValue("XMPPSingleUserChatHandle")
@@ -46,9 +47,10 @@ class XMPPSingleChatMessageListener extends XMPPHandle implements ChatMessageLis
 	}
 
 	@Override
-	public void sendXMPPMessage(Message message) {
+	public void sendXMPPMessage(Message message, DeliveryGoal deliveryGoal) {
 		try {
 			chat.sendMessage(message);
+			deliveryGoal.setDelivered();
 		} catch (SmackException.NotConnectedException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
 		}

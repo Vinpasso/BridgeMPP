@@ -13,7 +13,6 @@ import bridgempp.message.MessageBuilder;
 import bridgempp.message.formats.media.ImageMessageBody;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.service.SingleToMultiBridgeService;
-import bridgempp.services.xmpp.BOB.BOBIQ;
 import bridgempp.state.EventManager;
 import bridgempp.state.endpoint.XMPPPresenceEndpointRemover;
 

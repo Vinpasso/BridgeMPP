@@ -12,6 +12,7 @@ import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.MultiBridgeServiceHandle;
@@ -143,7 +144,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		try
 		{
@@ -166,10 +167,16 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 					}
 					break;
 			}
+			deliveryGoal.setDelivered();
 		} catch (IOException e)
 		{
 			ShadowManager.log(Level.SEVERE, null, e);
 			disconnect();
 		}
+	}
+
+	Endpoint getEndpoint()
+	{
+		return endpoint;
 	}
 }

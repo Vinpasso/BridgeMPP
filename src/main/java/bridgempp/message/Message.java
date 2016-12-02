@@ -10,6 +10,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
@@ -22,13 +27,25 @@ import bridgempp.message.formats.text.PlainTextMessageBody;
  *
  * @author Vincent Bode
  */
+@Entity(name = "Message")
 public class Message
 {
+	@Column(name = "Sender", nullable = false)
 	private User sender;
+	
+	@Column(name = "Origin", nullable = false)
 	private Endpoint origin;
+	
+	@OneToMany(mappedBy="Message")
 	private List<DeliveryGoal> destinations;
+	
+	@OneToMany()
 	private List<Group> groups;
+	
+	//TODO: CONTINUE HERE
 	private HashMap<Class<? extends MessageBody>, MessageBody> messageBodies;
+
+	
 	private MessageBody originalMessageBody;
 
 	public Message()
@@ -91,7 +108,7 @@ public class Message
 	
 	public String getMetadataInfo()
 	{
-		String messageFormat = (messageBodies.isEmpty()?"Empty":messageBodies.get(0).getFormatName()) + ": ";
+		String messageFormat = (messageBodies.isEmpty()?"Empty":originalMessageBody.getFormatName()) + ": ";
 		String sender = (getSender() != null) ? getSender().toString() : "Unknown";
 		String origin = (getOrigin() != null) ? getOrigin().toString() : "Unknown";
 		String target = getDeliveryGoals().stream().filter(e -> e.getStatus().equals(DeliveryStatus.DELIVERED)).count() + "/" + getDeliveryGoals().size();

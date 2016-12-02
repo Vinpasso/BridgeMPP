@@ -15,7 +15,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import bridgempp.ShadowManager;
-import bridgempp.message.MessageBuilder;
 import bridgempp.service.SingleToMultiBridgeService;
 
 /**
@@ -67,7 +66,7 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 			while (iterator.hasNext())
 			{
 				SocketClient handle = iterator.next();
-				handle.sendMessage(new MessageBuilder(null, null).addPlainTextBody("").build());
+				handle.getEndpoint().sendOperatorMessage("");
 //				sent++;
 			}
 		} catch (ConcurrentModificationException e)

@@ -1,10 +1,28 @@
 package bridgempp.message;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import bridgempp.data.Endpoint;
 
+@Entity(name = "DeliveryGoal")
 public class DeliveryGoal
 {
+	@Id()
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name = "Identifier", nullable = false)
+	private int id;
+	
+	@Column(name = "Target", nullable = false)
 	private Endpoint target;
+
+	@Column(name = "Message", nullable = false)
+	private Message message;
+	
+	@Column(name = "DeliveryStatus", nullable = false)
 	private DeliveryStatus status;
 
 	

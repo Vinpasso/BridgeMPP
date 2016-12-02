@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.MessageBodyRegister;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
 import bridgempp.statistics.StatisticsManager;
@@ -52,6 +53,7 @@ public class BridgeMPP {
 			ShadowManager.log(Level.INFO, "Server startup commencing...");
 			addShutdownHook();
 			EventManager.loadCentralEventSubscribers();
+			MessageBodyRegister.initializeConversionSystem();
 			CommandInterpreter.loadCommands();
 			ServiceManager.connectAllServices();
 			StatisticsManager.loadStatistics();

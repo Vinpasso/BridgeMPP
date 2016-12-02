@@ -16,6 +16,7 @@ import javax.persistence.OneToOne;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 
 @Entity(name = "MULTIBRIDGESERVICEHANDLE")
@@ -35,7 +36,7 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	protected Endpoint endpoint;
 	
 	
-	public abstract void sendMessage(Message message);
+	public abstract void sendMessage(Message message, DeliveryGoal deliveryGoal);
 
 	@SuppressWarnings("unchecked")
 	protected MultiBridgeServiceHandle(Endpoint endpoint, S service)

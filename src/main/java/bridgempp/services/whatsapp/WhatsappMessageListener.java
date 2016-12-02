@@ -73,7 +73,6 @@ class WhatsappMessageListener implements Runnable {
 			this.whatsappService.yowsup.getOutputStream().flush();
 			// Make sure Login actually happens
 			whatsappService.printStream = new PrintStream(whatsappService.yowsup.getOutputStream(), true);
-			this.whatsappService.senderThread.start();
 			this.whatsappService.bufferedReader = new BufferedReader(new InputStreamReader(
 					this.whatsappService.yowsup.getInputStream(), "UTF-8"));
 			ShadowManager.log(Level.INFO, "Started Yowsup Process");
@@ -105,10 +104,6 @@ class WhatsappMessageListener implements Runnable {
 			}
 		} catch (UnsupportedOperationException | IOException ex) {
 			ShadowManager.log(Level.SEVERE, null, ex);
-		}
-		if(whatsappService.senderThread != null)
-		{
-			this.whatsappService.senderThread.interrupt();
 		}
 		if(whatsappService.yowsup != null)
 		{

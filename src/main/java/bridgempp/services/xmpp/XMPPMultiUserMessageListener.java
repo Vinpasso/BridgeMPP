@@ -16,6 +16,7 @@ import org.jivesoftware.smackx.muc.Occupant;
 import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 
 @Entity(name = "XMPPMULTIUSERCHAT")
 @DiscriminatorValue("XMPPMultiUserChatHandle")
@@ -59,11 +60,12 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 
 
 	@Override
-	public void sendXMPPMessage(Message message)
+	public void sendXMPPMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		try
 		{
 			multiUserChat.sendMessage(message);
+			deliveryGoal.setDelivered();
 		} catch (SmackException.NotConnectedException ex)
 		{
 			ShadowManager.log(Level.SEVERE, null, ex);

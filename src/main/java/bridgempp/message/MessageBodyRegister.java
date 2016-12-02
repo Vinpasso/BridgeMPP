@@ -1,6 +1,8 @@
 package bridgempp.message;
 
+import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,6 +10,8 @@ import java.util.Queue;
 import java.util.function.Function;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+
+import org.apache.commons.io.IOUtils;
 
 import bridgempp.ShadowManager;
 import bridgempp.message.formats.media.ImageMessageBody;
@@ -65,7 +69,8 @@ public class MessageBodyRegister
 					return;
 				}
 				convertedMap.put(entry.getKey(), entry.getValue());
-				conversions.get(entry.getKey()).forEach((k, v) -> {
+				Map<Class<? extends MessageBody>, MessageBodyConverter<? extends MessageBody, ? extends MessageBody>> destinationMap = conversions.get(entry.getKey());
+				destinationMap.forEach((k, v) -> {
 					if (convertedMap.containsKey(k) && convertedMap.get(k).getConversionCost() <= v.getConversionCost() + entry.getValue().getConversionCost())
 					{
 						return;
@@ -81,30 +86,38 @@ public class MessageBodyRegister
 					pendingConversionChains.add(new AbstractMap.SimpleEntry<Class<? extends MessageBody>, MessageBodyConverter<?, ?>>(k, entry.getValue().sequence(v)));
 				});
 			}
-
-			conversions.forEach((origin, map1) -> {
-				final StringBuilder builder = new StringBuilder();
-				map1.forEach((e, v) -> builder.append(e.getName() + " (cost: " + v.getConversionCost() + ")\n"));
-				ShadowManager.log(Level.INFO, "The conversion map for " + origin.getSimpleName() + " has been built:\n" + builder.toString());
-			});
 		});
-
+		
+		conversions.forEach((origin, map1) -> {
+			final StringBuilder builder = new StringBuilder();
+			map1.forEach((e, v) -> builder.append(e.getName() + " (cost: " + v.getConversionCost() + ")\n"));
+			ShadowManager.log(Level.INFO, "The conversion map for " + origin.getSimpleName() + " has been built:\n" + builder.toString());
+		});
 	}
 	
 	public static <O extends MessageBody, D extends MessageBody> void registerConversion(Class<O> origin, Class<D> destination, int cost, Function<O, D> implementation)
+	{
+		Map<Class<? extends MessageBody>, MessageBodyConverter<? extends MessageBody, ? extends MessageBody>> map = initializeMessageFormatClass(origin);
+		map.put(destination, new MessageBodyConverter<>(cost, implementation));
+	}
+
+	public static <O extends MessageBody> Map<Class<? extends MessageBody>, MessageBodyConverter<? extends MessageBody, ? extends MessageBody>> initializeMessageFormatClass(Class<O> origin)
 	{
 		Map<Class<? extends MessageBody>, MessageBodyConverter<? extends MessageBody, ? extends MessageBody>> map = conversions.get(origin);
 		if(map == null)
 		{
 			map = new HashMap<>();
+			conversions.put(origin, map);
 		}
-		map.put(destination, new MessageBodyConverter<>(cost, implementation));
+		return map;
 	}
 	
 	private static final int DEFAULT_COST = 100;
-	static
+
+	public static void initializeConversionSystem()
 	{
 		conversions = new HashMap<>();
+		
 		//Default cost 10
 		//Base64
 		registerConversion(PlainTextMessageBody.class, Base64EncodedMessageBody.class, DEFAULT_COST, t ->	new Base64EncodedMessageBody(t.getText()));
@@ -121,15 +134,19 @@ public class MessageBodyRegister
 		
 		//Image
 		registerConversion(ImageMessageBody.class, PlainTextMessageBody.class, DEFAULT_COST, t -> new PlainTextMessageBody(t.getCaption() + ": " + t.getURL().toString()));
-//		registerConversion(ImageMessageBody.class, XHTMLXMPPMessageBody.class, DEFAULT_COST * 2, t -> {
-//			try
-//			{
-//				return new XHTMLXMPPMessageBody("<img src=\"data:" + t.getMimeType().toString() + ";base64," + Base64.getEncoder().encodeToString(IOUtils.toByteArray(t.getURL())) + "\"/>");
-//			} catch (IOException e)
-//			{
-//				return new XHTMLXMPPMessageBody("<img src=\""+ t.getURL().toString() + "\"/>");
-//			}
-//		});
+		registerConversion(ImageMessageBody.class, XHTMLXMPPMessageBody.class, DEFAULT_COST * 2, t -> {
+			try
+			{
+				return new XHTMLXMPPMessageBody("<img src=\"data:" + t.getMimeType().toString() + ";base64," + Base64.getEncoder().encodeToString(IOUtils.toByteArray(t.getURL())) + "\"/>");
+			} catch (IOException e)
+			{
+				return new XHTMLXMPPMessageBody("<img src=\""+ t.getURL().toString() + "\"/>");
+			}
+		});
+		
+		//Initialize classes that were not automatically initialized above
+		initializeMessageFormatClass(XHTMLXMPPMessageBody.class);
+
 		
 		buildConversionMap();
 	}

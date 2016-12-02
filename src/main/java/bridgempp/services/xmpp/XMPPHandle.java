@@ -5,6 +5,7 @@ import org.jivesoftware.smackx.xhtmlim.XHTMLManager;
 import org.jivesoftware.smackx.xhtmlim.XHTMLText;
 
 import bridgempp.data.Endpoint;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.formats.media.ImageMessageBody;
 import bridgempp.message.formats.text.XHTMLXMPPMessageBody;
 import bridgempp.service.MultiBridgeServiceHandle;
@@ -31,7 +32,7 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 		super();
 	}
 
-	public void sendMessage(bridgempp.message.Message message)
+	public void sendMessage(bridgempp.message.Message message, DeliveryGoal deliveryGoal)
 	{
 		Message sendMessage = new Message();
 		String xhtmlMessageContents = null;
@@ -52,11 +53,11 @@ public abstract class XMPPHandle extends MultiBridgeServiceHandle<XMPPService, X
 		}
 
 		sendMessage.addBody(null, message.getPlainTextMessageBody());
-		sendXMPPMessage(sendMessage);
+		sendXMPPMessage(sendMessage, deliveryGoal);
 	}
 
 	public abstract void onLoad();
 
-	public abstract void sendXMPPMessage(Message message);
+	public abstract void sendXMPPMessage(Message message, DeliveryGoal deliveryGoal);
 
 }

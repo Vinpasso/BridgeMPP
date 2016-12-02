@@ -1,14 +1,17 @@
 package bridgempp.services.asyncsocket;
 
+
 import java.util.logging.Level;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import io.netty.channel.socket.SocketChannel;
+import io.netty.util.concurrent.Future;
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.MultiBridgeServiceHandle;
@@ -52,7 +55,7 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 	}
 
 	@Override
-	public void sendMessage(Message message)
+	public void sendMessage(Message message, DeliveryGoal deliveryGoal)
 	{
 		if(socketChannel == null)
 		{
@@ -62,7 +65,8 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 		}
 		
 		bridgempp.services.socket.protobuf.Message protoMessage = ProtoBufUtils.serializeMessage(message);
-		socketChannel.writeAndFlush(protoMessage);
+		Future<?> future = socketChannel.writeAndFlush(protoMessage);
+		future.addListener((e) -> { if(e.isSuccess()) { deliveryGoal.setDelivered(); } });
 	}
 
 	public User getUser()

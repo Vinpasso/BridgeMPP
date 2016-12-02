@@ -34,7 +34,6 @@ public class WhatsappService extends BridgeService {
 	transient Process yowsup;
 	transient BufferedReader bufferedReader;
 	transient LinkedBlockingQueue<String> senderQueue;
-	transient Thread senderThread;
 	transient PrintStream printStream;
 	private transient long lastMessageTimestamp = 0l;
 	transient volatile boolean messageConfirmed = false;
@@ -56,7 +55,6 @@ public class WhatsappService extends BridgeService {
 
 	@Override
 	public void disconnect() {
-		senderThread.interrupt();
 		yowsup.destroy();
 	}
 	

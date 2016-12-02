@@ -9,6 +9,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
+import bridgempp.message.DeliveryGoal;
 
 @Entity(name = "XMPPNOOPHANDLE")
 @DiscriminatorValue("XMPPNoOpHandle")
@@ -35,9 +36,10 @@ public class XMPPNoOpHandle extends XMPPHandle
 	}
 
 	@Override
-	public void sendXMPPMessage(Message message)
+	public void sendXMPPMessage(Message message, DeliveryGoal deliveryGoal)
 	{
-		ShadowManager.log(Level.INFO, "Rejected message to NO-OP Handle: " + message.toString());
+		ShadowManager.log(Level.FINE, "Rejected message to NO-OP Handle: " + message.toString());
+		deliveryGoal.setDelivered();
 	}
 
 }
