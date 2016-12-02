@@ -25,7 +25,7 @@ final class XMPPConnectionListener implements ConnectionListener {
 
 	@Override
 	public void connectionClosedOnError(Exception e) {
-		ShadowManager.log(Level.WARNING, "The XMPP Connection has been disconnected: " + e.getMessage());
+		ShadowManager.fatal("The XMPP Connection has been disconnected: " + e.getMessage());
 	}
 
 	@Override

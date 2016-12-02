@@ -119,8 +119,9 @@ public class XMPPService extends SingleToMultiBridgeService<XMPPService, XMPPHan
 
 			MultiUserChatManager.getInstanceFor(connection).addInvitationListener(new XMPPMultiUserChatListener(this));
 			ShadowManager.log(Level.INFO, "Started XMPP Service");
-			ProviderManager.addIQProvider("data", "urn:xmpp:bob", new BOB());
-			connection.addAsyncStanzaListener(new XMPPIQPacketListener(this), new StanzaTypeFilter(BOBIQ.class));
+			BOB bobIQProcessor = new BOB(this);
+			ProviderManager.addIQProvider("data", "urn:xmpp:bob", bobIQProcessor);
+			connection.registerIQRequestHandler(bobIQProcessor);
 
 			Iterator<XMPPHandle> iterator = handles.values().iterator();
 			while (iterator.hasNext())

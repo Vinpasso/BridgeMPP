@@ -24,7 +24,7 @@ public class DataManager
 		return endpoint;
 	}
 	
-	private static Endpoint registerTimedEndpoint(BridgeService service,
+	private static synchronized Endpoint registerTimedEndpoint(BridgeService service,
 			String identifier, long expiry, TemporalUnit unit) {
 		Endpoint endpoint = new TimedEndpoint(service, identifier, expiry, unit);
 		PERSISTANCE_MANAGER.updateState(endpoint);
@@ -184,7 +184,7 @@ public class DataManager
 	
 	public static void acquireDOMWritePermission() throws InterruptedException
 	{
-		domLock.writeLock().lock();;
+		domLock.writeLock().lock();
 	}
 	
 	public static void releaseDOMWritePermission()
@@ -192,7 +192,7 @@ public class DataManager
 		domLock.writeLock().unlock();
 	}
 
-	public static <T> Collection<T> list(Class<T> clazz) {
+	public static synchronized <T> Collection<T> list(Class<T> clazz) {
 		return PERSISTANCE_MANAGER.getQuery(clazz);
 	}
 }
