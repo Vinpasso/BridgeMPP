@@ -9,7 +9,7 @@ public class PlainTextMessageBody extends MessageBody
 	
 	public PlainTextMessageBody(String text)
 	{
-		this.text = text;
+		this.text = (text == null) ? "" : text;
 	}
 	
 	@Override

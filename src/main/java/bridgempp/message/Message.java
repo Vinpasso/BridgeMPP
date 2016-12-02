@@ -42,6 +42,7 @@ public class Message
 		this.origin = origin;
 		this.destinations = new ArrayList<>();
 		this.groups = new ArrayList<>();
+		this.messageBodies = new HashMap<>();
 	}
 
 	/**
