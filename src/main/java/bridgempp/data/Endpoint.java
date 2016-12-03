@@ -28,6 +28,7 @@ import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
+import bridgempp.service.ServiceStatus;
 import bridgempp.util.StringOperations;
 
 /**
@@ -80,7 +81,7 @@ public class Endpoint {
 
     //Send this endpoint a Message (convenience)
     public void sendMessage(Message message, DeliveryGoal deliveryGoal) {
-        if(!service.isEnabled())
+        if(service.getStatus() != ServiceStatus.ONLINE)
         {
         	return;
         }

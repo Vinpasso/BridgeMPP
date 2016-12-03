@@ -7,6 +7,7 @@ package bridgempp;
 
 import bridgempp.data.DataManager;
 import bridgempp.service.BridgeService;
+import bridgempp.service.ServiceStatus;
 import bridgempp.services.ConsoleService;
 import bridgempp.state.EventManager;
 import bridgempp.state.EventManager.Event;
@@ -64,9 +65,9 @@ public class ServiceManager
 	public static void loadService(BridgeService service)
 	{
 		services.add(service);
-		if(!service.isEnabled())
+		if(service.getStatus() == ServiceStatus.DISABLED)
 		{
-			ShadowManager.log(Level.WARNING, "Service: " + service.toString() + " is Disabled");
+			ShadowManager.log(Level.WARNING, "Service: " + service.toString() + " is disabled");
 			return;
 		}
 		connectService(service);
@@ -79,11 +80,11 @@ public class ServiceManager
 		try
 		{
 			service.connect();
+			service.setStatus(ServiceStatus.ONLINE);
 			EventManager.fireEvent(Event.SERVICE_CONNECTED, service);
 		} catch (Exception e)
 		{
-			ShadowManager.log(Level.SEVERE, "Could not load Service: " + service.toString());
-			ShadowManager.fatal(e);
+			ShadowManager.log(Level.SEVERE, "Could not load Service: " + service.toString(), e);
 		}
 	}
 
@@ -95,9 +96,9 @@ public class ServiceManager
 			try
 			{
 				ShadowManager.log(Level.INFO, "Disconnecting Service: " + services.get(i).getName());
-				if(!services.get(i).isEnabled())
+				if(services.get(i).getStatus() == ServiceStatus.DISABLED)
 				{
-					ShadowManager.log(Level.WARNING, "Service: " + services.get(i).toString() + " is Disabled");
+					ShadowManager.log(Level.WARNING, "Service: " + services.get(i).toString() + " is disabled");
 					continue;
 				}
 				disconnectService(services.get(i));
@@ -134,12 +135,11 @@ public class ServiceManager
 		try
 		{
 			service.disconnect();
-			EventManager.fireEvent(Event.SERVICE_DISCONNECTED, service);
 		} catch (Exception e)
 		{
-			ShadowManager.log(Level.SEVERE, "Could not disconnect Service: " + service.toString());
-			ShadowManager.fatal(e);
-
+			ShadowManager.log(Level.SEVERE, "Encountered error while disconnecting service: " + service.toString(), e);
 		}
+		service.setStatus(ServiceStatus.OFFLINE);
+		EventManager.fireEvent(Event.SERVICE_DISCONNECTED, service);
 	}
 }

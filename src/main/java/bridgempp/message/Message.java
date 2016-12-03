@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
@@ -32,20 +33,19 @@ public class Message
 {
 	@Column(name = "Sender", nullable = false)
 	private User sender;
-	
+
 	@Column(name = "Origin", nullable = false)
 	private Endpoint origin;
-	
-	@OneToMany(mappedBy="Message")
+
+	@OneToMany(mappedBy = "Message")
 	private List<DeliveryGoal> destinations;
-	
+
 	@OneToMany()
 	private List<Group> groups;
-	
-	//TODO: CONTINUE HERE
+
+	// TODO: CONTINUE HERE
 	private HashMap<Class<? extends MessageBody>, MessageBody> messageBodies;
 
-	
 	private MessageBody originalMessageBody;
 
 	public Message()
@@ -100,15 +100,15 @@ public class Message
 	{
 		destinations.add(new DeliveryGoal(endpoint));
 	}
-	
+
 	private List<DeliveryGoal> getDeliveryGoals()
 	{
 		return destinations;
 	}
-	
+
 	public String getMetadataInfo()
 	{
-		String messageFormat = (messageBodies.isEmpty()?"Empty":originalMessageBody.getFormatName()) + ": ";
+		String messageFormat = (messageBodies.isEmpty() ? "Empty" : originalMessageBody.getFormatName()) + ": ";
 		String sender = (getSender() != null) ? getSender().toString() : "Unknown";
 		String origin = (getOrigin() != null) ? getOrigin().toString() : "Unknown";
 		String target = getDeliveryGoals().stream().filter(e -> e.getStatus().equals(DeliveryStatus.DELIVERED)).count() + "/" + getDeliveryGoals().size();
@@ -124,23 +124,23 @@ public class Message
 	public void addMessageBody(MessageBody messageBody)
 	{
 		messageBodies.put(messageBody.getClass(), messageBody);
-		if(originalMessageBody == null)
+		if (originalMessageBody == null)
 		{
 			originalMessageBody = messageBody;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends MessageBody> T getMessageBody(Class<T> messageBodyClass)
 	{
 		MessageBody messageBody = messageBodies.get(messageBodyClass);
-		if(messageBody != null)
+		if (messageBody != null)
 		{
 			return (T) messageBody;
 		}
-		
+
 		T convertedMessageBody = MessageBodyRegister.convert(originalMessageBody, messageBodyClass);
-		if(convertedMessageBody != null)
+		if (convertedMessageBody != null)
 		{
 			messageBodies.put(messageBodyClass, convertedMessageBody);
 			return convertedMessageBody;
@@ -151,49 +151,51 @@ public class Message
 	public String getPlainTextMessageBody()
 	{
 		String result = getMessageBody(PlainTextMessageBody.class).getText();
-		return (result!=null)?result:"";
+		return (result != null) ? result : "";
 	}
 
 	/**
 	 * Includes conversions
-	 * @param bodyClass The target body class
+	 * 
+	 * @param bodyClass
+	 *            The target body class
 	 * @return Whether the message is available or can be converted
 	 */
 	public boolean hasMessageBody(Class<? extends MessageBody> bodyClass)
 	{
 		return messageBodies.containsKey(bodyClass) || MessageBodyRegister.canConvert(originalMessageBody, bodyClass);
 	}
-	
+
 	private MessageBody getOriginalMessageBody()
 	{
 		return originalMessageBody;
 	}
-	
+
 	public boolean hasOriginalMessageBody(Class<? extends MessageBody> bodyClass)
 	{
 		return bodyClass.isAssignableFrom(getOriginalMessageBody().getClass());
 	}
-	
+
 	public boolean isPlainTextMessage()
 	{
 		return originalMessageBody instanceof PlainTextMessageBody;
 	}
-	
+
 	public boolean isMarkupTextMessage()
 	{
 		return originalMessageBody instanceof MarkupTextMessageBody;
 	}
-	
+
 	public boolean isMediaMessage()
 	{
 		return originalMessageBody instanceof MediaMessageBody;
 	}
-	
+
 	public boolean isTextMessage()
 	{
 		return isPlainTextMessage() || isMarkupTextMessage();
 	}
-	
+
 	public void send()
 	{
 		CommandInterpreter.processMessage(this);
@@ -222,7 +224,15 @@ public class Message
 
 	public void deliver()
 	{
-		getDeliveryGoals().stream().filter(e -> e.getStatus() != DeliveryStatus.DELIVERED).forEach(e -> e.getTarget().sendMessage(this, e));
+		getDeliveryGoals().stream().filter(e -> e.getStatus() != DeliveryStatus.DELIVERED).forEach(e -> {
+			try
+			{
+				e.getTarget().sendMessage(this, e);
+			} catch (Exception ex)
+			{
+				ShadowManager.log(Level.WARNING, "Delivery failed to endpoint " + e.toString(), ex);
+			}
+		});
 	}
-	
+
 }

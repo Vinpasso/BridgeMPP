@@ -117,7 +117,8 @@ class WhatsappMessageListener implements Runnable {
 		long differenceToLastRead = System.currentTimeMillis() - lastRead;
 		if(differenceToLastRead > READ_TIMEOUT)
 		{
-			ShadowManager.fatal("Last successful Yowsup read surpassed timeout of " + READ_TIMEOUT + "ms (Last read was " + (differenceToLastRead /1000) + "s ago)." );
+			ShadowManager.log(Level.WARNING, "Last successful Yowsup read surpassed timeout of " + READ_TIMEOUT + "ms (Last read was " + (differenceToLastRead /1000) + "s ago)." );
+			
 		} else
 		{
 			ShadowManager.info("Yowsup read timeout OK. Last read was " + (differenceToLastRead / 1000) + "s ago.");

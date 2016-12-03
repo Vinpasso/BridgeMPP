@@ -15,6 +15,7 @@ import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
+import bridgempp.service.ServiceStatus;
 import bridgempp.services.BridgeChat;
 import bridgempp.services.ConsoleService;
 import bridgempp.services.MailService;
@@ -248,7 +249,7 @@ public class CommandServiceOperations
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
 		ShadowManager.log(Level.WARNING, "Enabling Service: " + service.toString());
-		service.setEnabled(true);
+		service.setStatus(ServiceStatus.OFFLINE);
 		service.connect();
 		return "Enabled Service: " + service.toString(); 
 	}
@@ -266,7 +267,7 @@ public class CommandServiceOperations
 		}
 		ShadowManager.log(Level.WARNING, "Disabling Service: " + service.toString());
 		service.disconnect();
-		service.setEnabled(false);
+		service.setStatus(ServiceStatus.DISABLED);
 		return "Disabled Service: " + service.toString(); 
 	}
 }

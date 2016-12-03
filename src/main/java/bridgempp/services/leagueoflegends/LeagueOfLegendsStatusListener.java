@@ -36,7 +36,8 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 			service.sendPresenceUpdate();
 		} catch (NotConnectedException e)
 		{
-			ShadowManager.fatal(e);
+			ShadowManager.log(Level.WARNING, "XMPP not connected.", e);
+			service.disconnect();
 		}
 	}
 

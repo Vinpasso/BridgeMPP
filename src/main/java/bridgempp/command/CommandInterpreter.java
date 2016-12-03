@@ -51,11 +51,11 @@ public class CommandInterpreter
 			return;
 		}
 		BridgeMPP.readLock();
+		ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 		for(int delivery = 0; delivery < 3; delivery++)
 		{
 			try
 			{
-				ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
 				StatisticsManager.processMessage(message);
 				if (message.isPlainTextMessage() && isCommand(message.getPlainTextMessageBody()))
 				{
@@ -90,6 +90,7 @@ public class CommandInterpreter
 				}
 			}
 		}
+		ShadowManager.log(Level.INFO, "Routed Message: " + message.toString());
 		BridgeMPP.readUnlock();
 	}
 

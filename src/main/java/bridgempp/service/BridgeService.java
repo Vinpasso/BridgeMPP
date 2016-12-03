@@ -45,11 +45,12 @@ public abstract class BridgeService {
 	
 	@OneToMany(mappedBy="service")
 	protected Collection<Endpoint> endpoints = new LinkedList<Endpoint>();
-	    
-	@Column(name = "ENABLED", nullable = false)
-	private boolean isEnabled = true;
 
+	@Column(name = "STATUS", nullable = false)
+	private ServiceStatus status;
+	
 	private transient ArrayList<Function<Message, Message>> filters = new ArrayList<>();
+
 	
     //Initialize Service
     public abstract void connect() throws Exception;
@@ -119,17 +120,17 @@ public abstract class BridgeService {
     
     public String toString()
     {
-    	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent) ":" (Non-Persistent) ") + (isEnabled()?"(Enabled)":"(Disabled)");
+    	return serviceIdentifier + ": " + getName() + (isPersistent()?" (Persistent) ":" (Non-Persistent) ") + getStatus().toString();
     }
     
-	public boolean isEnabled()
+    public ServiceStatus getStatus()
+    {
+    	return status;
+    }
+    
+	public void setStatus(ServiceStatus status)
 	{
-		return isEnabled;
-	}
-	
-	public void setEnabled(boolean enable)
-	{
-		this.isEnabled = enable;
+		this.status = status;
 	}
 	
 }
