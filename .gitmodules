@@ -1,3 +1,6 @@
 [submodule "src/main/resources/yowsup-python/yowsup"]
 	path = src/main/resources/yowsup-python/yowsup
 	url = https://github.com/tgalal/yowsup.git
+[submodule "src/common/"]
+	path = src/common/
+	url = https://github.com/Vinpasso/BridgeMPP-Common.git
