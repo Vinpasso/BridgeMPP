@@ -1,8 +1,8 @@
-/target/
-/bridgempp/
-/bridgedb/
-/.settings/
-/derby.log
-.classpath
-.project
-/bin/
+**/target/
+**/bridgempp/
+**/bridgedb/
+**/.settings/
+**/derby.log
+**/.classpath
+**/.project
+**/bin/
