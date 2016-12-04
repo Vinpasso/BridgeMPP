@@ -1,6 +1,3 @@
-[submodule "src/common/"]
-	path = bridgempp-common
-	url = https://github.com/Vinpasso/BridgeMPP-Common.git
 [submodule "bridgempp-common"]
 	path = bridgempp-common
 	url = https://github.com/Vinpasso/BridgeMPP-Common.git
