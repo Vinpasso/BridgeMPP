@@ -3,9 +3,9 @@ package bridgempp.statistics;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
+import bridgempp.data.DataManager;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
-import bridgempp.storage.PersistanceManager;
 import bridgempp.util.TimeUtil;
 
 public class StatisticsManager
@@ -43,7 +43,7 @@ public class StatisticsManager
 	{
 		if (statisticStore.installDate == 0)
 		{
-			ShadowManager.log(Level.WARNING, "No existing Statistics found. Creating new Statistics Store");
+			Log.log(Level.WARNING, "No existing Statistics found. Creating new Statistics Store");
 			statisticStore.installDate = System.currentTimeMillis();
 		}
 		statisticStore.lastStartup = System.currentTimeMillis();
@@ -60,8 +60,8 @@ public class StatisticsManager
 
 	public static void loadStatistics()
 	{
-		ShadowManager.log(Level.INFO, "Loading Statistics...");
-		Iterator<StatisticStore> iterator = PersistanceManager.getPersistanceManager().getStatisticsStore().iterator();
+		Log.log(Level.INFO, "Loading Statistics...");
+		Iterator<StatisticStore> iterator = DataManager.getStatisticsStore().iterator();
 		if (iterator.hasNext())
 		{
 			statisticStore = iterator.next();
@@ -70,15 +70,15 @@ public class StatisticsManager
 			statisticStore = new StatisticStore();
 		}
 		startedUp();
-		ShadowManager.log(Level.INFO, "Loaded Statistics");
+		Log.log(Level.INFO, "Loaded Statistics");
 	}
 
 	public static void saveStatistics()
 	{
-		ShadowManager.log(Level.INFO, "Saving Statistics...");
+		Log.log(Level.INFO, "Saving Statistics...");
 		shuttingDown();
-		PersistanceManager.getPersistanceManager().saveStatisticsStore(statisticStore);
-		ShadowManager.log(Level.INFO, "Saved Statistics");
+		DataManager.saveStatisticsStore(statisticStore);
+		Log.log(Level.INFO, "Saved Statistics");
 	}
 
 }

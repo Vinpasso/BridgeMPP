@@ -3,29 +3,31 @@ package bridgempp.state.database;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
+import bridgempp.BridgeMPP;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
+import bridgempp.state.Event;
 import bridgempp.state.EventListener;
-import bridgempp.state.EventManager.Event;
 import bridgempp.statistics.StatisticsManager;
 import bridgempp.state.EventSubscribe;
 
 @EventSubscribe(Event.BRIDGEMPP_STARTUP)
-public class DatabaseConnectionKeepAlive extends EventListener<Void>
+public class DatabaseConnectionKeepAlive implements EventListener<Void>
 {
 
 	@Override
 	public void onEvent(Void eventMessage)
 	{
 		Schedule.scheduleRepeatWithPeriod(() -> {
-			ShadowManager.log(Level.INFO, "Keeping database connection alive");
+			Log.log(Level.INFO, "Keeping database connection alive");
 			try
 			{
 				StatisticsManager.saveStatistics();
 			}
 			catch(Exception e)
 			{
-				ShadowManager.fatal("Error while keeping database connection alive", e);
+				Log.log(Level.SEVERE, "Error while keeping database connection alive", e);
+				BridgeMPP.exit();
 			}
 		}, 5, 5, TimeUnit.MINUTES); 
 	}

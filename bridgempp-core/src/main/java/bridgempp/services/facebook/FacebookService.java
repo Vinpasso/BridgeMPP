@@ -17,9 +17,9 @@ import com.restfb.Version;
 import com.restfb.FacebookClient.AccessToken;
 import com.restfb.types.FacebookType;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.service.BridgeService;
@@ -43,11 +43,11 @@ public class FacebookService extends BridgeService
 	@Override
 	public void connect()
 	{
-		ShadowManager.log(Level.INFO, "Facebook Client starting up");
+		Log.log(Level.INFO, "Facebook Client starting up");
 		facebook = new DefaultFacebookClient(accessToken, appSecret, Version.VERSION_2_3);
 		pollService = new SmartFacebookPollService(this);
 		Schedule.scheduleRepeatWithPeriod(pollService, 0, 15, TimeUnit.MINUTES);
-		ShadowManager.log(Level.INFO, "Facebook Client ready");
+		Log.log(Level.INFO, "Facebook Client ready");
 	}
 
 	@Override
@@ -99,10 +99,10 @@ public class FacebookService extends BridgeService
 
 	private void updateToken()
 	{
-		ShadowManager.log(Level.INFO, "Obtaining new Access Token for old Access Token: " + getAccessToken());
+		Log.log(Level.INFO, "Obtaining new Access Token for old Access Token: " + getAccessToken());
 		accessToken = exchangeToken();
 
-		ShadowManager.log(Level.INFO, "Got new Access Token: " + getAccessToken());
+		Log.log(Level.INFO, "Got new Access Token: " + getAccessToken());
 	}
 
 	private String exchangeToken()

@@ -14,7 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.ShadowManager;
+import bridgempp.log.Log;
 import bridgempp.service.SingleToMultiBridgeService;
 
 /**
@@ -40,10 +40,10 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 	@Override
 	public void connect()
 	{
-		ShadowManager.log(Level.INFO, "Loading TCP Server Socket Service...");
+		Log.log(Level.INFO, "Loading TCP Server Socket Service...");
 		serverListener = new ServerListener(this);
 		new Thread(serverListener, "Socket Server Listener").start();
-		ShadowManager.log(Level.INFO, "Loaded TCP Server Socket Service");
+		Log.log(Level.INFO, "Loaded TCP Server Socket Service");
 	}
 
 	@Override
@@ -71,11 +71,11 @@ public class SocketService extends SingleToMultiBridgeService<SocketService, Soc
 			}
 		} catch (ConcurrentModificationException e)
 		{
-			ShadowManager.log(Level.INFO, "The Data Model has changed, resending Keep-Alive Messages");
+			Log.log(Level.INFO, "The Data Model has changed, resending Keep-Alive Messages");
 			sendKeepAliveMessages();
 		} catch (Exception e)
 		{
-			ShadowManager.log(Level.WARNING, "Aborted sending Keep-Alive due to exception ", e);
+			Log.log(Level.WARNING, "Aborted sending Keep-Alive due to exception ", e);
 		}
 		//ShadowManager.log(Level.INFO, "Sent " + sent + "/" + handles.size() + " Keep-Alive Messages");
 	}

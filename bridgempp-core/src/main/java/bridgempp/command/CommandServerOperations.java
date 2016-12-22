@@ -8,12 +8,12 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 
 /**
@@ -29,7 +29,7 @@ public class CommandServerOperations
 	@RequiredPermission(Permission.EXIT)
 	public static void cmdExit(Message message)
 	{
-		ShadowManager.logAndReply(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString(), message);
+		Log.logAndReply(Level.WARNING, "Server is being remotely shutdown by " + message.getOrigin().toString(), message);
 		BridgeMPP.executeScheduledShutdown();
 	}
 

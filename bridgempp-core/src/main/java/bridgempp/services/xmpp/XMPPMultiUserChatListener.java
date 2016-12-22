@@ -9,7 +9,7 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import bridgempp.ShadowManager;
+import bridgempp.log.Log;
 
 class XMPPMultiUserChatListener implements InvitationListener {
 
@@ -36,7 +36,7 @@ class XMPPMultiUserChatListener implements InvitationListener {
 			multiUserChat.addMessageListener(listener);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException
 				| SmackException.NotConnectedException ex) {
-			ShadowManager.log(Level.SEVERE, null, ex);
+			Log.log(Level.SEVERE, null, ex);
 		}
 	}
 

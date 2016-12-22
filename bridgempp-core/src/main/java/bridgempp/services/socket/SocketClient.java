@@ -8,17 +8,17 @@ import java.util.logging.Level;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.ShadowManager;
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.MultiBridgeServiceHandle;
 import bridgempp.services.socket.SocketService.ProtoCarry;
+import bridgempp.state.Event;
 import bridgempp.state.EventManager;
-import bridgempp.state.EventManager.Event;
 
 @Entity(name = "SOCKET_HANDLE")
 @DiscriminatorValue("SOCKET_HANDLE")
@@ -60,7 +60,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 	@Override
 	public void run()
 	{
-		ShadowManager.log(Level.INFO, "TCP client has connected");
+		Log.log(Level.INFO, "TCP client has connected");
 		EventManager.fireEvent(Event.ENDPOINT_CONNECTED, endpoint);
 		try
 		{
@@ -78,7 +78,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 				throw new IOException("Connection closed");
 			}
 			protoCarry = ProtoCarry.values()[initialProtocol];
-			ShadowManager.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
+			Log.log(Level.INFO, "TCP client is using Protocol: " + protoCarry.toString());
 			BufferedReader bufferedReader = null;
 			if (protoCarry == ProtoCarry.ProtoBuf)
 			{
@@ -112,7 +112,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 						CommandInterpreter.processMessage(new MessageBuilder(user, endpoint).addPlainTextBody(messageLine).build());
 						break;
 					case None:
-						ShadowManager.log(Level.SEVERE, "Established Socket has Protocol None, aborting");
+						Log.log(Level.SEVERE, "Established Socket has Protocol None, aborting");
 						disconnect();
 						break;
 				}
@@ -120,7 +120,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 
 		} catch (IOException ex)
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			Log.log(Level.SEVERE, null, ex);
 		}
 		disconnect();
 	}
@@ -135,12 +135,12 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 				socket.close();
 			} catch (IOException e)
 			{
-				ShadowManager.log(Level.INFO, "Could not close Socket on disconnecting.");
+				Log.log(Level.INFO, "Could not close Socket on disconnecting.");
 			}
 		}
 		removeHandle();
 		EventManager.fireEvent(Event.ENDPOINT_DISCONNECTED, endpoint);
-		ShadowManager.log(Level.INFO, "TCP client has disconnected");
+		Log.log(Level.INFO, "TCP client has disconnected");
 	}
 
 	@Override
@@ -159,10 +159,10 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 					protoMessage.writeDelimitedTo(socket.getOutputStream());
 					break;
 				case None:
-					ShadowManager.log(Level.WARNING, "Message not delivered due to Protocol None: " + message.toString());
+					Log.log(Level.WARNING, "Message not delivered due to Protocol None: " + message.toString());
 					if (thread == null || !thread.isAlive())
 					{
-						ShadowManager.log(Level.WARNING, "Found dead Socket Connection. Will disconnect.");
+						Log.log(Level.WARNING, "Found dead Socket Connection. Will disconnect.");
 						disconnect();
 					}
 					break;
@@ -170,7 +170,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 			deliveryGoal.setDelivered();
 		} catch (IOException e)
 		{
-			ShadowManager.log(Level.SEVERE, null, e);
+			Log.log(Level.SEVERE, null, e);
 			disconnect();
 		}
 	}

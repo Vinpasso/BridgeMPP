@@ -14,11 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import bridgempp.BridgeMPP;
-import bridgempp.ShadowManager;
+import bridgempp.ServiceManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 
@@ -44,23 +45,23 @@ class WhatsappMessageListener implements Runnable {
 
 	@Override
 	public void run() {
-		ShadowManager.log(Level.INFO, "Whatsapp Message Listener starting up");
+		Log.log(Level.INFO, "Whatsapp Message Listener starting up");
 		Future<?> keepAlive = Schedule.scheduleRepeatWithPeriod(() -> checkLastSuccessfulRead(), READ_TIMEOUT, READ_TIMEOUT, TimeUnit.MILLISECONDS);
 		process();
 		keepAlive.cancel(false);
-		ShadowManager.log(Level.INFO, "Whatsapp Message Listener shutting down");
-		ShadowManager.fatal("Whatsapp Message Listener offline");
+		Log.log(Level.INFO, "Whatsapp Message Listener shutting down");
+		ServiceManager.onServiceError(whatsappService, "WhatsApp Message Listener offline", null);
 	}
 
 	public void process() {
 		try {
-			ShadowManager.log(Level.INFO, "Starting Yowsup Process...");
+			Log.log(Level.INFO, "Starting Yowsup Process...");
 			String pythonCommand = System.getProperty("os.name").toLowerCase().contains("win") ? "C:\\python27\\python.exe"
 					: "python3";
 			String[] launchCommand = {pythonCommand, "-u", BridgeMPP.getPathLocation()
 					+ "/yowsup/src/yowsup-cli", "demos", "-l", this.whatsappService.phone + ":"
 					+ this.whatsappService.password, "--yowsup"};
-			ShadowManager.log(Level.INFO, "Yowsup launch command: " + Arrays.stream(launchCommand).reduce("", (a, v) -> a + " " + v));
+			Log.log(Level.INFO, "Yowsup launch command: " + Arrays.stream(launchCommand).reduce("", (a, v) -> a + " " + v));
 			ProcessBuilder builder = new ProcessBuilder(launchCommand);
 			builder.directory(new File(BridgeMPP.getPathLocation() + "/yowsup/src/"));
 			builder.environment().put("PYTHONPATH", BridgeMPP.getPathLocation() + "/yowsup/src/");
@@ -75,7 +76,7 @@ class WhatsappMessageListener implements Runnable {
 			whatsappService.printStream = new PrintStream(whatsappService.yowsup.getOutputStream(), true);
 			this.whatsappService.bufferedReader = new BufferedReader(new InputStreamReader(
 					this.whatsappService.yowsup.getInputStream(), "UTF-8"));
-			ShadowManager.log(Level.INFO, "Started Yowsup Process");
+			Log.log(Level.INFO, "Started Yowsup Process");
 			while (true) {
 				String buffer = "";
 				do {
@@ -84,7 +85,7 @@ class WhatsappMessageListener implements Runnable {
 				if (buffer.trim().equals("null")) {
 					break;
 				}
-				ShadowManager.log(Level.INFO, "YOWSUP Buffer: " + buffer);
+				Log.log(Level.INFO, "YOWSUP Buffer: " + buffer);
 				lastRead = System.currentTimeMillis();
 				Matcher matcher = REGEX_MESSAGE.matcher(buffer);
 				while (matcher.find()) {
@@ -103,13 +104,13 @@ class WhatsappMessageListener implements Runnable {
 				}
 			}
 		} catch (UnsupportedOperationException | IOException ex) {
-			ShadowManager.log(Level.SEVERE, null, ex);
+			ServiceManager.onServiceError(whatsappService, "WhatsApp Message Listener error", ex);
 		}
 		if(whatsappService.yowsup != null)
 		{
 			this.whatsappService.yowsup.destroyForcibly();
 		}
-		ShadowManager.log(Level.INFO, "Stopped Yowsup Process");
+		Log.log(Level.INFO, "Stopped Yowsup Process");
 	}
 	
 	private void checkLastSuccessfulRead()
@@ -117,11 +118,11 @@ class WhatsappMessageListener implements Runnable {
 		long differenceToLastRead = System.currentTimeMillis() - lastRead;
 		if(differenceToLastRead > READ_TIMEOUT)
 		{
-			ShadowManager.log(Level.WARNING, "Last successful Yowsup read surpassed timeout of " + READ_TIMEOUT + "ms (Last read was " + (differenceToLastRead /1000) + "s ago)." );
+			Log.log(Level.WARNING, "Last successful Yowsup read surpassed timeout of " + READ_TIMEOUT + "ms (Last read was " + (differenceToLastRead /1000) + "s ago)." );
 			
 		} else
 		{
-			ShadowManager.info("Yowsup read timeout OK. Last read was " + (differenceToLastRead / 1000) + "s ago.");
+			Log.info("Yowsup read timeout OK. Last read was " + (differenceToLastRead / 1000) + "s ago.");
 		}
 	}
 }

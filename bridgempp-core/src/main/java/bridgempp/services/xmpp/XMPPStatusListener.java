@@ -6,10 +6,10 @@ import java.util.logging.Level;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.RosterListener;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 
@@ -26,19 +26,19 @@ public class XMPPStatusListener implements RosterListener
 	@Override
 	public void entriesAdded(Collection<String> addresses)
 	{
-		ShadowManager.log(Level.INFO, "XMPP Roster entries added: " + addresses.toString());
+		Log.log(Level.INFO, "XMPP Roster entries added: " + addresses.toString());
 	}
 
 	@Override
 	public void entriesUpdated(Collection<String> addresses)
 	{
-		ShadowManager.log(Level.INFO, "XMPP Roster entries updated: " + addresses.toString());
+		Log.log(Level.INFO, "XMPP Roster entries updated: " + addresses.toString());
 	}
 
 	@Override
 	public void entriesDeleted(Collection<String> addresses)
 	{
-		ShadowManager.log(Level.INFO, "XMPP Roster entries removed: " + addresses.toString());
+		Log.log(Level.INFO, "XMPP Roster entries removed: " + addresses.toString());
 	}
 
 	@Override

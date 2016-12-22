@@ -9,7 +9,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
+import bridgempp.log.Log;
 import bridgempp.services.socket.protobuf.Message;
 
 public class KeepAliveSender extends ChannelDuplexHandler {
@@ -28,11 +28,11 @@ public class KeepAliveSender extends ChannelDuplexHandler {
 			if (idleEvent.state() == IdleState.WRITER_IDLE) {
 				sendPing(context);
 			} else if (idleEvent.state() == IdleState.READER_IDLE) {
-				ShadowManager.log(Level.WARNING,
+				Log.log(Level.WARNING,
 						"A Connection is stalling due to READER_IDLE");
 				sendPing(context);
 			} else if (idleEvent.state() == IdleState.ALL_IDLE) {
-				ShadowManager.log(Level.WARNING,
+				Log.log(Level.WARNING,
 								"Communications are stalling on a connection due to ALL_IDLE");
 				sendPing(context);
 			}
@@ -48,7 +48,7 @@ public class KeepAliveSender extends ChannelDuplexHandler {
 			public void operationComplete(ChannelFuture future)
 					throws Exception {
 				if (!future.isSuccess()) {
-					ShadowManager.log(Level.SEVERE,
+					Log.log(Level.SEVERE,
 							"A Connection has been disconnected after PING: "
 									+ future.toString()
 									+ ", exiting...");
@@ -61,21 +61,21 @@ public class KeepAliveSender extends ChannelDuplexHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		ShadowManager.log(Level.WARNING,
+		Log.log(Level.WARNING,
 						"Communications have broken down due to Exception on " + client.getUser().toString() + ": " + cause.getMessage());
 		client.disconnect();
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		ShadowManager.log(Level.INFO,
+		Log.log(Level.INFO,
 						"Communications have broken down due to Channel Deactivation on " + client.getUser().toString());
 		client.disconnect();
 	}
 
 	@Override
 	public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-		ShadowManager.log(Level.INFO,
+		Log.log(Level.INFO,
 						"Communications have broken down due to Channel Deregistration on " + client.getUser().toString());
 		client.disconnect();
 	}

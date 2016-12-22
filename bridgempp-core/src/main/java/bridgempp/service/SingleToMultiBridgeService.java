@@ -10,10 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 
@@ -26,10 +26,10 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 	protected Map<String, H> handles = new HashMap<String, H>();
 
 	@Override
-	public abstract void connect();
+	public abstract void connect() throws Exception;
 
 	@Override
-	public void disconnect()
+	public void disconnect() throws Exception
 	{
 		if (!isPersistent())
 		{
@@ -50,17 +50,17 @@ public abstract class SingleToMultiBridgeService<S extends SingleToMultiBridgeSe
 		MultiBridgeServiceHandle<S, H> handle = getHandle(endpoint.getIdentifier());
 		if (handle == null)
 		{
-			ShadowManager.log(Level.WARNING, "Attempted to send Message to non existent Handle (Delaying endpoint removal): " + message.toString());
+			Log.log(Level.WARNING, "Attempted to send Message to non existent Handle (Delaying endpoint removal): " + message.toString());
 			Schedule.schedule(() -> {
-				ShadowManager.log(Level.INFO, "Removal of Endpoint " + endpoint.toString() + " imminent, searching for handle");
+				Log.log(Level.INFO, "Removal of Endpoint " + endpoint.toString() + " imminent, searching for handle");
 				H handle2 = getHandle(endpoint.getIdentifier());
 				if(handle2 != null)
 				{
-					ShadowManager.log(Level.INFO, "Found a handle, removing it.");
+					Log.log(Level.INFO, "Found a handle, removing it.");
 					removeHandle(handle2);
-					ShadowManager.log(Level.INFO, "Successfully removed handle");
+					Log.log(Level.INFO, "Successfully removed handle");
 				}
-				ShadowManager.log(Level.INFO, "Attempting to remove endpoint");
+				Log.log(Level.INFO, "Attempting to remove endpoint");
 				DataManager.deregisterEndpointAndUsers(endpoint);
 			});
 			return;

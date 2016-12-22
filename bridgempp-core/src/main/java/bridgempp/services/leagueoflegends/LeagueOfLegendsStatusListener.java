@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.packet.Presence;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.services.xmpp.XMPPStatusListener;
@@ -36,7 +36,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 			service.sendPresenceUpdate();
 		} catch (NotConnectedException e)
 		{
-			ShadowManager.log(Level.WARNING, "XMPP not connected.", e);
+			Log.log(Level.WARNING, "XMPP not connected.", e);
 			service.disconnect();
 		}
 	}
@@ -57,7 +57,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 		{
 			if(!acceptedStatus.contains(matcher.group(1)))
 			{
-				ShadowManager.log(Level.INFO, "Ignored Status update: " + matcher.group(1) + " from " + user.toString());
+				Log.log(Level.INFO, "Ignored Status update: " + matcher.group(1) + " from " + user.toString());
 				return;
 			}
 			switch(matcher.group(1))
@@ -91,7 +91,7 @@ public class LeagueOfLegendsStatusListener extends XMPPStatusListener
 		}
 		else
 		{
-			ShadowManager.log(Level.WARNING, "Received presence update without Game Status tag: " + presence.toString());
+			Log.log(Level.WARNING, "Received presence update without Game Status tag: " + presence.toString());
 		}
 	}
 }

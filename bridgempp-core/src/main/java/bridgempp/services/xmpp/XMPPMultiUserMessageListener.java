@@ -13,9 +13,10 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.Occupant;
-import bridgempp.ShadowManager;
+
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 
 @Entity(name = "XMPPMULTIUSERCHAT")
@@ -43,7 +44,7 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 	// For resumed Chats
 	public void onLoad()
 	{
-		ShadowManager.log(Level.INFO, "Resumed XMPP Multi User Chat from Handle: " + endpoint.getIdentifier());
+		Log.log(Level.INFO, "Resumed XMPP Multi User Chat from Handle: " + endpoint.getIdentifier());
 		try
 		{
 			MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(service.connection);
@@ -54,7 +55,7 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 			multiUserChat.addMessageListener(this);
 		} catch (XMPPException.XMPPErrorException | SmackException.NoResponseException | SmackException.NotConnectedException ex)
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			service.serviceError("Failed to resume group chat", ex);
 		}
 	}
 
@@ -68,7 +69,7 @@ class XMPPMultiUserMessageListener extends XMPPHandle implements MessageListener
 			deliveryGoal.setDelivered();
 		} catch (SmackException.NotConnectedException ex)
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			Log.log(Level.SEVERE, null, ex);
 		}
 	}
 

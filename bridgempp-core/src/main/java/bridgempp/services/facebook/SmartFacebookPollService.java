@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.MessageBuilder;
 import com.restfb.Connection;
 import com.restfb.Parameter;
@@ -46,7 +46,7 @@ public class SmartFacebookPollService implements Runnable
 					service.receiveMessage(new MessageBuilder(user, e).addPlainTextBody(post.getMessage()).build());
 				} else
 				{
-					ShadowManager.log(Level.WARNING, "Encountered unknown Facebook Type: " + post.getType());
+					Log.log(Level.WARNING, "Encountered unknown Facebook Type: " + post.getType());
 				}
 			});
 		});

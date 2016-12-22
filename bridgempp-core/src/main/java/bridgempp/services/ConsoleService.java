@@ -12,10 +12,10 @@ import java.util.logging.Level;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
@@ -37,18 +37,18 @@ public class ConsoleService extends BridgeService
 	@Override
 	public void connect()
 	{
-		ShadowManager.log(Level.INFO, "Console Service is being loaded...");
+		Log.log(Level.INFO, "Console Service is being loaded...");
 		scanner = new Scanner(System.in);
 		reader = new ConsoleReader();
 		consoleThread = new Thread(reader, "Console Reader");
 		consoleThread.start();
-		ShadowManager.log(Level.INFO, "Console Service has been loaded...");
+		Log.log(Level.INFO, "Console Service has been loaded...");
 	}
 
 	@Override
 	public void disconnect()
 	{
-		ShadowManager.log(Level.WARNING, "Console service has been disconnected...");
+		Log.log(Level.WARNING, "Console service has been disconnected...");
 		scanner.close();
 	}
 
@@ -77,7 +77,7 @@ public class ConsoleService extends BridgeService
 		@Override
 		public void run()
 		{
-			ShadowManager.log(Level.FINE, "Console reader is running...");
+			Log.log(Level.FINE, "Console reader is running...");
 			try
 			{
 				while (true)
@@ -95,15 +95,15 @@ public class ConsoleService extends BridgeService
 				}
 			} catch (IllegalStateException e)
 			{
-				ShadowManager.log(Level.WARNING, "System_IN was closed");
+				Log.log(Level.WARNING, "System_IN was closed");
 			} catch (InterruptedException e)
 			{
-				ShadowManager.log(Level.WARNING, "Shutting down Console Reader due to interrupt");
+				Log.log(Level.WARNING, "Shutting down Console Reader due to interrupt");
 			} catch (IOException e)
 			{
-				ShadowManager.log(Level.WARNING, "System_IN was closed");
+				Log.log(Level.WARNING, "System_IN was closed");
 			}
-			ShadowManager.log(Level.FINE, "Console reader has closed");
+			Log.log(Level.FINE, "Console reader has closed");
 		}
 
 	}

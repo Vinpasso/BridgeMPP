@@ -5,41 +5,48 @@ import java.util.logging.Level;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
 
-import bridgempp.ShadowManager;
+import bridgempp.log.Log;
 
 final class XMPPConnectionListener implements ConnectionListener {
+	private XMPPService service;
+	
+	public XMPPConnectionListener(XMPPService service)
+	{
+		this.service = service;
+	}
+	
 	@Override
 	public void reconnectionSuccessful() {
-		ShadowManager.info("XMPP Service has reconnected");
+		Log.info("XMPP Service has reconnected");
 	}
 
 	@Override
 	public void reconnectionFailed(Exception e) {
-		ShadowManager.fatal("XMPP Service could not reconnect", e);
+		service.serviceError("XMPP Service could not reconnect", e);
 	}
 
 	@Override
 	public void reconnectingIn(int seconds) {
-		ShadowManager.info("XMPP Service will reconnect in " + seconds);
+		Log.info("XMPP Service will reconnect in " + seconds);
 	}
 
 	@Override
 	public void connectionClosedOnError(Exception e) {
-		ShadowManager.fatal("The XMPP Connection has been disconnected: " + e.getMessage());
+		service.serviceError("The XMPP Connection has been disconnected.", e);
 	}
 
 	@Override
 	public void connectionClosed() {
-		ShadowManager.log(Level.WARNING, "XMPP Service has disconnected");
+		Log.log(Level.WARNING, "XMPP Service has disconnected");
 	}
 
 	@Override
 	public void connected(XMPPConnection connection) {
-		ShadowManager.info("XMPP Service has connected");
+		Log.info("XMPP Service has connected");
 	}
 
 	@Override
 	public void authenticated(XMPPConnection connection, boolean resumed) {
-		ShadowManager.info("XMPP Service has logged in. " + (resumed?"Resumed connection.":""));
+		Log.info("XMPP Service has logged in. " + (resumed?"Resumed connection.":""));
 	}
 }

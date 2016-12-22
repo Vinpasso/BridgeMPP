@@ -1,8 +1,7 @@
 package bridgempp.services.asyncsocket;
 
 import java.net.InetAddress;
-import java.util.logging.Level;
-
+import java.net.UnknownHostException;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -22,7 +21,6 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
@@ -41,18 +39,18 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 
 	@Column(name = "Listen_Address", length = 50, nullable = false)
 	private String listenAddress;
-	
+
 	@Column(name = "Listen_Port", nullable = false)
 	private int listenPort;
-	
+
 	@Column(name = "Server_Threads", nullable = false)
 	private int numServerThreads;
 
 	@Column(name = "Client_Threads", nullable = false)
 	private int numClientThreads;
-	
+
 	@Override
-	public void connect()
+	public void connect() throws UnknownHostException
 	{
 		serverGroup = new NioEventLoopGroup(numServerThreads);
 		clientGroup = new NioEventLoopGroup(numClientThreads);
@@ -71,13 +69,10 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 
 				ASyncSocketClient handle = new ASyncSocketClient(ASyncSocketService.this, endpoint, user, ch);
 				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast("idleStateHandler", new IdleStateHandler(120, 60,
-						120));
+				pipeline.addLast("idleStateHandler", new IdleStateHandler(120, 60, 120));
 				pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
-				pipeline.addLast("protobufDecoder", new ProtobufDecoder(
-						Message.getDefaultInstance()));
-				pipeline.addLast("frameEncoder",
-						new ProtobufVarint32LengthFieldPrepender());
+				pipeline.addLast("protobufDecoder", new ProtobufDecoder(Message.getDefaultInstance()));
+				pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
 				pipeline.addLast("protobufEncoder", new ProtobufEncoder());
 				pipeline.addLast("keepAliveSender", new KeepAliveSender(handle));
 				pipeline.addLast(new SimpleChannelInboundHandler<Message>() {
@@ -90,35 +85,23 @@ public class ASyncSocketService extends SingleToMultiBridgeService<ASyncSocketSe
 
 				});
 			}
-			
+
 		});
-		try
-		{
-			bootstrap.bind(InetAddress.getByName(listenAddress), listenPort);
-		} catch (Exception e)
-		{
-			ShadowManager.log(Level.SEVERE, "Failed to bind Server Bootstrap", e);
-		}
+
+		bootstrap.bind(InetAddress.getByName(listenAddress), listenPort);
 		EventManager.loadEventListenerClass(new ASyncSocketHandleRemover());
 	}
 
 	@Override
-	public void disconnect()
+	public void disconnect() throws Exception
 	{
-		try
+		serverGroup.shutdownGracefully().await();
+		clientGroup.shutdownGracefully().await();
+		while (!handles.isEmpty())
 		{
-			serverGroup.shutdownGracefully().await();
-			clientGroup.shutdownGracefully().await();
-			while(!handles.isEmpty())
-			{
-				handles.values().iterator().next().disconnect();
-			}
-			super.disconnect();
+			handles.values().iterator().next().disconnect();
 		}
-		catch(Exception e)
-		{
-			ShadowManager.log(Level.WARNING, "Could not disconnect ASyncSocketService", e);
-		}
+		super.disconnect();
 	}
 
 	@Override

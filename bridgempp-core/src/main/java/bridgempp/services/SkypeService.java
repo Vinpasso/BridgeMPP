@@ -5,10 +5,11 @@
  */
 package bridgempp.services;
 
-import bridgempp.ShadowManager;
+import bridgempp.ServiceManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
@@ -33,25 +34,25 @@ import com.skype.SkypeException;
 @DiscriminatorValue(value = "SKYPE_SERVICE")
 public class SkypeService extends BridgeService
 {
+	
+	private transient SkypeChatListener listener;
 
 	@Override
-	public void connect()
+	public void connect() throws Exception
 	{
-		try
-		{
-			ShadowManager.log(Level.INFO, "Starting Skype Service...");
-			Skype.setDaemon(false);
-			Skype.addChatMessageListener(new SkypeChatListener());
-			ShadowManager.log(Level.INFO, "Starting Skype Service...");
-		} catch (SkypeException ex)
-		{
-			ShadowManager.log(Level.SEVERE, null, ex);
-		}
+
+		Log.log(Level.INFO, "Starting Skype Service...");
+		Skype.setDaemon(false);
+		listener = new SkypeChatListener();
+		Skype.addChatMessageListener(listener);
+		Log.log(Level.INFO, "Starting Skype Service...");
+
 	}
 
 	@Override
 	public void disconnect()
 	{
+		Skype.removeChatMessageListener(listener);
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class SkypeService extends BridgeService
 			}
 		} catch (SkypeException ex)
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			ServiceManager.onServiceError(this, "Skype error", ex);
 		}
 	}
 
@@ -114,6 +115,6 @@ public class SkypeService extends BridgeService
 	}
 
 	public void configure()
-	{		
+	{
 	}
 }

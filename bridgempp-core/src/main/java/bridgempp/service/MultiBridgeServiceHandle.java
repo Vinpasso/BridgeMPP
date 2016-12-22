@@ -13,9 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 
@@ -64,9 +64,9 @@ public abstract class MultiBridgeServiceHandle<S extends SingleToMultiBridgeServ
 	protected void scheduleRemoveHandle()
 	{
 		Schedule.schedule(() -> {
-			ShadowManager.log(Level.INFO, "Removing handle previously scheduled for deletion: " + identifier);
+			Log.log(Level.INFO, "Removing handle previously scheduled for deletion: " + identifier);
 			removeHandle();
-			ShadowManager.log(Level.INFO, "Removed handle previously scheduled for deletion: " + identifier);
+			Log.log(Level.INFO, "Removed handle previously scheduled for deletion: " + identifier);
 			});
 	}
 	

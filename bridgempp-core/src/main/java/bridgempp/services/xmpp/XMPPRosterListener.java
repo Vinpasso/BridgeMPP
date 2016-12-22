@@ -1,14 +1,11 @@
 package bridgempp.services.xmpp;
 
-import java.util.logging.Level;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.roster.Roster;
-
-import bridgempp.ShadowManager;
 
 class XMPPRosterListener implements StanzaListener {
 
@@ -42,7 +39,7 @@ class XMPPRosterListener implements StanzaListener {
 			xmppService.connection.sendStanza(subscribeRequest);
 		} catch (SmackException.NotLoggedInException | SmackException.NoResponseException
 				| XMPPException.XMPPErrorException ex) {
-			ShadowManager.log(Level.SEVERE, null, ex);
+			xmppService.serviceError("Roster failure.", ex);
 		}
 	}
 }

@@ -3,7 +3,7 @@ package bridgempp.service.filter;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 
 public class RateLimiter implements Function<Message, Message>
@@ -21,7 +21,7 @@ public class RateLimiter implements Function<Message, Message>
 				Thread.sleep((lastMessage + messageDelay) - System.currentTimeMillis());
 			} catch (InterruptedException e)
 			{
-				ShadowManager.log(Level.WARNING, "Deliverung message instantly due to interrupt");
+				Log.log(Level.WARNING, "Deliverung message instantly due to interrupt");
 			}
 		}
 		lastMessage = System.currentTimeMillis();

@@ -9,13 +9,13 @@ import java.util.logging.Level;
 
 import bridgempp.BridgeMPP;
 import bridgempp.PermissionsManager;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.PermissionsManager.Permissions;
 import bridgempp.command.wrapper.CommandHelp;
 import bridgempp.command.wrapper.CommandWrapper;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 import bridgempp.statistics.StatisticsManager;
 
@@ -39,7 +39,7 @@ public class CommandInterpreter
 			DataManager.releaseDOMWritePermission();
 		} catch (InterruptedException e)
 		{
-			ShadowManager.logAndReply(Level.SEVERE, "Failed to get write permission to DOM", message, e);
+			Log.logAndReply(Level.SEVERE, "Failed to get write permission to DOM", message, e);
 		}
 	}
 
@@ -51,7 +51,7 @@ public class CommandInterpreter
 			return;
 		}
 		BridgeMPP.readLock();
-		ShadowManager.log(Level.INFO, "Routing Message: " + message.toString());
+		Log.log(Level.INFO, "Routing Message: " + message.toString());
 		for(int delivery = 0; delivery < 3; delivery++)
 		{
 			try
@@ -64,7 +64,6 @@ public class CommandInterpreter
 					interpretCommand(message);
 				} else
 				{
-					ShadowManager.shadowEndpoints.forEach(endpoint -> message.addDestinationEndpoint(endpoint));
 					
 					if(message.getDestinations().size() == 0)
 					{
@@ -83,33 +82,32 @@ public class CommandInterpreter
 				break;
 			} catch (Exception e)
 			{
-				ShadowManager.log(Level.WARNING, "Process Message failure (" + (delivery + 1) + "/3) due to " + e.getClass().getSimpleName());
+				Log.log(Level.WARNING, "Process Message failure (" + (delivery + 1) + "/3) due to " + e.getClass().getSimpleName());
 				if(delivery == 2)
 				{
-					ShadowManager.log(Level.SEVERE, "Process Message failure (This is final): ", e);
+					Log.log(Level.SEVERE, "Process Message failure (This is final): ", e);
 				}
 			}
 		}
-		ShadowManager.log(Level.INFO, "Routed Message: " + message.toString());
+		Log.log(Level.INFO, "Routed Message: " + message.toString());
 		BridgeMPP.readUnlock();
 	}
 
 	public static void loadCommands()
 	{
-		ShadowManager.log(Level.INFO, "Loading all Command Classes...");
+		Log.log(Level.INFO, "Loading all Command Classes...");
 		addCommandClass(CommandAliasOperations.class);
 		addCommandClass(CommandGroupOperations.class);
 		addCommandClass(CommandEndpointOperations.class);
 		addCommandClass(CommandUserOperations.class);
 		addCommandClass(CommandPermissionOperations.class);
 		addCommandClass(CommandServerOperations.class);
-		addCommandClass(CommandShadowOperations.class);
 		addCommandClass(CommandServiceOperations.class);
 		addCommandClass(CommandStatisticsOperations.class);
 		addCommandClass(CommandInfoOperations.class);
 		addCommandClass(CommandBotOperations.class);
 		addCommandClass(CommandHelp.class);
-		ShadowManager.log(Level.INFO, "Loaded all Command Classes");
+		Log.log(Level.INFO, "Loaded all Command Classes");
 	}
 
 	public static void addCommandClass(Class<?> commandClass)

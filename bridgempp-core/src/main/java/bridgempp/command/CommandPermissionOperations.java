@@ -8,12 +8,12 @@ package bridgempp.command;
 import java.util.logging.Level;
 
 import bridgempp.PermissionsManager;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
 import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 
 /**
@@ -31,7 +31,7 @@ public class CommandPermissionOperations
 		boolean success = PermissionsManager.useKey(key, message.getOrigin());
 		if (success)
 		{
-			ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has used key and now has " + message.getOrigin().getPermissions());
+			Log.log(Level.INFO, message.getOrigin().toString() + " has used key and now has " + message.getOrigin().getPermissions());
 			message.getOrigin().sendOperatorMessage("Rights granted successfully. Your new rights are: " + message.getOrigin().getPermissions());
 		} else
 		{
@@ -54,7 +54,7 @@ public class CommandPermissionOperations
 	public static void cmdGeneratePermanentKey(int rights, Message message)
 	{
 		int permissions = rights & message.getOrigin().getPermissions();
-		ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has created permanent key with permissions " + permissions);
+		Log.log(Level.INFO, message.getOrigin().toString() + " has created permanent key with permissions " + permissions);
 		message.getOrigin().sendOperatorMessage("Generated Permanent Key: " + PermissionsManager.generateKey(permissions, false) + " Permissions: " + permissions);
 	}
 
@@ -66,7 +66,7 @@ public class CommandPermissionOperations
 	{
 		if (CommandInterpreter.checkPermission(message.getOrigin(), PermissionsManager.Permission.GENERATE_ONETIME_KEYS))
 		{
-			ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has created temporary key with permissions " + permissions);
+			Log.log(Level.INFO, message.getOrigin().toString() + " has created temporary key with permissions " + permissions);
 			message.getOrigin().sendOperatorMessage("Generated One Time Key: " + PermissionsManager.generateKey(permissions, true) + " Permissions: " + permissions);
 		} else
 		{
@@ -95,7 +95,7 @@ public class CommandPermissionOperations
 	public static void cmdRemoveKey(String key, Message message)
 	{
 		PermissionsManager.removeKey(key);
-		ShadowManager.log(Level.INFO, message.getOrigin().toString() + " has removed key");
+		Log.log(Level.INFO, message.getOrigin().toString() + " has removed key");
 		message.getOrigin().sendOperatorMessage("Successfully removed key");
 	}
 

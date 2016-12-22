@@ -5,11 +5,13 @@
  */
 package bridgempp.services;
 
-import bridgempp.ShadowManager;
+import bridgempp.ServiceManager;
+import bridgempp.binarydistribution.BinaryDistributionManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.MessageBody;
 import bridgempp.message.formats.media.ImageMessageBody;
@@ -37,6 +39,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
@@ -76,71 +79,56 @@ public class MailService extends BridgeService
 	private int smtpport;
 
 	@Override
-	public void connect()
+	public void connect() throws Exception
 	{
-		ShadowManager.log(Level.INFO, "Loading Mail Service...");
+		Log.log(Level.INFO, "Loading Mail Service...");
 
-		try
-		{
+		Properties mailProperties = new Properties();
 
-			Properties mailProperties = new Properties();
+		mailProperties.setProperty("mail.store.protocol", "imaps");
+		mailProperties.setProperty("mail.smtp.submitter", username);
+		mailProperties.setProperty("mail.smtp.auth", "true");
+		mailProperties.setProperty("mail.smtp.host", smtphost);
+		mailProperties.setProperty("mail.smtp.port", smtpport + "");
+		mailProperties.put("mail.smtp.socketFactory.port", smtpport);
+		mailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		mailProperties.put("mail.smtp.socketFactory.fallback", "false");
+		mailProperties.put("mail.smtp.starttls.enable", "true");
 
-			mailProperties.setProperty("mail.store.protocol", "imaps");
-			mailProperties.setProperty("mail.smtp.submitter", username);
-			mailProperties.setProperty("mail.smtp.auth", "true");
-			mailProperties.setProperty("mail.smtp.host", smtphost);
-			mailProperties.setProperty("mail.smtp.port", smtpport + "");
-			mailProperties.put("mail.smtp.socketFactory.port", smtpport);
-			mailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-			mailProperties.put("mail.smtp.socketFactory.fallback", "false");
-			mailProperties.put("mail.smtp.starttls.enable", "true");
-
-			Authenticator authenticator = new Authenticator() {
-				@Override
-				protected PasswordAuthentication getPasswordAuthentication()
-				{
-					return new PasswordAuthentication(username, password);
-				}
-
-			};
-
-			session = Session.getDefaultInstance(mailProperties, authenticator);
-			store = session.getStore("imaps");
-			store.connect(imaphost, imapport, username, password);
-			inboxFolder = (IMAPFolder) store.getFolder("Inbox");
-			inboxFolder.open(Folder.READ_WRITE);
-			processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
-			if (!processedFolder.exists())
+		Authenticator authenticator = new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication()
 			{
-				processedFolder.create(Folder.HOLDS_MESSAGES);
+				return new PasswordAuthentication(username, password);
 			}
-			processedFolder.open(Folder.READ_WRITE);
-			sentItemsFolder = (IMAPFolder) store.getFolder("Sent");
-			sentItemsFolder.open(Folder.READ_WRITE);
-			new Thread(new MailMessageListener(), "Mail Message Listener").start();
-		} catch (NoSuchProviderException ex)
+
+		};
+
+		session = Session.getDefaultInstance(mailProperties, authenticator);
+		store = session.getStore("imaps");
+		store.connect(imaphost, imapport, username, password);
+		inboxFolder = (IMAPFolder) store.getFolder("Inbox");
+		inboxFolder.open(Folder.READ_WRITE);
+		processedFolder = (IMAPFolder) store.getFolder("BridgeMPP Processed Messages");
+		if (!processedFolder.exists())
 		{
-			ShadowManager.log(Level.SEVERE, null, ex);
-		} catch (MessagingException ex)
-		{
-			ShadowManager.log(Level.SEVERE, null, ex);
+			processedFolder.create(Folder.HOLDS_MESSAGES);
 		}
-		ShadowManager.log(Level.INFO, "Mail service loaded");
+		processedFolder.open(Folder.READ_WRITE);
+		sentItemsFolder = (IMAPFolder) store.getFolder("Sent");
+		sentItemsFolder.open(Folder.READ_WRITE);
+		new Thread(new MailMessageListener(), "Mail Message Listener").start();
+
+		Log.log(Level.INFO, "Mail service loaded");
 	}
 
 	@Override
-	public void disconnect()
+	public void disconnect() throws Exception
 	{
-		try
-		{
-			inboxFolder.close(true);
-			processedFolder.close(true);
-			sentItemsFolder.close(true);
-			store.close();
-		} catch (MessagingException ex)
-		{
-			ShadowManager.log(Level.SEVERE, null, ex);
-		}
+		inboxFolder.close(true);
+		processedFolder.close(true);
+		sentItemsFolder.close(true);
+		store.close();
 	}
 
 	@Override
@@ -164,10 +152,10 @@ public class MailService extends BridgeService
 			mimeMessage.setSubject(destination.getIdentifier());
 			MimeMultipart multiPart = new MimeMultipart("alternative");
 
-			if (message.hasMessageBody(HTMLMessageBody.class)) {
+			if (message.hasMessageBody(HTMLMessageBody.class))
+			{
 				MimeBodyPart htmlMimeBodyPart = new MimeBodyPart();
-				htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(),
-						StandardCharsets.UTF_8.name(), "html");
+				htmlMimeBodyPart.setText(message.getMessageBody(HTMLMessageBody.class).getText(), StandardCharsets.UTF_8.name(), "html");
 				multiPart.addBodyPart(htmlMimeBodyPart);
 			}
 
@@ -179,13 +167,13 @@ public class MailService extends BridgeService
 
 			Transport.send(mimeMessage, username, password);
 			deliveryGoal.setDelivered();
-			ShadowManager.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
+			Log.log(Level.INFO, "Sent mail message to " + recipients.size() + " recipients");
 
 			sentItemsFolder.addMessages(new Message[] { mimeMessage });
-			ShadowManager.log(Level.INFO, "Stored sent message in sent items IMAP folder");
+			Log.log(Level.INFO, "Stored sent message in sent items IMAP folder");
 		} catch (Exception ex)
 		{
-			ShadowManager.log(Level.SEVERE, "Failed to send Message", ex);
+			Log.log(Level.WARNING, "Failed to send Message", ex);
 		}
 	}
 
@@ -216,7 +204,7 @@ public class MailService extends BridgeService
 				{
 					try
 					{
-						ShadowManager.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
+						Log.log(Level.INFO, "MailService: Sending Keep-Alive NOOP");
 
 						IMAPFolder.ProtocolCommand noopCommand = new IMAPFolder.ProtocolCommand() {
 
@@ -231,10 +219,10 @@ public class MailService extends BridgeService
 						inboxFolder.doCommand(noopCommand);
 						processedFolder.doCommand(noopCommand);
 						sentItemsFolder.doCommand(noopCommand);
-						ShadowManager.log(Level.INFO, "MailService: Sent Keep-Alive NOOP. " + inboxFolder.getMessageCount() + " messages in inbox");
+						Log.log(Level.INFO, "MailService: Sent Keep-Alive NOOP. " + inboxFolder.getMessageCount() + " messages in inbox");
 					} catch (MessagingException ex)
 					{
-						ShadowManager.log(Level.SEVERE, null, ex);
+						ServiceManager.onServiceError(MailService.this, "Message listening error", ex);
 					}
 				}
 			}, 0, KEEP_ALIVE_FREQUENCY, TimeUnit.MILLISECONDS);
@@ -256,7 +244,7 @@ public class MailService extends BridgeService
 
 				} catch (MessagingException ex)
 				{
-					ShadowManager.log(Level.SEVERE, "Error while processing messages in inbox", ex);
+					ServiceManager.onServiceError(MailService.this, "Error while processing messages in inbox", ex);
 				}
 				processingInbox.unlock();
 
@@ -265,7 +253,7 @@ public class MailService extends BridgeService
 					inboxFolder.idle();
 				} catch (MessagingException e)
 				{
-					ShadowManager.log(Level.SEVERE, "Error while idling Inbox folder", e);
+					ServiceManager.onServiceError(MailService.this, "Error idling inbox folder", e);
 				}
 
 			}
@@ -289,7 +277,7 @@ public class MailService extends BridgeService
 				}
 			} catch (MessagingException e1)
 			{
-				ShadowManager.log(Level.SEVERE, "Mailbox error", e1);
+				ServiceManager.onServiceError(MailService.this, "Mailbox error", e1);
 			}
 
 			processingInbox.unlock();
@@ -329,14 +317,14 @@ public class MailService extends BridgeService
 					if (replyMessages != null && replyMessages.length > 0)
 					{
 						subjectName = replyMessages[0].getSubject();
-						ShadowManager.log(Level.INFO, "Extracted Subject from In-Reply-To Header: " + subjectName);
+						Log.log(Level.INFO, "Extracted Subject from In-Reply-To Header: " + subjectName);
 					} else
 					{
-						ShadowManager.log(Level.INFO, "Could not find original In-Reply-To message");
+						Log.log(Level.INFO, "Could not find original In-Reply-To message");
 					}
 				} else
 				{
-					ShadowManager.log(Level.INFO, "In-Reply-To Header not set");
+					Log.log(Level.INFO, "In-Reply-To Header not set");
 				}
 
 				Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(subjectName, MailService.this);
@@ -351,7 +339,7 @@ public class MailService extends BridgeService
 
 			} catch (MessagingException | IOException ex)
 			{
-				ShadowManager.log(Level.SEVERE, null, ex);
+				ServiceManager.onServiceError(MailService.this, "Error while processing message", ex);
 			}
 		}
 
@@ -362,8 +350,8 @@ public class MailService extends BridgeService
 			{
 				Multipart container = (Multipart) messageContent;
 				processMultiPartMessage(bMessage, container);
-				//Receive Message handled in process multipart
-			} else if(messageContent instanceof MimeBodyPart)
+				// Receive Message handled in process multipart
+			} else if (messageContent instanceof MimeBodyPart)
 			{
 				bMessage.addMessageBody(getMessageFormatFromMimeType(message.getContentType(), (MimeBodyPart) messageContent));
 				receiveMessage(bMessage);
@@ -412,13 +400,14 @@ public class MailService extends BridgeService
 					case "text/html":
 						return new HTMLMessageBody(content.getContent().toString());
 					case "image/*":
-						return new ImageMessageBody(new MimeType(contentType), content.getFileName(), content.getInputStream());
+						URL publishURL = BinaryDistributionManager.defaultPublish(content.getFileName(), content.getInputStream());
+						return new ImageMessageBody(content.getFileName(), new MimeType(contentType), publishURL);
 					default:
 						return new PlainTextMessageBody(content.getContent().toString());
 				}
 			} catch (IOException | MimeTypeParseException | MessagingException e)
 			{
-				ShadowManager.log(Level.SEVERE, "Error in multipart e-mail message", e);
+				ServiceManager.onServiceError(MailService.this, "Error in multipart e-mail message.", e);
 			}
 			return new PlainTextMessageBody(content.toString());
 		}

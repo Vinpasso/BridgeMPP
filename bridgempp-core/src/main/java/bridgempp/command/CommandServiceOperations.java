@@ -3,7 +3,6 @@ package bridgempp.command;
 import java.util.List;
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.ServiceManager;
 import bridgempp.command.wrapper.CommandName;
@@ -13,6 +12,7 @@ import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceStatus;
@@ -197,7 +197,7 @@ public class CommandServiceOperations
 		{
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
-		ShadowManager.log(Level.WARNING, "Injecting Endpoint: " + service.toString() + " new Endpoint: " + endpointID);
+		Log.log(Level.WARNING, "Injecting Endpoint: " + service.toString() + " new Endpoint: " + endpointID);
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpointID, service);
 		return "Injected endpoint: " + endpoint.toString(); 
 	}
@@ -213,7 +213,7 @@ public class CommandServiceOperations
 		{
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
-		ShadowManager.log(Level.WARNING, "Remote sending Message from: " + service.toString() + " endpoint: " + endpointID + " message: " + message);
+		Log.log(Level.WARNING, "Remote sending Message from: " + service.toString() + " endpoint: " + endpointID + " message: " + message);
 		Endpoint endpoint = DataManager.getOrNewEndpointForIdentifier(endpointID, service);
 		User user = DataManager.getOrNewUserForIdentifier(userID, endpoint);
 		new MessageBuilder(user, endpoint).addPlainTextBody(message).build().send();
@@ -231,7 +231,7 @@ public class CommandServiceOperations
 		{
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
-		ShadowManager.log(Level.WARNING, "Reloading Service: " + service.toString());
+		Log.log(Level.WARNING, "Reloading Service: " + service.toString());
 		service.disconnect();
 		service.connect();
 		return "Reloaded Service: " + service.toString(); 
@@ -248,7 +248,7 @@ public class CommandServiceOperations
 		{
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
-		ShadowManager.log(Level.WARNING, "Enabling Service: " + service.toString());
+		Log.log(Level.WARNING, "Enabling Service: " + service.toString());
 		service.setStatus(ServiceStatus.OFFLINE);
 		service.connect();
 		return "Enabled Service: " + service.toString(); 
@@ -265,7 +265,7 @@ public class CommandServiceOperations
 		{
 			return "Service " + serviceID + "not found. Try obtaining a Service ID with !listservices";
 		}
-		ShadowManager.log(Level.WARNING, "Disabling Service: " + service.toString());
+		Log.log(Level.WARNING, "Disabling Service: " + service.toString());
 		service.disconnect();
 		service.setStatus(ServiceStatus.DISABLED);
 		return "Disabled Service: " + service.toString(); 

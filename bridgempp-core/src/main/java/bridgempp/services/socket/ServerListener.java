@@ -7,10 +7,10 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 
 class ServerListener implements Runnable {
 	/**
@@ -29,7 +29,7 @@ class ServerListener implements Runnable {
 
 	@Override
 	public void run() {
-		ShadowManager.log(Level.INFO, "Starting TCP Server Socket Listener");
+		Log.log(Level.INFO, "Starting TCP Server Socket Listener");
 
 		try {
 			socketService.serverSocket = new ServerSocket(socketService.listenPort, 10,
@@ -51,7 +51,7 @@ class ServerListener implements Runnable {
 				}
 			}
 		} catch (IOException ex) {
-			ShadowManager.log(Level.SEVERE, null, ex);
+			Log.log(Level.SEVERE, null, ex);
 		}
 	}
 

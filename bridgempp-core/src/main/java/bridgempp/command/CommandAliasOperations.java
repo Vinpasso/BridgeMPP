@@ -14,8 +14,8 @@ import bridgempp.command.wrapper.HelpTopic;
 import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
-import bridgempp.ShadowManager;
 
 /**
  *
@@ -33,7 +33,7 @@ public class CommandAliasOperations
 		{
 			message.getOrigin().sendOperatorMessage("You already have an Alias, overwriting your old Alias");
 		}
-		ShadowManager.log(Level.FINER, "Endpoint: " + message.getOrigin().toString() + " now has assigned Alias: " + newAlias);
+		Log.log(Level.FINER, "Endpoint: " + message.getOrigin().toString() + " now has assigned Alias: " + newAlias);
 		message.getSender().setName(newAlias);
 		message.getOrigin().sendOperatorMessage("Alias successfully assigned");
 	}

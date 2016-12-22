@@ -8,10 +8,10 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
@@ -64,7 +64,7 @@ public class BridgeChat extends BridgeService {
 				}
 			}).start();
 		} catch (NumberFormatException | IOException e) {
-			ShadowManager.log(Level.SEVERE,
+			Log.log(Level.SEVERE,
 					null, e);
 		}
 	}

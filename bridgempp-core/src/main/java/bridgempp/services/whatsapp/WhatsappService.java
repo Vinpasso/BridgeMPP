@@ -5,8 +5,8 @@
  */
 package bridgempp.services.whatsapp;
 
-import bridgempp.*;
 import bridgempp.data.Endpoint;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.formats.text.Base64EncodedMessageBody;
@@ -47,10 +47,10 @@ public class WhatsappService extends BridgeService {
 
 	@Override
 	public void connect() {
-		ShadowManager.log(Level.INFO, "Starting Whatsapp Service...");
+		Log.log(Level.INFO, "Starting Whatsapp Service...");
 		senderQueue = new LinkedBlockingQueue<>();
 		new Thread(new WhatsappMessageListener(this), "Whatsapp Message Listener").start();
-		ShadowManager.log(Level.INFO, "Service Whatsapp started");
+		Log.log(Level.INFO, "Service Whatsapp started");
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class WhatsappService extends BridgeService {
 				Thread.sleep(Math.max(0, System.currentTimeMillis() - 10000 - lastMessageTimestamp));
 			} catch (InterruptedException e)
 			{
-				ShadowManager.log(Level.WARNING, "Whatsapp send message interrupted");
+				Log.log(Level.WARNING, "Whatsapp send message interrupted");
 				return;
 			}
 		}
@@ -83,7 +83,7 @@ public class WhatsappService extends BridgeService {
 			printStream.wait(10000);
 		} catch (InterruptedException e)
 		{
-			ShadowManager.log(Level.WARNING, "Whatsapp send message confirmation interrupted");
+			Log.log(Level.WARNING, "Whatsapp send message confirmation interrupted");
 		}
 		if(messageConfirmed)
 		{

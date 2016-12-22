@@ -18,7 +18,7 @@ public class LeagueOfLegendsService extends XMPPService
 	@Column(name = "Status_Filter", length = 255, nullable = false)
 	private String statusFilter;
 	
-	public void connect()
+	public void connect() throws Exception
 	{
 		super.connect();
 		Roster.getInstanceFor(connection).addRosterListener(new LeagueOfLegendsStatusListener(this, statusFilter));

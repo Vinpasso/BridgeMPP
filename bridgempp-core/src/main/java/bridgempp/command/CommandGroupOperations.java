@@ -9,7 +9,6 @@ import java.util.logging.Level;
 
 import bridgempp.GroupManager;
 import bridgempp.ServiceManager;
-import bridgempp.ShadowManager;
 import bridgempp.PermissionsManager.Permission;
 import bridgempp.command.wrapper.CommandName;
 import bridgempp.command.wrapper.CommandTrigger;
@@ -18,6 +17,7 @@ import bridgempp.command.wrapper.RequiredPermission;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.Group;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
 import bridgempp.service.BridgeService;
@@ -38,7 +38,7 @@ public class CommandGroupOperations
 		boolean success = removeGroup(name);
 		if (success)
 		{
-			ShadowManager.logAndReply(Level.FINE, "Group has been removed: " + name, message);
+			Log.logAndReply(Level.FINE, "Group has been removed: " + name, message);
 		} else
 		{
 			message.getOrigin().sendOperatorMessage("Error: Group not found");
@@ -54,7 +54,7 @@ public class CommandGroupOperations
 		Group group = subscribeGroup(name, message.getOrigin());
 		if (group != null)
 		{
-			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
+			Log.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
 			new MessageBuilder(message.getSender(), message.getOrigin())
 			.addDestinationsFromGroupNoLoopback(group)
 			.addPlainTextBody("BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been added to Group: " + group.getName())
@@ -82,7 +82,7 @@ public class CommandGroupOperations
 		Group group = subscribeGroup(name, endpoint);
 		if (group != null)
 		{
-			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
+			Log.log(Level.FINE, message.getOrigin().toString() + " has been subscribed: " + group.getName());
 			return "Group has been subscribed";
 		} else
 		{
@@ -106,7 +106,7 @@ public class CommandGroupOperations
 		Group group = unsubscribeGroup(name, endpoint);
 		if (group != null)
 		{
-			ShadowManager.log(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName());
+			Log.log(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName());
 			return "Group has been unsubscribed";
 		} else
 		{
@@ -133,7 +133,7 @@ public class CommandGroupOperations
 		Group group = unsubscribeGroup(name, message.getOrigin());
 		if (group != null)
 		{
-			ShadowManager.logAndReply(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName(), message);
+			Log.logAndReply(Level.FINE, message.getOrigin().toString() + " has been unsubscribed: " + group.getName(), message);
 			new MessageBuilder(message.getSender(), message.getOrigin())
 			.addDestinationsFromGroupNoLoopback(group)
 			.addPlainTextBody("BridgeMPP: Endpoint: " + message.getOrigin().toString() + " has been removed from Group: " + group.getName())
@@ -171,7 +171,7 @@ public class CommandGroupOperations
 			message.getOrigin().sendOperatorMessage("Error: Group already exists");
 		} else
 		{
-			ShadowManager.log(Level.FINE, "Group has been created: " + group.getName());
+			Log.log(Level.FINE, "Group has been created: " + group.getName());
 			message.getOrigin().sendOperatorMessage("Group has been created: " + group.getName());
 		}
 	}

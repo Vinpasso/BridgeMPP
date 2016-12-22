@@ -8,9 +8,9 @@ import javax.persistence.Entity;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Future;
-import bridgempp.ShadowManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
@@ -59,7 +59,7 @@ public class ASyncSocketClient extends MultiBridgeServiceHandle<ASyncSocketServi
 	{
 		if(socketChannel == null)
 		{
-			ShadowManager.log(Level.WARNING, "Attempted to send Message to non connected Socket Handle: " + identifier);
+			Log.log(Level.WARNING, "Attempted to send Message to non connected Socket Handle: " + identifier);
 			scheduleRemoveHandle();
 			return;
 		}

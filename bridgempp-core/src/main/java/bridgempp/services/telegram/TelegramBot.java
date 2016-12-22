@@ -16,10 +16,11 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import bridgempp.ShadowManager;
+import bridgempp.ServiceManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
+import bridgempp.log.Log;
 import bridgempp.message.DeliveryGoal;
 import bridgempp.message.Message;
 import bridgempp.message.MessageBuilder;
@@ -63,7 +64,7 @@ public class TelegramBot extends TelegramLongPollingBot
 			username += (message.getFrom().getLastName() == null) ? "" : message.getFrom().getLastName();
 			username = (username.length() == 0) ? message.getFrom().getUserName() : username;
 			user.setName(username.trim());
-			ShadowManager.log(Level.INFO, "Automatically extracted Alias from Telegram");
+			Log.log(Level.INFO, "Automatically extracted Alias from Telegram");
 		}
 		if (message.hasText())
 		{
@@ -90,7 +91,7 @@ public class TelegramBot extends TelegramLongPollingBot
 				{
 					org.telegram.telegrambots.api.objects.File file = getFile(getFile);
 					URL imageURL = new URL("https://api.telegram.org/bot" + getBotToken() + "/" + file.getFilePath());
-					ImageMessageBody body = new ImageMessageBody(imageURL.openConnection());
+					ImageMessageBody body = ImageMessageBody.fromURL(imageURL);
 					bridgeMessage.addMessageBody(body);
 					if (message.getCaption() != null)
 					{
@@ -99,7 +100,7 @@ public class TelegramBot extends TelegramLongPollingBot
 					service.receiveMessage(bridgeMessage);
 				} catch (TelegramApiException | IOException | MimeTypeParseException e)
 				{
-					ShadowManager.log(Level.SEVERE, "Failed to generate Telegram file request", e);
+					Log.log(Level.SEVERE, "Failed to generate Telegram file request", e);
 				}
 			}
 		}
@@ -135,7 +136,7 @@ public class TelegramBot extends TelegramLongPollingBot
 			deliveryGoal.setDelivered();
 		} catch (TelegramApiException | IOException e)
 		{
-			ShadowManager.log(Level.SEVERE, "Telegram Api Error", e);
+			ServiceManager.onServiceError(service, "Telegram API Error", e);
 		}
 	}
 

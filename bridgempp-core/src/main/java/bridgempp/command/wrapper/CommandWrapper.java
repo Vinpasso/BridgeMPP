@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import bridgempp.PermissionsManager;
 import bridgempp.PermissionsManager.Permissions;
+import bridgempp.log.Log;
 import bridgempp.message.Message;
-import bridgempp.ShadowManager;
 
 public class CommandWrapper {
 
@@ -23,7 +23,7 @@ public class CommandWrapper {
 				if (!attemptMatch(method, message)) {
 					continue;
 				}
-				ShadowManager.log(Level.INFO, "Invoking Command: " + method.getName()
+				Log.log(Level.INFO, "Invoking Command: " + method.getName()
 						+ " due to " + message.getSender().toString());
 				if (!testPermissions(method, message)) {
 					sendInsufficientPermissions(method, message);
@@ -31,7 +31,7 @@ public class CommandWrapper {
 				}
 				Object[] parameters = fetchParameters(method, message);
 				if (parameters == null) {
-					ShadowManager
+					Log
 							.logAndReply(
 									Level.INFO,
 									"Invalid Arguments. Type \"!command <command>\" to access the command's help topic",
@@ -39,7 +39,7 @@ public class CommandWrapper {
 					continue;
 				}
 				callCommand(method, parameters, message);
-				ShadowManager.log(Level.INFO, "Command executed: " + method.getName()
+				Log.log(Level.INFO, "Command executed: " + method.getName()
 						+ " due to " + message.getSender().toString());
 			}
 		}
@@ -50,10 +50,10 @@ public class CommandWrapper {
 		RequiredPermission requiredPermissions = method
 				.getAnnotation(RequiredPermission.class);
 		if (requiredPermissions == null) {
-			ShadowManager.logAndReply(Level.SEVERE,
+			Log.logAndReply(Level.SEVERE,
 					"Access denied due to non existant Permission", message);
 		}
-		ShadowManager.logAndReply(Level.WARNING,
+		Log.logAndReply(Level.WARNING,
 				"Access Denied. Required Permissions: "
 						+ requiredPermissions.value().toString(), message);
 	}
@@ -67,7 +67,7 @@ public class CommandWrapper {
 			}
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			ShadowManager
+			Log
 					.logAndReply(
 							Level.WARNING,
 							"Failed to execute BridgeMPP Command. Could not invoke Command Method",
@@ -210,7 +210,7 @@ public class CommandWrapper {
 	}
 
 	public static void loadCommandClass(Class<?> commandClass) {
-		ShadowManager.log(Level.INFO,
+		Log.log(Level.INFO,
 				"Loading Command Class: " + commandClass.getSimpleName());
 		if (commands == null) {
 			commands = new ArrayList<Class<?>>();

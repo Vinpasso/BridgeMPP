@@ -6,11 +6,13 @@
 package bridgempp;
 
 import bridgempp.data.DataManager;
+import bridgempp.data.processing.Schedule;
+import bridgempp.log.Log;
 import bridgempp.service.BridgeService;
 import bridgempp.service.ServiceStatus;
 import bridgempp.services.ConsoleService;
+import bridgempp.state.Event;
 import bridgempp.state.EventManager;
-import bridgempp.state.EventManager.Event;
 import bridgempp.storage.PersistanceManager;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -32,34 +35,34 @@ public class ServiceManager
 	// Load Services from Config
 	public static void connectAllServices()
 	{
-		ShadowManager.log(Level.INFO, "Connecting all Services...");
+		Log.log(Level.INFO, "Connecting all Services...");
 
 		services = new ArrayList<>();
-		Collection<BridgeService> serviceConfigurations = PersistanceManager.getPersistanceManager().getServiceConfigurations();
+		Collection<BridgeService> serviceConfigurations = DataManager.getServiceConfigurations();
 		Iterator<BridgeService> iterator = serviceConfigurations.iterator();
 		while (iterator.hasNext())
 		{
 			BridgeService service = iterator.next();
-			ShadowManager.log(Level.INFO, "Connecting Service: " + service.getName());
+			Log.log(Level.INFO, "Connecting Service: " + service.getName());
 			loadService(service);
-			ShadowManager.log(Level.INFO, "Connected Service: " + service.getName());
+			Log.log(Level.INFO, "Connected Service: " + service.getName());
 		}
 		if (serviceConfigurations.isEmpty())
 		{
 			setupFirstRun();
 		}
-		ShadowManager.log(Level.INFO, "All Services connected");
+		Log.log(Level.INFO, "All Services connected");
 
 	}
 
 	private static void setupFirstRun()
 	{
-		ShadowManager.log(Level.INFO, "No Services loaded. Automatically loading Console-Service");
+		Log.log(Level.INFO, "No Services loaded. Automatically loading Console-Service");
 		loadService(new ConsoleService());
-		ShadowManager.log(Level.INFO, "Loaded Service: Console Service. Due to automatic loading.");
-		ShadowManager.log(Level.INFO, "Creating Server Key. Due to automatic loading");
+		Log.log(Level.INFO, "Loaded Service: Console Service. Due to automatic loading.");
+		Log.log(Level.INFO, "Creating Server Key. Due to automatic loading");
 		String key = PermissionsManager.generateKey(Integer.MAX_VALUE, true);
-		ShadowManager.log(Level.INFO, "Created Server Key " + key + ". Due to automatic loading");
+		Log.log(Level.INFO, "Created Server Key " + key + ". Due to automatic loading");
 	}
 
 	public static void loadService(BridgeService service)
@@ -67,12 +70,37 @@ public class ServiceManager
 		services.add(service);
 		if(service.getStatus() == ServiceStatus.DISABLED)
 		{
-			ShadowManager.log(Level.WARNING, "Service: " + service.toString() + " is disabled");
+			Log.log(Level.WARNING, "Service: " + service.toString() + " is disabled");
 			return;
 		}
 		connectService(service);
 		PersistanceManager.getPersistanceManager().updateState(service);
 		EventManager.fireEvent(Event.SERVICE_LOADED, service);
+	}
+	
+	public static void onServiceError(BridgeService service, String message, Exception error)
+	{
+		Log.log(Level.INFO, "Received error in service " + service.getName() + ": " + message, error);
+		try
+		{
+			service.disconnect();
+		} catch (Exception e)
+		{
+			Log.log(Level.WARNING, "Received additional error trying to disconnect service " + service.getName(), e);
+		}
+		EventManager.fireEvent(Event.SERVICE_DISCONNECTED, service);
+		Schedule.scheduleOnce(() -> {
+			Log.log(Level.INFO, "Restarting previously crashed service: " + service.getName());
+			try
+			{
+				service.connect();
+			}
+			catch(Exception e)
+			{
+				Log.log(Level.SEVERE, "Disabling Service: " + service.getName() + " due to multiple failures.");
+				service.setStatus(ServiceStatus.DISABLED);
+			}
+		}, 60, TimeUnit.SECONDS);
 	}
 
 	private static void connectService(BridgeService service)
@@ -84,31 +112,31 @@ public class ServiceManager
 			EventManager.fireEvent(Event.SERVICE_CONNECTED, service);
 		} catch (Exception e)
 		{
-			ShadowManager.log(Level.SEVERE, "Could not load Service: " + service.toString(), e);
+			Log.log(Level.SEVERE, "Could not load Service: " + service.toString(), e);
 		}
 	}
 
 	public static void disconnectAllServices()
 	{
-		ShadowManager.log(Level.INFO, "Disconnecting all Services...");
+		Log.log(Level.INFO, "Disconnecting all Services...");
 		for (int i = 0; i < services.size(); i++)
 		{
 			try
 			{
-				ShadowManager.log(Level.INFO, "Disconnecting Service: " + services.get(i).getName());
+				Log.log(Level.INFO, "Disconnecting Service: " + services.get(i).getName());
 				if(services.get(i).getStatus() == ServiceStatus.DISABLED)
 				{
-					ShadowManager.log(Level.WARNING, "Service: " + services.get(i).toString() + " is disabled");
+					Log.log(Level.WARNING, "Service: " + services.get(i).toString() + " is disabled");
 					continue;
 				}
 				disconnectService(services.get(i));
-				ShadowManager.log(Level.INFO, "Disconnected Service: " + services.get(i).getName());
+				Log.log(Level.INFO, "Disconnected Service: " + services.get(i).getName());
 			} catch (Exception e)
 			{
-				ShadowManager.log(Level.INFO, "Shutdown of Service " + services.get(i).getName() + " has failed", e);
+				Log.log(Level.INFO, "Shutdown of Service " + services.get(i).getName() + " has failed", e);
 			}
 		}
-		ShadowManager.log(Level.INFO, "Disconnected all Services...");
+		Log.log(Level.INFO, "Disconnected all Services...");
 	}
 
 	public static BridgeService getServiceByServiceIdentifier(int serviceIdentifierId)
@@ -124,7 +152,7 @@ public class ServiceManager
 	public static void removeService(int serviceID)
 	{
 		BridgeService service = getServiceByServiceIdentifier(serviceID);
-		ShadowManager.log(Level.WARNING, "Removing Service: " + service.toString());
+		Log.log(Level.WARNING, "Removing Service: " + service.toString());
 		services.remove(service);
 		PersistanceManager.getPersistanceManager().removeState(service);
 		disconnectService(service);
@@ -137,7 +165,7 @@ public class ServiceManager
 			service.disconnect();
 		} catch (Exception e)
 		{
-			ShadowManager.log(Level.SEVERE, "Encountered error while disconnecting service: " + service.toString(), e);
+			Log.log(Level.SEVERE, "Encountered error while disconnecting service: " + service.toString(), e);
 		}
 		service.setStatus(ServiceStatus.OFFLINE);
 		EventManager.fireEvent(Event.SERVICE_DISCONNECTED, service);
