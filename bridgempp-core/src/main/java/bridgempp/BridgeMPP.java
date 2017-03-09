@@ -8,9 +8,12 @@ package bridgempp;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+
+import org.apache.commons.io.IOUtils;
 
 import bridgempp.command.CommandInterpreter;
 import bridgempp.data.processing.Schedule;
@@ -40,6 +43,7 @@ public class BridgeMPP {
 	public static void main(String[] args) {
 		writeLock();
 		try {
+			Log.log(Level.INFO, "BridgeMPP Version: " + IOUtils.toString(BridgeMPP.class.getResourceAsStream("buildinfo.txt"), StandardCharsets.UTF_8));
 			if (args.length != 0) {
 				for (int i = 0; i < args.length; i++) {
 					if (args[i].trim().equalsIgnoreCase("-stopTime")) {
@@ -47,8 +51,12 @@ public class BridgeMPP {
 							startExitSync(Long.parseLong(args[i + 1]));
 						} catch (Exception e) {
 							System.err.println("Syntax Error");
-							System.exit(0);
+							return;
 						}
+					}
+					if (args[i].trim().equals("-version"))
+					{
+						return;
 					}
 				}
 			}

@@ -10,4 +10,10 @@
 		<module>bridgempp-core</module>
 		<module>bridgempp-common</module>
 	</modules>
+		<distributionManagement>
+		<repository>
+			<id>update-site</id>
+			<url>scpexe://vinpasso@vpt1.org/home/vinpasso/BridgeMPP</url>
+		</repository>
+	</distributionManagement>
 </project>
