@@ -1,5 +1,8 @@
 bridgempp.state.database.DatabaseConnectionKeepAlive
-bridgempp.state.NoEndpointUserDeregistrator
-bridgempp.state.TimedEndpointExpiryCheck
-bridgempp.state.XMPPPresenceEndpointRemover
-bridgempp.handle.ASyncSocketHandleRemover
+bridgempp.state.endpoint.NoEndpointUserDeregistrator
+bridgempp.state.endpoint.TimedEndpointExpiryCheck
+bridgempp.state.endpoint.XMPPPresenceEndpointRemover
+bridgempp.state.endpoint.NonPersistantEndpointDisconnectedListener
+bridgempp.state.handle.ASyncSocketHandleRemover
+bridgempp.state.message.MessageDeliveryCommandInterpreter
+bridgempp.state.message.MessageDeliveryReschedule

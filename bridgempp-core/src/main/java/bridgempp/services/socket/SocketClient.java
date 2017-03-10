@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import bridgempp.command.CommandInterpreter;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
 import bridgempp.log.Log;
@@ -109,7 +108,7 @@ class SocketClient extends MultiBridgeServiceHandle<SocketService, SocketClient>
 							disconnect();
 							break;
 						}
-						CommandInterpreter.processMessage(new MessageBuilder(user, endpoint).addPlainTextBody(messageLine).build());
+						service.receiveMessage(new MessageBuilder(user, endpoint).addPlainTextBody(messageLine).build());
 						break;
 					case None:
 						Log.log(Level.SEVERE, "Established Socket has Protocol None, aborting");

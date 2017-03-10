@@ -43,7 +43,7 @@ public class BridgeMPP {
 	public static void main(String[] args) {
 		writeLock();
 		try {
-			Log.log(Level.INFO, "BridgeMPP Version: " + IOUtils.toString(BridgeMPP.class.getResourceAsStream("buildinfo.txt"), StandardCharsets.UTF_8));
+			Log.log(Level.INFO, "BridgeMPP Version: " + IOUtils.toString(BridgeMPP.class.getResourceAsStream("/buildinfo.txt"), StandardCharsets.UTF_8));
 			if (args.length != 0) {
 				for (int i = 0; i < args.length; i++) {
 					if (args[i].trim().equalsIgnoreCase("-stopTime")) {

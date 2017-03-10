@@ -52,42 +52,32 @@ public class CommandInterpreter
 		}
 		BridgeMPP.readLock();
 		Log.log(Level.INFO, "Routing Message: " + message.toString());
-		for(int delivery = 0; delivery < 3; delivery++)
+		try
 		{
-			try
+			StatisticsManager.processMessage(message);
+			if (message.isPlainTextMessage() && isCommand(message.getPlainTextMessageBody()))
 			{
-				StatisticsManager.processMessage(message);
-				if (message.isPlainTextMessage() && isCommand(message.getPlainTextMessageBody()))
+				interpretCommand(message);
+			} else
+			{
+
+				if (message.getDestinations().size() == 0)
 				{
-					//Never repeat a Command
-					delivery = 2;
-					interpretCommand(message);
-				} else
-				{
-					
-					if(message.getDestinations().size() == 0)
-					{
-						message.getOrigin().getGroups().forEach(group -> {
-							message.addDestinationsFromGroupNoLoopback(group);
-						});
-					}
-					
-					message.deliver();
-					
-					if(message.getDestinations().size() == 0)
-					{
-			        	message.getOrigin().sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
-					}
+					message.getOrigin().getGroups().forEach(group -> {
+						message.addDestinationsFromGroupNoLoopback(group);
+					});
 				}
-				break;
-			} catch (Exception e)
-			{
-				Log.log(Level.WARNING, "Process Message failure (" + (delivery + 1) + "/3) due to " + e.getClass().getSimpleName());
-				if(delivery == 2)
+
+				message.deliver();
+
+				if (message.getDestinations().size() == 0)
 				{
-					Log.log(Level.SEVERE, "Process Message failure (This is final): ", e);
+					message.getOrigin().sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
 				}
 			}
+		} catch (Exception e)
+		{
+			Log.log(Level.WARNING, "Process Message failure due to " + e.getClass().getSimpleName() + " at " + e.getStackTrace()[0].toString());
 		}
 		Log.log(Level.INFO, "Routed Message: " + message.toString());
 		BridgeMPP.readUnlock();

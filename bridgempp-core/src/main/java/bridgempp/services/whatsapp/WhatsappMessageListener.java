@@ -100,7 +100,7 @@ class WhatsappMessageListener implements Runnable {
 				if(MESSAGE_SENT_CONFIRMATION.matcher(buffer).find())
 				{
 					whatsappService.messageConfirmed = true;
-					whatsappService.printStream.notify();
+					whatsappService.notify();
 				}
 			}
 		} catch (UnsupportedOperationException | IOException ex) {

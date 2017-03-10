@@ -73,14 +73,15 @@ public class WhatsappService extends BridgeService {
 				return;
 			}
 		}
+		Base64EncodedMessageBody messageBody = message.getMessageBody(Base64EncodedMessageBody.class);
 		printStream.println("/message send "
 					+ endpoint.getIdentifier().substring(0, endpoint.getIdentifier().indexOf("@"))
 					+ " \""
-					+ message.getMessageBody(Base64EncodedMessageBody.class) + "\"");
+					+ ((messageBody==null)?"Malformed message":messageBody.getText()) + "\"");
 		lastMessageTimestamp = System.currentTimeMillis();
 		try
 		{
-			printStream.wait(10000);
+			wait(10000);
 		} catch (InterruptedException e)
 		{
 			Log.log(Level.WARNING, "Whatsapp send message confirmation interrupted");

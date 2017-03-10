@@ -1,5 +1,6 @@
 package bridgempp.storage;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
@@ -8,6 +9,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+
+import com.mysql.cj.fabric.xmlrpc.base.Array;
 
 import bridgempp.BridgeMPP;
 import bridgempp.log.Log;
@@ -93,7 +96,7 @@ public class HibernatePersistanceManager extends PersistanceManager {
 	{
 		transactionFailures++;
 		Log.log(Level.WARNING, "Transaction failure #" + transactionFailures);
-		if(transactionFailures >= 3)
+		if(transactionFailures >= 1)
 		{
 			Log.log(Level.SEVERE, "Transaction failure reached critical level");
 			BridgeMPP.exit();
@@ -113,5 +116,11 @@ public class HibernatePersistanceManager extends PersistanceManager {
 	public synchronized void shutdown() {
 		entityManager.close();
 		entityManagerFactory.close();
+	}
+
+	@Override
+	public boolean hasState(Object... objects)
+	{
+		return Arrays.stream(objects).allMatch(o -> entityManager.contains(o));
 	}
 }

@@ -12,7 +12,7 @@ import bridgempp.state.Event;
 import bridgempp.state.EventListener;
 import bridgempp.state.EventSubscribe;
 
-@EventSubscribe({Event.SERVICE_CONNECTED, Event.SERVICE_DISCONNECTED})
+@EventSubscribe({Event.BRIDGEMPP_SHUTDOWN})
 public class XMPPPresenceEndpointRemover implements EventListener<BridgeService> {
 
 	@Override

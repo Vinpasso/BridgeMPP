@@ -10,10 +10,21 @@
 		<module>bridgempp-core</module>
 		<module>bridgempp-common</module>
 	</modules>
-		<distributionManagement>
+	<distributionManagement>
 		<repository>
 			<id>update-site</id>
 			<url>scpexe://vinpasso@vpt1.org/home/vinpasso/BridgeMPP</url>
 		</repository>
 	</distributionManagement>
+
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
+	</build>
+
 </project>
