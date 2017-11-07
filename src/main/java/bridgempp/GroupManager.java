@@ -54,7 +54,7 @@ public class GroupManager {
         Collection<Group> groups = endpoint.getGroups();
         if(groups.size() == 0)
         {
-        	endpoint.sendOperatorMessage("Message does not have a destination (user is subscribed to 0 groups). Send !help for a list of commands");
+        	endpoint.sendOperatorMessage("Error: Message does not have a destination.");
         }
 		for(Group group : groups)
         {
