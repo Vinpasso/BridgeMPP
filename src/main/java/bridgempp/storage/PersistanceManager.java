@@ -101,13 +101,14 @@ public class PersistanceManager {
 	{
 		transactionFailures++;
 		ShadowManager.log(Level.WARNING, "Transaction failure #" + transactionFailures);
-		if(transactionFailures >= 3)
+		if(transactionFailures >= 1)
 		{
-			ShadowManager.log(Level.SEVERE, "Transaction failure reached critical level");
-			BridgeMPP.exit();
+//			ShadowManager.log(Level.SEVERE, "Transaction failure reached critical level");
+//			BridgeMPP.exit();
 			//This means we are already trying to shutdown but failing
 			//Give up
-			ShadowManager.log(Level.SEVERE, "Failed to terminate gracefully, giving up.");
+//			ShadowManager.log(Level.SEVERE, "Failed to terminate gracefully, giving up.");
+			ShadowManager.log(Level.SEVERE, "Shutting down immediately, on transaction failure");
 			System.exit(0);
 		}
 	}

@@ -56,6 +56,8 @@ public class BridgeMPP {
 			ServiceManager.connectAllServices();
 			StatisticsManager.loadStatistics();
 			EventManager.fireEvent(Event.BRIDGEMPP_STARTUP, null);
+			ShadowManager.log(Level.INFO, "Waiting for all units to catch up before unlocking");
+			Thread.sleep(5000);
 		} catch (Exception e) {
 			ShadowManager.log(Level.SEVERE, "Fatal Error: ", e);
 			exit();
