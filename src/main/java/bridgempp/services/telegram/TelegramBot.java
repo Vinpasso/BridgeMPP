@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
-import org.telegram.telegrambots.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
