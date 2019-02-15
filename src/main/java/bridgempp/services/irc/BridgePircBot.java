@@ -1,6 +1,7 @@
 package bridgempp.services.irc;
 
 import bridgempp.Message;
+import bridgempp.ShadowManager;
 import bridgempp.data.DataManager;
 import bridgempp.data.Endpoint;
 import bridgempp.data.User;
@@ -15,6 +16,7 @@ public class BridgePircBot extends PircBot {
     public BridgePircBot(BridgeService service) {
         this.service = service;
         setName("BridgeMPP");
+        setLogin("BridgeMPP");
         setAutoNickChange(true);
     }
 
@@ -23,5 +25,9 @@ public class BridgePircBot extends PircBot {
         Endpoint endpoint = DataManager.getEndpointForIdentifier(channel);
         User user = DataManager.getOrNewUserForIdentifier(sender, endpoint);
         service.receiveMessage(new Message(user, endpoint, message, MessageFormat.PLAIN_TEXT));
+    }
+
+    public void onDisconnect() {
+        ShadowManager.fatal("IRC disconnected");
     }
 }
