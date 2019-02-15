@@ -38,7 +38,7 @@ public class TeamspeakService extends BridgeService
 		teamspeakConfig = new TS3Config();
 		teamspeakConfig.setHost(host);
 		teamspeakConfig.setQueryPort(port);
-		teamspeakConfig.setDebugLevel(Level.ALL);
+		//teamspeakConfig.setDebugLevel(Level.ALL);
 		
 		teamspeak = new TS3Query(teamspeakConfig);
 		teamspeak.connect();
