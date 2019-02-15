@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.xml.crypto.Data;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 @Entity(name = "IRC_SERVICE")
 @DiscriminatorValue(value = "IRC_SERVICE")
@@ -25,8 +26,8 @@ public class IRCService extends BridgeService {
     @Column(name = "PORT", nullable = false)
     private int port;
 
-    @Column(name = "SSL", nullable = false)
-    private boolean ssl;
+    @Column(name = "CONNECT_SSL", nullable = false)
+    private boolean connect_ssl;
 
     @Column(name = "NICKNAME", nullable = false, length = 50)
     private String nickname;
@@ -38,6 +39,15 @@ public class IRCService extends BridgeService {
         bot = new BridgePircBot(this);
         bot.setVerbose(true);
         bot.connect(host, port);
+
+        for (Endpoint endpoint : endpoints) {
+            // Join any channels
+            String endpointIdentifier = endpoint.getIdentifier();
+            if(endpointIdentifier.startsWith("#")) {
+                ShadowManager.log(Level.INFO, "Rejoining IRC channel: " + endpointIdentifier);
+                bot.joinChannel(endpointIdentifier);
+            }
+        }
     }
 
     @Override
@@ -63,5 +73,12 @@ public class IRCService extends BridgeService {
     @Override
     public MessageFormat[] getSupportedMessageFormats() {
         return MessageFormat.PLAIN_TEXT_ONLY;
+    }
+
+    public void configure(String host, int port, boolean connect_ssl, String nickname) {
+        this.host = host;
+        this.port = port;
+        this.connect_ssl = connect_ssl;
+        this.nickname = nickname;
     }
 }

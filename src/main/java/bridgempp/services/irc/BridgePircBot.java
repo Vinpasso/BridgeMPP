@@ -15,6 +15,7 @@ public class BridgePircBot extends PircBot {
     public BridgePircBot(BridgeService service) {
         this.service = service;
         setName("BridgeMPP");
+        setAutoNickChange(true);
     }
 
     @Override

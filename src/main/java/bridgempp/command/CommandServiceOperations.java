@@ -22,6 +22,7 @@ import bridgempp.services.MailService;
 import bridgempp.services.SkypeService;
 import bridgempp.services.asyncsocket.ASyncSocketService;
 import bridgempp.services.facebook.FacebookService;
+import bridgempp.services.irc.IRCService;
 import bridgempp.services.leagueoflegends.LeagueOfLegendsService;
 import bridgempp.services.socket.SocketService;
 import bridgempp.services.telegram.TelegramService;
@@ -89,6 +90,18 @@ public class CommandServiceOperations
 		ServiceManager.loadService(service);
 		return "Loaded service: " + service.toString(); 
 	}
+
+    @CommandName("!loadircservice: Load a IRC Service")
+    @CommandTrigger("!loadircservice")
+    @HelpTopic("Creates an IRC service. Requires host, port, ssl (boolean), nickname.")
+    @RequiredPermission(Permission.ADD_REMOVE_SERVICE)
+    public static String loadIRCService(String host, int port, boolean connectSSL, String nickname)
+    {
+        IRCService service = new IRCService();
+        service.configure(host, port, connectSSL, nickname);
+        ServiceManager.loadService(service);
+        return "Loaded service: " + service.toString();
+    }
 	
 	@CommandName("!loadleagueoflegendsservice: Load a League Of Legends Service")
 	@CommandTrigger("!loadleagueoflegendsservice")
